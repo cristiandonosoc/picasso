@@ -1,6 +1,11 @@
 #include <cstdio>
+#include <SDL.h>
 
-int main(int, char *argv[]) {
-  (void)argv;
-  printf("Hello, World\n");
+int main(int, char **) {
+  if (!SDL_Init(SDL_INIT_VIDEO)) {
+    fprintf(stderr, "SDL_Init Error: %s\n", SDL_GetError());
+    return 1;
+  }
+  SDL_Quit();
+  return 0;
 }

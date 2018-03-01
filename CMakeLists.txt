@@ -11,6 +11,13 @@ set(BUILD_DIR "${CMAKE_SOURCE_DIR}/bin")
 file(GLOB_RECURSE SOURCES ${SOURCE_DIR}/*.cc ${SOURCE_DIR}/*.h)
 
 #####################################################
+# SDL2 LOADING
+#####################################################
+
+set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_SOURCE_DIR}/cmake")
+find_package(SDL2 REQUIRED)
+
+#####################################################
 # COMPILER FLAGS
 #####################################################
 
@@ -26,6 +33,8 @@ endif()
 #####################################################
 
 add_executable(picasso ${SOURCES})
+target_link_libraries(picasso ${SDL2_LIBRARY})
+include_directories(${SDL2_INCLUDE_DIR})
 
 
 set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY "${BUILD_DIR}")
