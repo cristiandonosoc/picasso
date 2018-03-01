@@ -38,6 +38,7 @@ int main(int, char **) {
   // Setup ImGUI binding
   ImGui::CreateContext();
   ImGuiIO& io = ImGui::GetIO();
+  (void)io;
   ImGui_ImplSdlGL3_Init(window);
 
   // Setup style
