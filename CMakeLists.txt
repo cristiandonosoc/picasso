@@ -26,14 +26,17 @@ set(IMGUI_DIR ${CMAKE_SOURCE_DIR}/imgui)
 file(GLOB_RECURSE INTERNAL_SRCS ${SOURCE_DIR}/*.cc
                                 ${SOURCE_DIR}/*.h
 )
+
 file(GLOB_RECURSE EXTERNAL_SRCS ${EXTERNAL_DIR}/*.cpp
                                 ${EXTERNAL_DIR}/*.cc
                                 ${EXTERNAL_DIR}/*.h
                                 ${EXTERNAL_DIR}/*.c
 )
+
 file(GLOB IMGUI_SRCS ${IMGUI_DIR}/*.cpp
                      ${IMGUI_DIR}/*.h
 )
+
 set(SOURCES ${INTERNAL_SRCS} ${EXTERNAL_SRCS} ${IMGUI_SRCS})
 
 # Group of files that will send warnings
