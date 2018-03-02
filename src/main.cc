@@ -1,4 +1,5 @@
 #include "utils/file.h"
+#include "shader.h"
 
 #include <cstdio>
 
@@ -63,6 +64,8 @@ void ImGuiExample(const ImVec4& clear_color, bool show_demo_window,
 }
 
 int main(int, char **) {
+
+
   if (SDL_Init(SDL_INIT_VIDEO|SDL_INIT_TIMER) != 0) {
     fprintf(stderr, "SDL_Init Error: %s\n", SDL_GetError());
     return 1;
@@ -78,8 +81,13 @@ int main(int, char **) {
   SDL_GLContext glcontext = SDL_GL_CreateContext(window);
 	SDL_GL_SetSwapInterval(1); // Enable vsync
 
-
   gl3wInit();
+
+  // Load a shader
+	std::string vs = picasso::utils::ReadWholeFile("../shaders/simple.vert");
+	std::string fs = picasso::utils::ReadWholeFile("../shaders/simple.frag");
+	picasso::ShaderProgram(vs, fs);
+
 
   // Setup ImGUI binding
   ImGui::CreateContext();
