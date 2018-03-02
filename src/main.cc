@@ -1,3 +1,5 @@
+#include "utils/file.h"
+
 #include <cstdio>
 
 #include <GL/gl3w.h>
@@ -75,6 +77,7 @@ int main(int, char **) {
                                         SDL_WINDOW_OPENGL|SDL_WINDOW_RESIZABLE);
   SDL_GLContext glcontext = SDL_GL_CreateContext(window);
 	SDL_GL_SetSwapInterval(1); // Enable vsync
+
 
   gl3wInit();
 
