@@ -1,8 +1,11 @@
 #include "shader.h"
+
 #include "utils/result.h"
+#include "utils/gl.h"
 
 #include <cassert>
 #include <GL/gl3w.h>
+#include <memory>
 
 namespace picasso {
 
@@ -33,6 +36,38 @@ ResultOr<int> CompileShader(const std::string& shader_name,
 	}
 
   return ResultOr<int>::Success(std::move(shader_handle));
+}
+
+void ObtainAttributes(const ShaderProgram& program) {
+  int program_handle = program.GetProgramHandle();
+  if (!program_handle) { return; }
+
+  // Obtain the max size of the attribute names
+  GLint max_attrib_size;
+  glGetProgramiv(program_handle, GL_ACTIVE_ATTRIBUTE_MAX_LENGTH, &max_attrib_size);
+
+  // We obtain the attributes
+  GLint attrib_count;
+  glGetProgramiv(program_handle, GL_ACTIVE_ATTRIBUTES, &attrib_count);
+  for (GLint i = 0; i < attrib_count; i++) {
+    std::unique_ptr<char[]> buf(new char[max_attrib_size]);
+
+    GLsizei length, size;
+    GLenum type;
+    glGetActiveAttrib(program_handle, i, max_attrib_size,
+                      &length, &size, &type, buf.get());
+    assert(length < max_attrib_size);
+
+    // We get the name of the type
+    auto res = GL_TYPES_TO_STRING.Get(type);
+    std::string type_name;
+    if (res.Valid()) {
+      type_name = res.ConsumeOrDie();
+    }
+    fprintf(stderr, "Found Attrib \"%s\": (%d) %s\n",  buf.get(), type, type_name.c_str());
+  }
+
+  fflush(stderr);
 }
 
 }   // namespace
@@ -74,6 +109,7 @@ ResultOr<ShaderProgram> ShaderProgram::Create(const std::string& vertex_src,
     return ResultOr<ShaderProgram>::Error("Error linkink program: %s\n", log);
   }
 
+  ObtainAttributes(program);
   return ResultOr<ShaderProgram>::Success(std::move(program));
 }
 
@@ -114,6 +150,14 @@ void ShaderProgram::Cleanup() {
     glDeleteProgram(program_handle_);
   }
 }
+
+/**
+ * GETTERS/SETTERS
+ **/
+
+int ShaderProgram::GetProgramHandle() const { return program_handle_; }
+int ShaderProgram::GetVertexHandle() const { return vertex_handle_; }
+int ShaderProgram::GetFragmentHandle() const { return fragment_handle_; }
 
 
 }   // namespace picasso

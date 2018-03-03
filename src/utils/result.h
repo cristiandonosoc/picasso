@@ -46,6 +46,7 @@ class ResultOr {
   static ResultOr Success(T&& t) {
     return ResultOr(std::move(t));
   }
+  ResultOr(const T& t) : val_(t), valid_(true) {}
   ResultOr(T&& t) : val_(std::move(t)), valid_(true) {}
 
   static ResultOr Error(const char *fmt,  ...) {

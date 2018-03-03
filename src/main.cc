@@ -59,8 +59,6 @@ void ImGuiExample(const ImVec4& clear_color, bool show_demo_window,
       ImGui::ShowDemoWindow(&show_demo_window);
   }
 
-
-
 }
 
 int main(int, char **) {
@@ -83,6 +81,16 @@ int main(int, char **) {
 
   gl3wInit();
 
+
+  // Setup ImGUI binding
+  ImGui::CreateContext();
+  ImGuiIO& io = ImGui::GetIO();
+  (void)io;
+  // Mainly sets up the HDC and SDL Keyboard/Mouse stuf
+  ImGui_ImplSdlGL3_Init(window);
+
+  fprintf(stderr, "GL_VERSION: %s\n", (char*)glGetString(GL_VERSION));
+
   // Load a shader
 	std::string vs = picasso::utils::ReadWholeFile("../shaders/simple.vert");
 	std::string fs = picasso::utils::ReadWholeFile("../shaders/simple.frag");
@@ -97,12 +105,6 @@ int main(int, char **) {
   fflush(stderr);
 
 
-  // Setup ImGUI binding
-  ImGui::CreateContext();
-  ImGuiIO& io = ImGui::GetIO();
-  (void)io;
-  // Mainly sets up the HDC and SDL Keyboard/Mouse stuf
-  ImGui_ImplSdlGL3_Init(window);
 
   // Setup style
   ImGui::StyleColorsDark();

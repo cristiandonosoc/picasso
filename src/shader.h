@@ -25,6 +25,11 @@ class ShaderProgram {
   ShaderProgram(ShaderProgram&&) noexcept;
   ShaderProgram& operator=(ShaderProgram&&) noexcept;
 
+ public:
+  int GetProgramHandle() const;
+  int GetVertexHandle() const;
+  int GetFragmentHandle() const;
+
  private:
   // Cleans up handles
   void Cleanup();
@@ -34,6 +39,8 @@ class ShaderProgram {
   int fragment_handle_ = 0;
   int program_handle_ = 0;
   bool valid_;
+
+
 };
 
 }   // namespace picasso
