@@ -1,6 +1,8 @@
 #ifndef SRC_UTILS_RESULT_H
 #define SRC_UTILS_RESULT_H
 
+#include <cassert>
+#include <cstdarg>
 #include <cstdio>
 #include <string>
 #include <type_traits>
@@ -34,8 +36,19 @@ class ResultOr {
   * PUBLIC INTERFACE
   **/
  public:
+  // NOTE(Cristian): Disabled construction by copy, because it's very easy
+  //                 to simply write
+  //
+  //                 return expensive_to_copy_value;
+  //
+  //                 and not realize we're making a copy.
+  //                 If it's too annoying, perhaps I'll enable it
+  static ResultOr Success(T&& t) {
+    return ResultOr(std::move(t));
+  }
   ResultOr(T&& t) : val_(std::move(t)), valid_(true) {}
-  static ResultOr Invalid(const char *fmt,  ...) {
+
+  static ResultOr Error(const char *fmt,  ...) {
     va_list arglist;
     va_start(arglist, fmt);
     char buffer[1024];
@@ -43,26 +56,31 @@ class ResultOr {
     va_end(arglist);
 
     auto res = ResultOr();
-    res.msg_ = buffer;
+    res.error_msg_ = buffer;
+    return res;
+  }
+  static ResultOr Error(const std::string& error_msg) {
+    auto res = ResultOr();
+    res.error_msg_ = error_msg;
     return res;
   }
 
  public:
-  T&& Consume() {
+  T&& ConsumeOrDie() {
     assert(valid_);
     valid_ = false;
     return std::move(val_);
   }
   bool Valid() const { return valid_; }
-  const std::string& ErrorMsg() const { return msg_; }
+  const std::string& ErrorMsg() const { return error_msg_; }
 
  private:
-  ResultOr() : val_(false) {}
+  ResultOr() : valid_(false) {}
 
  private:
   T val_;
   bool valid_;
-  std::string msg_;
+  std::string error_msg_;
 };
 
 

@@ -1,55 +1,109 @@
 #include "shader.h"
+#include "utils/result.h"
 
 #include <cassert>
 #include <GL/gl3w.h>
 
 namespace picasso {
 
+using namespace utils;
+
 namespace {
 
-int CompileShader(const std::string& shader_name,
+ResultOr<int> CompileShader(const std::string& shader_name,
                   GLenum shader_kind, const std::string& src) {
-  int handle = glCreateShader(shader_kind);
-  assert(handle);
+  int shader_handle = glCreateShader(shader_kind);
+  if (!shader_handle) {
+    return ResultOr<int>::Error("Could not create shader \"%s\"\n",
+                                shader_name.c_str());
+  }
+
+  // We compile the shader
   const GLchar *src_ptr = src.c_str();
-  glShaderSource(handle, 1, &src_ptr, 0);
-  glCompileShader(handle);
+  glShaderSource(shader_handle, 1, &src_ptr, 0);
+  glCompileShader(shader_handle);
   // Check for error
   GLint success = 0;
-  glGetShaderiv(handle, GL_COMPILE_STATUS, &success);
+  glGetShaderiv(shader_handle, GL_COMPILE_STATUS, &success);
   if (success == GL_FALSE) {
     GLchar log[2048];
-    glGetShaderInfoLog(handle, sizeof(log), 0, log);
-    fprintf(stderr, "ERROR COMPILING %s: %s\n", shader_name.c_str(), log);
-    assert(!"Error compiling shader. Aborting.");
+    glGetShaderInfoLog(shader_handle, sizeof(log), 0, log);
+    return ResultOr<int>::Error("Error compiling \"%s\": %s\n",
+                                shader_name.c_str(), log);
 	}
 
-  return handle;
+  return ResultOr<int>::Success(std::move(shader_handle));
 }
 
 }   // namespace
 
-ShaderProgram::ShaderProgram(const std::string& vertex_src,
-                             const std::string& fragment_src) {
+ResultOr<ShaderProgram> ShaderProgram::Create(const std::string& vertex_src,
+                                              const std::string& fragment_src) {
+  // If some result is invalid, the ShaderProgram destructor will
+  // free the resources
+  ShaderProgram program;
+  // Vertex Shader
+  auto vertex_res = CompileShader("Vertex", GL_VERTEX_SHADER, vertex_src);
+  if (!vertex_res.Valid()) {
+    return ResultOr<ShaderProgram>::Error(vertex_res.ErrorMsg());
+  }
+  program.vertex_handle_ = vertex_res.ConsumeOrDie();
 
-  vertex_handle_ = CompileShader("Vertex Shader", GL_VERTEX_SHADER,
-                                 vertex_src);
-  fragment_handle_ = CompileShader("Fragment Shader", GL_FRAGMENT_SHADER,
-                                   fragment_src);
+  // Fragment Shader
+  auto fragment_res = CompileShader("Fragment", GL_FRAGMENT_SHADER,
+                                    fragment_src);
+  if (!fragment_res.Valid()) {
+    return ResultOr<ShaderProgram>::Error(fragment_res.ErrorMsg());
+  }
+  program.fragment_handle_ = fragment_res.ConsumeOrDie();
 
-  program_handle_ = glCreateProgram();
-  assert(program_handle_);
+  // Program
+  program.program_handle_ = glCreateProgram();
+  if (!program.program_handle_) {
+    return ResultOr<ShaderProgram>::Error("Could not get program handle");
+  }
 
-  glAttachShader(program_handle_, vertex_handle_);
-  glAttachShader(program_handle_, fragment_handle_);
-  glLinkProgram(program_handle_);
+  glAttachShader(program.program_handle_, program.vertex_handle_);
+  glAttachShader(program.program_handle_, program.fragment_handle_);
+  glLinkProgram(program.program_handle_);
+  GLint is_linked;
+  glGetProgramiv(program.program_handle_, GL_LINK_STATUS, &is_linked);
+  if (is_linked == GL_FALSE) {
+    GLchar log[2048];
+    glGetProgramInfoLog(program.program_handle_, sizeof(log), 0, log);
+    return ResultOr<ShaderProgram>::Error("Error linkink program: %s\n", log);
+  }
 
-  GLint is_linked = 0;
-  glGetProgramiv(program_handle_, GL_LINK_STATUS, &is_linked);
-  assert(is_linked != GL_FALSE);
+  return ResultOr<ShaderProgram>::Success(std::move(program));
 }
 
+ShaderProgram::ShaderProgram() {}
+
 ShaderProgram::~ShaderProgram() {
+  Cleanup();
+}
+
+/**
+ * Operators
+ **/
+ShaderProgram::ShaderProgram(ShaderProgram&& other) noexcept {
+  *this = std::move(other);   // Call the move assignment;
+}
+
+ShaderProgram& ShaderProgram::operator=(ShaderProgram&& other) noexcept {
+  vertex_handle_ = other.vertex_handle_;
+  other.vertex_handle_ = 0;
+  fragment_handle_ = other.fragment_handle_;
+  other.fragment_handle_ = 0;
+  program_handle_ = other.program_handle_;
+  other.program_handle_ = 0;
+  valid_ = other.valid_;
+  other.valid_ = false;
+  return *this;
+}
+
+
+void ShaderProgram::Cleanup() {
   if (vertex_handle_) {
     glDeleteShader(vertex_handle_);
   }
@@ -57,10 +111,8 @@ ShaderProgram::~ShaderProgram() {
     glDeleteShader(fragment_handle_);
   }
   if (program_handle_) {
-    glDeleteShader(program_handle_);
+    glDeleteProgram(program_handle_);
   }
-
-
 }
 
 

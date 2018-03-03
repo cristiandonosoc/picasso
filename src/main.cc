@@ -86,7 +86,15 @@ int main(int, char **) {
   // Load a shader
 	std::string vs = picasso::utils::ReadWholeFile("../shaders/simple.vert");
 	std::string fs = picasso::utils::ReadWholeFile("../shaders/simple.frag");
-	picasso::ShaderProgram(vs, fs);
+  auto shader_res = picasso::ShaderProgram::Create(vs, fs);
+  picasso::ShaderProgram shader;
+  if (shader_res.Valid()) {
+    shader = shader_res.ConsumeOrDie();
+    fprintf(stderr, "Successful shader\n");
+  } else {
+    fprintf(stderr, "Error getting shader: %s\n", shader_res.ErrorMsg().c_str());
+  }
+  fflush(stderr);
 
 
   // Setup ImGUI binding
