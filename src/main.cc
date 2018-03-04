@@ -1,10 +1,10 @@
 #include "shader.h"
+#include "ui.h"
 #include "utils/file.h"
 #include "utils/gl.h"
 #include "utils/log.h"
 
 #include <cstdio>
-
 #include <GL/gl3w.h>
 #include <SDL.h>
 
@@ -22,54 +22,15 @@ void SetupSDL() {
   SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 2);
 }
 
-void ImGuiExample(const ImVec4& clear_color, bool show_demo_window,
-                  bool show_another_window) {
-  // 1. Show a simple window.
-  // Tip: if we don't call ImGui::Begin()/ImGui::End() the widgets automatically appears in a window called "Debug".
-  {
-      static float f = 0.0f;
-      static int counter = 0;
-      ImGui::Text("Hello, world!");                           // Display some text (you can use a format string too)
-      ImGui::SliderFloat("float", &f, 0.0f, 1.0f);            // Edit 1 float using a slider from 0.0f to 1.0f
-      ImGui::ColorEdit3("clear color", (float*)&clear_color); // Edit 3 floats representing a color
-
-      ImGui::Checkbox("Demo Window", &show_demo_window);      // Edit bools storing our windows open/close state
-      ImGui::Checkbox("Another Window", &show_another_window);
-
-      if (ImGui::Button("Button"))                            // Buttons return true when clicked (NB: most widgets return true when edited/activated)
-          counter++;
-      ImGui::SameLine();
-      ImGui::Text("counter = %d", counter);
-
-      ImGui::Text("Application average %.3f ms/frame (%.1f FPS)", 1000.0f / ImGui::GetIO().Framerate, ImGui::GetIO().Framerate);
-  }
-
-  // 2. Show another simple window. In most cases you will use an explicit Begin/End pair to name your windows.
-  if (show_another_window)
-  {
-      ImGui::Begin("Another Window", &show_another_window);
-      ImGui::Text("Hello from another window!");
-      if (ImGui::Button("Close Me"))
-          show_another_window = false;
-      ImGui::End();
-  }
-
-  // 3. Show the ImGui demo window. Most of the sample code is in ImGui::ShowDemoWindow(). Read its code to learn more about Dear ImGui!
-  if (show_demo_window)
-  {
-      ImGui::SetNextWindowPos(ImVec2(650, 20), ImGuiCond_FirstUseEver); // Normally user code doesn't need/want to call this because positions are saved in .ini file anyway. Here we just want to make the demo initial state a bit more friendly!
-      ImGui::ShowDemoWindow(&show_demo_window);
-  }
-
-}
-
 using namespace picasso::utils;
 
 int main(int, char **) {
 
+
 // TODO(Cristian): For some reason, we need this for stdout logging in windows
 //                 Move this to the platform layer
 #ifdef WIN32
+
   fflush(stderr);
 #endif
 
@@ -115,7 +76,6 @@ int main(int, char **) {
 
   logerr::Info("Printing shader attributes:");
   const auto& attribs = shader.GetAttributes();
-  fprintf(stderr, "MAIN ATTRIB SIZES: %zu\n", attribs.size());
   for (const auto& attrib : attribs) {
     std::string type_name;
     auto type_name_res = picasso::utils::GL_TYPES_TO_STRING.Get(attrib.GetType());
@@ -129,25 +89,96 @@ int main(int, char **) {
                        attrib.GetLocation());
   }
 
+  logerr::Info("Printing shader uniforms. Length: %zu", shader.GetUniforms().size());
+  for (auto&& it = shader.UniformBegin();
+       it != shader.UniformEnd();
+       it++) {
+    const auto& uniform = *it;
+    logout::IndentInfo(2, "NAME: %s, TYPE: %s, SIZE: %zu, LOCATION: %d",
+                       uniform.GetName().c_str(),
+                       uniform.GetTypeName().c_str(),
+                       uniform.GetSize(),
+                       uniform.GetLocation());
+  }
+
+  float vertices[] = {
+    -0.5f, -0.5f, 0.0f,
+     0.5f, -0.5f, 0.0f,
+     0.0f,  0.5f, 0.0f
+  };
+
+  // Establishing data to the GPU
+
+  // 1. We create a buffers. In OpenGL, you create buffers that get binded to
+  //    certain types of buffers. The in received is the "name" of the buffer
+  //    that we are generating. They are unbinded (have no type) at first.
+  unsigned int vbo;
+  glGenBuffers(1, &vbo);
+
+  // 2. Bind it to a particular type. In this case to GL_ARRAY_BUFFER.
+  //    This will make vbo into a VERTEX BUFFER OBJECT (hence the name).
+  //    When a buffer is binded some things happen:
+  //    - Any previous binded data of another type is discarded
+  //    - If the buffer wasn't binded to this type, a new array of that
+  //      type is created
+  //    - This buffer is the active one for this type.
+  //      This means that any future calls that affect GL_ARRAY_BUFFER will
+  //      now affect the one binded to the vbo, until another binding occurs.
+  glBindBuffer(GL_ARRAY_BUFFER, vbo);   // Make
+
+  // 3. Send data to the active buffer (vbo in this case).
+  //    This call will scale the buffer to the size specified here.
+  //    Any previous data associated with the buffer will be discarded.
+  glBufferData(GL_ARRAY_BUFFER,       // Buffer being sent data
+               sizeof(vertices),      // New size of the buffer,
+               vertices,              // Pointer to the array to send
+               GL_STATIC_DRAW);       // Type of memory where to store it
+                                      // Depending on the usage, some are
+                                      // better than others
+
+  // OpenGL has buffer with vertices in it, but has no idea how to interpret them
+  // (which ones are colors, which ones positions, uv, etc.).
+  // For that we need to tell which attribute holds which information where.
+  // That configuration can (and should) be stored in an object that can then
+  // be binded to the current buffer so that OpenGL knows how to interpret it.
+  // These objects are called VERTEX ATTRIBUTE OBJECTS
+
+  // 4. Create the VAO
+  unsigned int vao;
+  glGenVertexArrays(1, &vao);
+
+  // 5. Bind the VAO as active. Any vertex attrib calls will now be stored in
+  //    this VAO. A VAO could be thought as a "replay" of the attrib/buffer
+  //    binding made.
+  glBindVertexArray(vao);
+
+  // 6. Associate the buffer with this VAO. That way, when we bing the VAO
+  //    we are also
+  glBindBuffer(GL_ARRAY_BUFFER, vbo);
+
+  // 7. Set the vertex attribute points. This calls describe exactly how
+  //    OpenGL should interpret the data in the buffer.
+  //    The buffer can hold many interleaved data, that is accessed in the
+  //    shader through the attributes.
+  //    This means that we need to set an attrib pointer foreach attribute
+  // Position is number 2
+  // TODO(Cristian): Have a way to query for attributes by name
+  int pos_attrib_location = 0;
+  glVertexAttribPointer(pos_attrib_location,      // Attribute location
+                        3,                        // size (?)
+                        GL_FLOAT,                 // Type of the attribute
+                        GL_FALSE,                 // Whether values should be normalized
+                        0,                        // stride (space between instances of the attrib)
+                        0);                       // Offset to the first component
+
+  // 8. We need to enable the attrib.
+  //    If disabled, apparently they are not accesible from the shader (?)
+  glEnableVertexAttribArray(pos_attrib_location);
+
 
   // Setup style
   ImGui::StyleColorsDark();
   //ImGui::StyleColorsClassic();
-
-  // Load Fonts
-  // - If no fonts are loaded, dear imgui will use the default font. You can also load multiple fonts and use ImGui::PushFont()/PopFont() to select them.
-  // - AddFontFromFileTTF() will return the ImFont* so you can store it if you need to select the font among multiple.
-  // - If the file cannot be loaded, the function will return NULL. Please handle those errors in your application (e.g. use an assertion, or display an error and quit).
-  // - The fonts will be rasterized at a given size (w/ oversampling) and stored into a texture when calling ImFontAtlas::Build()/GetTexDataAsXXXX(), which ImGui_ImplXXXX_NewFrame below will call.
-  // - Read 'misc/fonts/README.txt' for more instructions and details.
-  // - Remember that in C/C++ if you want to include a backslash \ in a string literal you need to write a double backslash \\ !
-  //io.Fonts->AddFontDefault();
-  //io.Fonts->AddFontFromFileTTF("../../misc/fonts/Roboto-Medium.ttf", 16.0f);
-  //io.Fonts->AddFontFromFileTTF("../../misc/fonts/Cousine-Regular.ttf", 15.0f);
-  //io.Fonts->AddFontFromFileTTF("../../misc/fonts/DroidSans.ttf", 16.0f);
-  //io.Fonts->AddFontFromFileTTF("../../misc/fonts/ProggyTiny.ttf", 10.0f);
-  //ImFont* font = io.Fonts->AddFontFromFileTTF("c:\\Windows\\Fonts\\ArialUni.ttf", 18.0f, NULL, io.Fonts->GetGlyphRangesJapanese());
-  //IM_ASSERT(font != NULL);
 
   bool show_demo_window = true;
   bool show_another_window = false;
@@ -168,15 +199,27 @@ int main(int, char **) {
           if (event.type == SDL_QUIT)
               done = true;
       }
+
+			if (io.KeysDown[io.KeyMap[ImGuiKey_Escape]]) {
+				done = true;
+			}
+
       ImGui_ImplSdlGL3_NewFrame(window);
 
-      ImGuiExample(clear_color, show_demo_window, show_another_window);
+
+
+      picasso::ImGuiExample(clear_color, show_demo_window, show_another_window);
 
       // Rendering
       // Clear the window
       glViewport(0, 0, (int)ImGui::GetIO().DisplaySize.x, (int)ImGui::GetIO().DisplaySize.y);
       glClearColor(clear_color.x, clear_color.y, clear_color.z, clear_color.w);
       glClear(GL_COLOR_BUFFER_BIT);
+
+      // Use our program
+      glUseProgram(shader.GetProgramHandle());
+      glBindVertexArray(vao);
+      glDrawArrays(GL_TRIANGLES, 0, 3);
 
       ImGui::Render();
       ImGui_ImplSdlGL3_RenderDrawData(ImGui::GetDrawData());
