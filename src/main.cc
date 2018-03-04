@@ -101,10 +101,19 @@ int main(int, char **) {
                        uniform.GetLocation());
   }
 
+  // We create some sample points
+  // Actual points to be renderer
   float vertices[] = {
-    -0.5f, -0.5f, 0.0f,
-     0.5f, -0.5f, 0.0f,
-     0.0f,  0.5f, 0.0f
+     0.5f,  0.5f, 0.0f,  // top right
+     0.5f, -0.5f, 0.0f,  // bottom right
+    -0.5f, -0.5f, 0.0f,  // bottom left
+    -0.5f,  0.5f, 0.0f   // top left
+  };
+  // Indices that OpenGL will use to generate the primitives
+  // This enables us to send much less data
+  unsigned int indices[] = {  // note that we start from 0!
+    0, 1, 3,   // first triangle
+    1, 2, 3    // second triangle
   };
 
   // Establishing data to the GPU
@@ -136,6 +145,31 @@ int main(int, char **) {
                                       // Depending on the usage, some are
                                       // better than others
 
+  // [OPTIONA] OpenGL now has a buffer with data. But it can be when drawing
+  //    primitives that a lot of them averlap (ie. a rectangle made out of
+  //    2 triangles share 2 of the 3 vertices). It's possible to tell OpenGL
+  //    to do indexing drawing. Basically you send a set of points and then
+  //    use an array of indices to expand that set to the actual primitives
+  //    needed. This saves space and bandwidth because indices are only one int
+  //    long, while a vertex can be quite large, depending on the amount of
+  //    data associated with it being accessed through the attributes
+  //    (position, color, uv, normals, etc.)
+  //
+  //    The object used for holding the indices is called an
+  //    ELEMENT BUFFER OBJECT, or EBO
+  //
+  //    In order to render with indices, we simply need to bind an EBO
+  //    and call glDrawElements instead of glDrawArrays
+
+  // Here we create the EBO. It is just another buffer like the vertex one
+  unsigned int ebo;
+  glGenBuffers(1, &ebo);            // Created the same way as the VBO
+  // This DOES NOT unbind the VBO, because they are different types
+  glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ebo);
+  // We sent the data exactly like the vertices
+  glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices), indices,
+               GL_STATIC_DRAW);
+
   // OpenGL has buffer with vertices in it, but has no idea how to interpret them
   // (which ones are colors, which ones positions, uv, etc.).
   // For that we need to tell which attribute holds which information where.
@@ -147,14 +181,20 @@ int main(int, char **) {
   unsigned int vao;
   glGenVertexArrays(1, &vao);
 
+
   // 5. Bind the VAO as active. Any vertex attrib calls will now be stored in
   //    this VAO. A VAO could be thought as a "replay" of the attrib/buffer
   //    binding made.
   glBindVertexArray(vao);
 
   // 6. Associate the buffer with this VAO. That way, when we bing the VAO
-  //    we are also
+  //    we are also. When VAO is created, it gets associated to the VBO
+  //    that is active, so this point is technically not needed here.
+  //    But is goog to remember it
   glBindBuffer(GL_ARRAY_BUFFER, vbo);
+
+  // [OPTIONAL] VAO also tracks EBO, so we can bind it
+  glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ebo);
 
   // 7. Set the vertex attribute points. This calls describe exactly how
   //    OpenGL should interpret the data in the buffer.
@@ -175,14 +215,13 @@ int main(int, char **) {
   //    If disabled, apparently they are not accesible from the shader (?)
   glEnableVertexAttribArray(pos_attrib_location);
 
-
   // Setup style
   ImGui::StyleColorsDark();
   //ImGui::StyleColorsClassic();
 
   bool show_demo_window = true;
   bool show_another_window = false;
-  ImVec4 clear_color = ImVec4(0.45f, 0.55f, 0.60f, 1.00f);
+  ImVec4 clear_color = ImVec4(0.137f, 0.152f, 0.637f, 1.00f);
 
   // Main loop
   bool done = false;
@@ -218,8 +257,12 @@ int main(int, char **) {
 
       // Use our program
       glUseProgram(shader.GetProgramHandle());
+      // Bind the VAO (and the VBO and EBO by proxy)
       glBindVertexArray(vao);
-      glDrawArrays(GL_TRIANGLES, 0, 3);
+      // Draw indexed
+      glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+      glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
+      /* glPolygonMode(GL_FRONT_AND_BACK, GL_LINE); */
 
       ImGui::Render();
       ImGui_ImplSdlGL3_RenderDrawData(ImGui::GetDrawData());
