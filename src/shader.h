@@ -9,16 +9,35 @@
 
 namespace picasso {
 
-class GLAttribute {
+enum ShaderVariableKind {
+  NONE,
+  ATTRIBUTE,
+  UNIFORM,
+};
+
+/**
+ * ShaderVariable
+ * ---------------
+ *
+ * Represents the information of either a GL attribute of uniform
+ **/
+class ShaderVariable {
  private:
-  GLAttribute() {}  // Only shaders create attributes
+  // Only shaders create attributes
+  ShaderVariable(ShaderVariableKind kind) : kind_(kind) {}
+
  public:
-  int GetLocation() const;
-  const std::string& GetName() const;
-  size_t GetSize() const;
-  GLenum GetType() const;
+  ShaderVariableKind GetKind() const { return kind_; }
+  int GetLocation() const { return location_; }
+  const std::string& GetName() const { return name_; }
+  size_t GetSize() const { return size_; }
+  GLenum GetType() const { return type_; }
+
+ public:
+  std::string GetTypeName() const;
 
  private:
+  ShaderVariableKind kind_;
   GLint location_;
   std::string name_;
   GLsizei size_;
@@ -27,6 +46,8 @@ class GLAttribute {
  public:
   friend class ShaderProgram;
 };
+
+using ShaderVariableContainer = std::vector<ShaderVariable>;
 
 class ShaderProgram {
   // FACTORIES
@@ -49,18 +70,34 @@ class ShaderProgram {
 
   // GETTERS/SETTERS
  public:
-  int GetProgramHandle() const;
-  int GetVertexHandle() const;
-  int GetFragmentHandle() const;
-  const std::vector<GLAttribute> GetAttributes() const;
+  int GetProgramHandle() const { return program_handle_; }
+  int GetVertexHandle() const { return vertex_handle_; }
+  int GetFragmentHandle() const { return fragment_handle_; }
+
+
+  // ATTRIBUTES
+ public:
+  using ConstAttribIt = ShaderVariableContainer::const_iterator;
+  const ShaderVariableContainer& GetAttributes() const { return attribs_; }
+  ConstAttribIt AttribBegin() const { return attribs_.cbegin(); }
+  ConstAttribIt AttribEnd() const { return attribs_.cend(); }
+
+  // UNIFORMS
+ public:
+  using ConstUniformIt = ShaderVariableContainer::const_iterator;
+  const ShaderVariableContainer& GetUniforms() const { return uniforms_; }
+  ConstUniformIt UniformBegin() const { return uniforms_.cbegin(); }
+  ConstUniformIt UniformEnd() const { return uniforms_.cend(); }
 
  private:
   // Cleans up handles
   void Cleanup();
   void ObtainAttributes();
+  void ObtainUniforms();
 
  private:
-  std::vector<GLAttribute> attribs_;
+  ShaderVariableContainer attribs_;
+  ShaderVariableContainer uniforms_;
   int vertex_handle_ = 0;
   int fragment_handle_ = 0;
   int program_handle_ = 0;

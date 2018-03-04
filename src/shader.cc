@@ -2,6 +2,7 @@
 
 #include "utils/result.h"
 #include "utils/gl.h"
+#include "utils/log.h"
 
 #include <cassert>
 #include <GL/gl3w.h>
@@ -41,13 +42,15 @@ ResultOr<int> CompileShader(const std::string& shader_name,
 }   // namespace
 
 /**
- * GLAttribute
+ * ShaderVariable
  **/
-int GLAttribute::GetLocation() const { return location_; }
-const std::string& GLAttribute::GetName() const { return name_; }
-size_t GLAttribute::GetSize() const { return size_; }
-GLenum GLAttribute::GetType() const { return type_; }
-
+std::string ShaderVariable::GetTypeName() const {
+  auto res = GL_TYPES_TO_STRING.Get(type_);
+  if (!res.Valid()) {
+    return "INVALID";
+  }
+  return res.ConsumeOrDie();
+}
 
 /**
  * ShaderProgram
@@ -90,6 +93,7 @@ ResultOr<ShaderProgram> ShaderProgram::Create(const std::string& vertex_src,
   }
 
   program.ObtainAttributes();
+  program.ObtainUniforms();
   return ResultOr<ShaderProgram>::Success(std::move(program));
 }
 
@@ -116,6 +120,7 @@ ShaderProgram& ShaderProgram::operator=(ShaderProgram&& other) noexcept {
   valid_ = other.valid_;
   other.valid_ = false;
   attribs_ = std::move(other.attribs_);
+  uniforms_ = std::move(other.uniforms_);
   return *this;
 }
 
@@ -142,13 +147,46 @@ void ShaderProgram::ObtainAttributes() {
     // Obtain the location
     GLint location = glGetAttribLocation(program_handle_, name_ptr.get());
 
-    GLAttribute attrib;
+    ShaderVariable attrib(ShaderVariableKind::ATTRIBUTE);
     attrib.location_ = location;
     attrib.name_ = name_ptr.get();  // Copy
     attrib.size_ = size;
     attrib.type_ = type;
     attribs_.push_back(std::move(attrib));
   }
+}
+
+void ShaderProgram::ObtainUniforms() {
+  // Obtain the max size of the uniforms names
+  GLint max_uniform_size;
+  glGetProgramiv(program_handle_, GL_ACTIVE_UNIFORM_MAX_LENGTH,
+                 &max_uniform_size);
+
+  // We obtain the uniforms
+  GLint uniform_count;
+  glGetProgramiv(program_handle_, GL_ACTIVE_UNIFORMS, &uniform_count);
+  logerr::Debug("Uniform count: %d", uniform_count);
+  for (GLint i = 0; i < uniform_count; i++) {
+    std::unique_ptr<char[]> name_ptr(new char[max_uniform_size]);
+
+    GLsizei length, size;
+    GLenum type;
+    glGetActiveUniform(program_handle_, i, max_uniform_size,
+                       &length, &size, &type, name_ptr.get());
+    assert(length < max_uniform_size);
+
+    // Obtain the location
+    GLint location = glGetUniformLocation(program_handle_, name_ptr.get());
+
+    logerr::Debug("Uniform name: %s", name_ptr.get());
+    ShaderVariable uniform(ShaderVariableKind::UNIFORM);
+    uniform.location_ = location;
+    uniform.name_ = name_ptr.get();  // Copy
+    uniform.size_ = size;
+    uniform.type_ = type;
+    uniforms_.push_back(std::move(uniform));
+  }
+  logerr::Debug("Saved uniforms: %zu", uniforms_.size());
 }
 
 
@@ -167,13 +205,6 @@ void ShaderProgram::Cleanup() {
 /**
  * GETTERS/SETTERS
  **/
-
-int ShaderProgram::GetProgramHandle() const { return program_handle_; }
-int ShaderProgram::GetVertexHandle() const { return vertex_handle_; }
-int ShaderProgram::GetFragmentHandle() const { return fragment_handle_; }
-const std::vector<GLAttribute> ShaderProgram::GetAttributes() const {
-  return attribs_;
-}
 
 
 }   // namespace picasso
