@@ -152,7 +152,7 @@ void ShaderProgram::ObtainAttributes() {
     attrib.name_ = name_ptr.get();  // Copy
     attrib.size_ = size;
     attrib.type_ = type;
-    attribs_.push_back(std::move(attrib));
+    attribs_[attrib.name_] = std::move(attrib);
   }
 }
 
@@ -184,7 +184,7 @@ void ShaderProgram::ObtainUniforms() {
     uniform.name_ = name_ptr.get();  // Copy
     uniform.size_ = size;
     uniform.type_ = type;
-    uniforms_.push_back(std::move(uniform));
+    uniforms_[uniform.name_] = std::move(uniform);
   }
   logerr::Debug("Saved uniforms: %zu", uniforms_.size());
 }

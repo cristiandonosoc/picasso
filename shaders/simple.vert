@@ -1,6 +1,6 @@
 #version 150
 
-uniform mat4 proj_mat;
+uniform mat4x4[3] proj_mat;
 
 in vec3 pos;
 in vec2 uv;
@@ -13,5 +13,5 @@ void main() {
   // frag_uv = uv;
   // frag_color = color;
   // gl_Position = proj_mat * vec4(pos.xy, 0, 1);
-  gl_Position = vec4(pos.xyz, 1);
+  gl_Position = proj_mat[1] * vec4(pos.xyz, 1);
 }

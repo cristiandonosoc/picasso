@@ -76,14 +76,16 @@ int main(int, char **) {
 
   logerr::Info("Printing shader attributes:");
   const auto& attribs = shader.GetAttributes();
-  for (const auto& attrib : attribs) {
+  for (const auto& attrib_it : attribs) {
+    const std::string& attrib_name = attrib_it.first;
+    const picasso::ShaderVariable& attrib = attrib_it.second;
     std::string type_name;
     auto type_name_res = picasso::utils::GL_TYPES_TO_STRING.Get(attrib.GetType());
     if (type_name_res.Valid()) {
       type_name = type_name_res.ConsumeOrDie();
     }
     logout::IndentInfo(2, "NAME: %s, TYPE: %s, SIZE: %zu, LOCATION: %d",
-                       attrib.GetName().c_str(),
+                       attrib_name.c_str(),
                        type_name.c_str(),
                        attrib.GetSize(),
                        attrib.GetLocation());
@@ -93,13 +95,17 @@ int main(int, char **) {
   for (auto&& it = shader.UniformBegin();
        it != shader.UniformEnd();
        it++) {
-    const auto& uniform = *it;
+    const std::string& uniform_name = it->first;
+    const picasso::ShaderVariable& uniform = it->second;
     logout::IndentInfo(2, "NAME: %s, TYPE: %s, SIZE: %zu, LOCATION: %d",
-                       uniform.GetName().c_str(),
+                       uniform_name.c_str(),
                        uniform.GetTypeName().c_str(),
                        uniform.GetSize(),
                        uniform.GetLocation());
   }
+
+  logerr::Info("With the property. Length: %zu", shader.Uniforms.size());
+
 
   // We create some sample points
   // Actual points to be renderer

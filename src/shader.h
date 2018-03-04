@@ -3,9 +3,9 @@
 
 #include "utils/result.h"
 
+#include <map>
 #include <string>
 #include <GL/gl3w.h>
-#include <vector>
 
 namespace picasso {
 
@@ -22,6 +22,8 @@ enum ShaderVariableKind {
  * Represents the information of either a GL attribute of uniform
  **/
 class ShaderVariable {
+ public:
+   ShaderVariable() = default;
  private:
   // Only shaders create attributes
   ShaderVariable(ShaderVariableKind kind) : kind_(kind) {}
@@ -42,12 +44,13 @@ class ShaderVariable {
   std::string name_;
   GLsizei size_;
   GLenum type_;
+  std::unique_ptr
 
  public:
   friend class ShaderProgram;
 };
 
-using ShaderVariableContainer = std::vector<ShaderVariable>;
+using ShaderVariableContainer = std::map<std::string, ShaderVariable>;
 
 class ShaderProgram {
   // FACTORIES
@@ -84,6 +87,7 @@ class ShaderProgram {
 
   // UNIFORMS
  public:
+  const ShaderVariableContainer& Uniforms = uniforms_;
   using ConstUniformIt = ShaderVariableContainer::const_iterator;
   const ShaderVariableContainer& GetUniforms() const { return uniforms_; }
   ConstUniformIt UniformBegin() const { return uniforms_.cbegin(); }
