@@ -1,6 +1,7 @@
 #include "shader.h"
 #include "utils/file.h"
 #include "utils/gl.h"
+#include "utils/log.h"
 
 #include <cstdio>
 
@@ -62,11 +63,19 @@ void ImGuiExample(const ImVec4& clear_color, bool show_demo_window,
 
 }
 
+using namespace picasso::utils;
+
 int main(int, char **) {
+
+// TODO(Cristian): For some reason, we need this for stdout logging in windows
+//                 Move this to the platform layer
+#ifdef WIN32
+  fflush(stderr);
+#endif
 
 
   if (SDL_Init(SDL_INIT_VIDEO|SDL_INIT_TIMER) != 0) {
-    fprintf(stderr, "SDL_Init Error: %s\n", SDL_GetError());
+    logerr::Error("SDL_Init Error: %s", SDL_GetError());
     return 1;
   }
 
@@ -90,7 +99,7 @@ int main(int, char **) {
   // Mainly sets up the HDC and SDL Keyboard/Mouse stuf
   ImGui_ImplSdlGL3_Init(window);
 
-  fprintf(stderr, "GL_VERSION: %s\n", (char*)glGetString(GL_VERSION));
+  logout::Info("GL_VERSION: %sn", (char*)glGetString(GL_VERSION));
 
   // Load a shader
 	std::string vs = picasso::utils::ReadWholeFile("../shaders/simple.vert");
@@ -99,12 +108,12 @@ int main(int, char **) {
   picasso::ShaderProgram shader;
   if (shader_res.Valid()) {
     shader = shader_res.ConsumeOrDie();
-    fprintf(stderr, "Successful shader\n");
+    logout::Info("Successful shader");
   } else {
-    fprintf(stderr, "Error getting shader: %s\n", shader_res.ErrorMsg().c_str());
+    logout::Info("Error getting shader: %s\n", shader_res.ErrorMsg().c_str());
   }
 
-  fprintf(stderr, "Printing shader attributes:\n");
+  logerr::Info("Printing shader attributes:");
   const auto& attribs = shader.GetAttributes();
   fprintf(stderr, "MAIN ATTRIB SIZES: %zu\n", attribs.size());
   for (const auto& attrib : attribs) {
@@ -113,16 +122,12 @@ int main(int, char **) {
     if (type_name_res.Valid()) {
       type_name = type_name_res.ConsumeOrDie();
     }
-    fprintf(stderr, "NAME: %s, TYPE: %s, SIZE: %zu, LOCATION: %d\n",
-            attrib.GetName().c_str(),
-            type_name.c_str(),
-            attrib.GetSize(),
-            attrib.GetLocation());
+    logout::IndentInfo(2, "NAME: %s, TYPE: %s, SIZE: %zu, LOCATION: %d",
+                       attrib.GetName().c_str(),
+                       type_name.c_str(),
+                       attrib.GetSize(),
+                       attrib.GetLocation());
   }
-
-
-  fflush(stderr);
-
 
 
   // Setup style

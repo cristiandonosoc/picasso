@@ -130,7 +130,6 @@ void ShaderProgram::ObtainAttributes() {
   // We obtain the attributes
   GLint attrib_count;
   glGetProgramiv(program_handle_, GL_ACTIVE_ATTRIBUTES, &attrib_count);
-  fprintf(stderr, "ATTRIB SIZE: %zu\n", attribs_.size());
   for (GLint i = 0; i < attrib_count; i++) {
     std::unique_ptr<char[]> name_ptr(new char[max_attrib_size]);
 
@@ -150,8 +149,6 @@ void ShaderProgram::ObtainAttributes() {
     attrib.type_ = type;
     attribs_.push_back(std::move(attrib));
   }
-
-  fprintf(stderr, "ATTRIB SIZE: %zu\n", attribs_.size());
 }
 
 

@@ -63,8 +63,12 @@ if (UNIX)
   message(FATAL_ERROR "UNIX not supported yet")
 else()
   message(STATUS "Setting MSVC flags")
-  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /W4 /WX /EHsc")
+  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /W4 /WX /EHsc /std=c++14")
 endif()
+
+#####################################################
+# ERROR WARNINGS FIX
+#####################################################
 
 # -Werror Handling
 if(CMAKE_CXX_FLAGS MATCHES "-Werror")
