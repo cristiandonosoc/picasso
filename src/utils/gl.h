@@ -10,23 +10,23 @@ namespace picasso {
 namespace utils {
 
 /**
- * GlTypesToString
+ * GLTypesToString
  * ---------------
  *
  * Singleton that holds the mapping from attribute types to a string
  * glGetString wouldn't accept it and could not find another function that did it.
  * Hopefully there is one out there.
  *
- * You can get the singleton explicitly (GlTypesToString::Instance()) or call
+ * You can get the singleton explicitly (GLTypesToString::Instance()) or call
  * a global reference in GL_TYPES_TO_STRING
  *
  * I will resort to the latter as I use CAPS_NAMING to refer to globals
  **/
-class GlTypesToString {
+class GLTypesToString {
 
  public:
-   static const GlTypesToString& Instance() {
-     static GlTypesToString instance;
+   static const GLTypesToString& Instance() {
+     static GLTypesToString instance;
      return instance;
    }
  public:
@@ -39,7 +39,7 @@ class GlTypesToString {
    }
 
  private:
-  GlTypesToString() {
+  GLTypesToString() {
     mapping_[GL_FLOAT] = "GL_FLOAT";
     mapping_[GL_FLOAT_VEC2] = "GL_FLOAT_VEC2";
     mapping_[GL_FLOAT_VEC3] = "GL_FLOAT_VEC3";
@@ -59,13 +59,11 @@ class GlTypesToString {
    std::map<GLenum, std::string> mapping_;
 };
 
-const GlTypesToString& GL_TYPES_TO_STRING = GlTypesToString::Instance();
+// Exported singleton variable
+extern const GLTypesToString& GL_TYPES_TO_STRING;
 
 }   // namespace utils
 }   // namespace picasso
-
-
-
 
 
 #endif  // SRC_UTILS_GL_H

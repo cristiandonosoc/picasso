@@ -1,5 +1,6 @@
-#include "utils/file.h"
 #include "shader.h"
+#include "utils/file.h"
+#include "utils/gl.h"
 
 #include <cstdio>
 
@@ -102,6 +103,24 @@ int main(int, char **) {
   } else {
     fprintf(stderr, "Error getting shader: %s\n", shader_res.ErrorMsg().c_str());
   }
+
+  fprintf(stderr, "Printing shader attributes:\n");
+  const auto& attribs = shader.GetAttributes();
+  fprintf(stderr, "MAIN ATTRIB SIZES: %zu\n", attribs.size());
+  for (const auto& attrib : attribs) {
+    std::string type_name;
+    auto type_name_res = picasso::utils::GL_TYPES_TO_STRING.Get(attrib.GetType());
+    if (type_name_res.Valid()) {
+      type_name = type_name_res.ConsumeOrDie();
+    }
+    fprintf(stderr, "NAME: %s, TYPE: %s, SIZE: %zu, LOCATION: %d\n",
+            attrib.GetName().c_str(),
+            type_name.c_str(),
+            attrib.GetSize(),
+            attrib.GetLocation());
+  }
+
+
   fflush(stderr);
 
 

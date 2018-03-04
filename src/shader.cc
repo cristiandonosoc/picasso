@@ -38,40 +38,20 @@ ResultOr<int> CompileShader(const std::string& shader_name,
   return ResultOr<int>::Success(std::move(shader_handle));
 }
 
-void ObtainAttributes(const ShaderProgram& program) {
-  int program_handle = program.GetProgramHandle();
-  if (!program_handle) { return; }
-
-  // Obtain the max size of the attribute names
-  GLint max_attrib_size;
-  glGetProgramiv(program_handle, GL_ACTIVE_ATTRIBUTE_MAX_LENGTH, &max_attrib_size);
-
-  // We obtain the attributes
-  GLint attrib_count;
-  glGetProgramiv(program_handle, GL_ACTIVE_ATTRIBUTES, &attrib_count);
-  for (GLint i = 0; i < attrib_count; i++) {
-    std::unique_ptr<char[]> buf(new char[max_attrib_size]);
-
-    GLsizei length, size;
-    GLenum type;
-    glGetActiveAttrib(program_handle, i, max_attrib_size,
-                      &length, &size, &type, buf.get());
-    assert(length < max_attrib_size);
-
-    // We get the name of the type
-    auto res = GL_TYPES_TO_STRING.Get(type);
-    std::string type_name;
-    if (res.Valid()) {
-      type_name = res.ConsumeOrDie();
-    }
-    fprintf(stderr, "Found Attrib \"%s\": (%d) %s\n",  buf.get(), type, type_name.c_str());
-  }
-
-  fflush(stderr);
-}
-
 }   // namespace
 
+/**
+ * GLAttribute
+ **/
+int GLAttribute::GetLocation() const { return location_; }
+const std::string& GLAttribute::GetName() const { return name_; }
+size_t GLAttribute::GetSize() const { return size_; }
+GLenum GLAttribute::GetType() const { return type_; }
+
+
+/**
+ * ShaderProgram
+ **/
 ResultOr<ShaderProgram> ShaderProgram::Create(const std::string& vertex_src,
                                               const std::string& fragment_src) {
   // If some result is invalid, the ShaderProgram destructor will
@@ -109,11 +89,11 @@ ResultOr<ShaderProgram> ShaderProgram::Create(const std::string& vertex_src,
     return ResultOr<ShaderProgram>::Error("Error linkink program: %s\n", log);
   }
 
-  ObtainAttributes(program);
+  program.ObtainAttributes();
   return ResultOr<ShaderProgram>::Success(std::move(program));
 }
 
-ShaderProgram::ShaderProgram() {}
+ShaderProgram::ShaderProgram() : attribs_() {}
 
 ShaderProgram::~ShaderProgram() {
   Cleanup();
@@ -135,7 +115,43 @@ ShaderProgram& ShaderProgram::operator=(ShaderProgram&& other) noexcept {
   other.program_handle_ = 0;
   valid_ = other.valid_;
   other.valid_ = false;
+  attribs_ = std::move(other.attribs_);
   return *this;
+}
+
+/**
+ * INTERNAL API
+ **/
+void ShaderProgram::ObtainAttributes() {
+  // Obtain the max size of the attribute names
+  GLint max_attrib_size;
+  glGetProgramiv(program_handle_, GL_ACTIVE_ATTRIBUTE_MAX_LENGTH, &max_attrib_size);
+
+  // We obtain the attributes
+  GLint attrib_count;
+  glGetProgramiv(program_handle_, GL_ACTIVE_ATTRIBUTES, &attrib_count);
+  fprintf(stderr, "ATTRIB SIZE: %zu\n", attribs_.size());
+  for (GLint i = 0; i < attrib_count; i++) {
+    std::unique_ptr<char[]> name_ptr(new char[max_attrib_size]);
+
+    GLsizei length, size;
+    GLenum type;
+    glGetActiveAttrib(program_handle_, i, max_attrib_size,
+                      &length, &size, &type, name_ptr.get());
+    assert(length < max_attrib_size);
+
+    // Obtain the location
+    GLint location = glGetAttribLocation(program_handle_, name_ptr.get());
+
+    GLAttribute attrib;
+    attrib.location_ = location;
+    attrib.name_ = name_ptr.get();  // Copy
+    attrib.size_ = size;
+    attrib.type_ = type;
+    attribs_.push_back(std::move(attrib));
+  }
+
+  fprintf(stderr, "ATTRIB SIZE: %zu\n", attribs_.size());
 }
 
 
@@ -158,6 +174,9 @@ void ShaderProgram::Cleanup() {
 int ShaderProgram::GetProgramHandle() const { return program_handle_; }
 int ShaderProgram::GetVertexHandle() const { return vertex_handle_; }
 int ShaderProgram::GetFragmentHandle() const { return fragment_handle_; }
+const std::vector<GLAttribute> ShaderProgram::GetAttributes() const {
+  return attribs_;
+}
 
 
 }   // namespace picasso
