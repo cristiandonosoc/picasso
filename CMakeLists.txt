@@ -51,6 +51,7 @@ file(GLOB_RECURSE NO_WARN_AS_ERROR ${EXTERNAL_DIR}/*
 # INCLUDES
 #####################################################
 
+include_directories(${SOURCE_DIR})
 include_directories(${INCLUDE_DIR})
 include_directories(${CMAKE_SOURCE_DIR}/imgui)
 include_directories(${SDL2_INCLUDE_DIR})

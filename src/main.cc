@@ -1,4 +1,4 @@
-#include "shader.h"
+#include "shaders/program.h"
 #include "ui.h"
 #include "utils/file.h"
 #include "utils/gl.h"
@@ -22,7 +22,8 @@ void SetupSDL() {
   SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 2);
 }
 
-using namespace picasso::utils;
+using namespace ::picasso::utils;
+using namespace ::picasso::shaders;
 
 int main(int, char **) {
 
@@ -65,8 +66,8 @@ int main(int, char **) {
   // Load a shader
 	std::string vs = picasso::utils::ReadWholeFile("../shaders/simple.vert");
 	std::string fs = picasso::utils::ReadWholeFile("../shaders/simple.frag");
-  auto shader_res = picasso::ShaderProgram::Create(vs, fs);
-  picasso::ShaderProgram shader;
+  auto shader_res = Program::Create(vs, fs);
+  Program shader;
   if (shader_res.Valid()) {
     shader = shader_res.ConsumeOrDie();
     logout::Info("Successful shader");
@@ -78,9 +79,9 @@ int main(int, char **) {
   const auto& attribs = shader.GetAttributes();
   for (const auto& attrib_it : attribs) {
     const std::string& attrib_name = attrib_it.first;
-    const picasso::ShaderVariable& attrib = attrib_it.second;
+    const Variable& attrib = attrib_it.second;
     std::string type_name;
-    auto type_name_res = picasso::utils::GL_TYPES_TO_STRING.Get(attrib.GetType());
+    auto type_name_res = GL_TYPES_TO_STRING.GetName(attrib.GetType());
     if (type_name_res.Valid()) {
       type_name = type_name_res.ConsumeOrDie();
     }
@@ -96,12 +97,14 @@ int main(int, char **) {
        it != shader.UniformEnd();
        it++) {
     const std::string& uniform_name = it->first;
-    const picasso::ShaderVariable& uniform = it->second;
-    logout::IndentInfo(2, "NAME: %s, TYPE: %s, SIZE: %zu, LOCATION: %d",
+    const Variable& uniform = it->second;
+    logout::IndentInfo(2, "NAME: %s, TYPE: %s, SIZE: %zu, LOCATION: %d, TYPE_SIZE: %zu, BACKEND_SIZE: %zu",
                        uniform_name.c_str(),
                        uniform.GetTypeName().c_str(),
                        uniform.GetSize(),
-                       uniform.GetLocation());
+                       uniform.GetLocation(),
+                       uniform.GetTypeSize(),
+                       uniform.GetBackendSize());
   }
 
   logerr::Info("With the property. Length: %zu", shader.Uniforms.size());

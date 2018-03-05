@@ -1,4 +1,4 @@
-#include "shader.h"
+#include "shaders/program.h"
 
 #include "utils/result.h"
 #include "utils/gl.h"
@@ -9,6 +9,7 @@
 #include <memory>
 
 namespace picasso {
+namespace shaders {
 
 using namespace utils;
 
@@ -42,28 +43,17 @@ ResultOr<int> CompileShader(const std::string& shader_name,
 }   // namespace
 
 /**
- * ShaderVariable
+ * Program
  **/
-std::string ShaderVariable::GetTypeName() const {
-  auto res = GL_TYPES_TO_STRING.Get(type_);
-  if (!res.Valid()) {
-    return "INVALID";
-  }
-  return res.ConsumeOrDie();
-}
-
-/**
- * ShaderProgram
- **/
-ResultOr<ShaderProgram> ShaderProgram::Create(const std::string& vertex_src,
+ResultOr<Program> Program::Create(const std::string& vertex_src,
                                               const std::string& fragment_src) {
-  // If some result is invalid, the ShaderProgram destructor will
+  // If some result is invalid, the Program destructor will
   // free the resources
-  ShaderProgram program;
+  Program program;
   // Vertex Shader
   auto vertex_res = CompileShader("Vertex", GL_VERTEX_SHADER, vertex_src);
   if (!vertex_res.Valid()) {
-    return ResultOr<ShaderProgram>::Error(vertex_res.ErrorMsg());
+    return ResultOr<Program>::Error(vertex_res.ErrorMsg());
   }
   program.vertex_handle_ = vertex_res.ConsumeOrDie();
 
@@ -71,14 +61,14 @@ ResultOr<ShaderProgram> ShaderProgram::Create(const std::string& vertex_src,
   auto fragment_res = CompileShader("Fragment", GL_FRAGMENT_SHADER,
                                     fragment_src);
   if (!fragment_res.Valid()) {
-    return ResultOr<ShaderProgram>::Error(fragment_res.ErrorMsg());
+    return ResultOr<Program>::Error(fragment_res.ErrorMsg());
   }
   program.fragment_handle_ = fragment_res.ConsumeOrDie();
 
   // Program
   program.program_handle_ = glCreateProgram();
   if (!program.program_handle_) {
-    return ResultOr<ShaderProgram>::Error("Could not get program handle");
+    return ResultOr<Program>::Error("Could not get program handle");
   }
 
   glAttachShader(program.program_handle_, program.vertex_handle_);
@@ -89,45 +79,47 @@ ResultOr<ShaderProgram> ShaderProgram::Create(const std::string& vertex_src,
   if (is_linked == GL_FALSE) {
     GLchar log[2048];
     glGetProgramInfoLog(program.program_handle_, sizeof(log), 0, log);
-    return ResultOr<ShaderProgram>::Error("Error linkink program: %s\n", log);
+    return ResultOr<Program>::Error("Error linkink program: %s\n", log);
   }
 
   program.ObtainAttributes();
   program.ObtainUniforms();
-  return ResultOr<ShaderProgram>::Success(std::move(program));
+  return ResultOr<Program>::Success(std::move(program));
 }
 
-ShaderProgram::ShaderProgram() : attribs_() {}
+Program::Program() : attribs_() {}
 
-ShaderProgram::~ShaderProgram() {
+Program::~Program() {
   Cleanup();
 }
 
 /**
  * Operators
  **/
-ShaderProgram::ShaderProgram(ShaderProgram&& other) noexcept {
+Program::Program(Program&& other) noexcept {
   *this = std::move(other);   // Call the move assignment;
 }
 
-ShaderProgram& ShaderProgram::operator=(ShaderProgram&& other) noexcept {
-  vertex_handle_ = other.vertex_handle_;
-  other.vertex_handle_ = 0;
-  fragment_handle_ = other.fragment_handle_;
-  other.fragment_handle_ = 0;
-  program_handle_ = other.program_handle_;
-  other.program_handle_ = 0;
-  valid_ = other.valid_;
-  other.valid_ = false;
-  attribs_ = std::move(other.attribs_);
-  uniforms_ = std::move(other.uniforms_);
+Program& Program::operator=(Program&& other) noexcept {
+  if (this != &other) {
+    vertex_handle_ = other.vertex_handle_;
+    other.vertex_handle_ = 0;
+    fragment_handle_ = other.fragment_handle_;
+    other.fragment_handle_ = 0;
+    program_handle_ = other.program_handle_;
+    other.program_handle_ = 0;
+    valid_ = other.valid_;
+    other.valid_ = false;
+    attribs_ = std::move(other.attribs_);
+    uniforms_ = std::move(other.uniforms_);
+  }
   return *this;
 }
 
 /**
  * INTERNAL API
  **/
-void ShaderProgram::ObtainAttributes() {
+void Program::ObtainAttributes() {
   // Obtain the max size of the attribute names
   GLint max_attrib_size;
   glGetProgramiv(program_handle_, GL_ACTIVE_ATTRIBUTE_MAX_LENGTH, &max_attrib_size);
@@ -146,17 +138,13 @@ void ShaderProgram::ObtainAttributes() {
 
     // Obtain the location
     GLint location = glGetAttribLocation(program_handle_, name_ptr.get());
-
-    ShaderVariable attrib(ShaderVariableKind::ATTRIBUTE);
-    attrib.location_ = location;
-    attrib.name_ = name_ptr.get();  // Copy
-    attrib.size_ = size;
-    attrib.type_ = type;
-    attribs_[attrib.name_] = std::move(attrib);
+    Variable attrib(VariableKind::ATTRIBUTE, name_ptr.get(), location,
+                    type, size);
+    attribs_[attrib.GetName()] = std::move(attrib);
   }
 }
 
-void ShaderProgram::ObtainUniforms() {
+void Program::ObtainUniforms() {
   // Obtain the max size of the uniforms names
   GLint max_uniform_size;
   glGetProgramiv(program_handle_, GL_ACTIVE_UNIFORM_MAX_LENGTH,
@@ -179,18 +167,16 @@ void ShaderProgram::ObtainUniforms() {
     GLint location = glGetUniformLocation(program_handle_, name_ptr.get());
 
     logerr::Debug("Uniform name: %s", name_ptr.get());
-    ShaderVariable uniform(ShaderVariableKind::UNIFORM);
-    uniform.location_ = location;
-    uniform.name_ = name_ptr.get();  // Copy
-    uniform.size_ = size;
-    uniform.type_ = type;
-    uniforms_[uniform.name_] = std::move(uniform);
+
+    Variable uniform(VariableKind::UNIFORM, name_ptr.get(), location,
+                     type, size);
+    uniforms_[uniform.GetName()] = std::move(uniform);
   }
   logerr::Debug("Saved uniforms: %zu", uniforms_.size());
 }
 
 
-void ShaderProgram::Cleanup() {
+void Program::Cleanup() {
   if (vertex_handle_) {
     glDeleteShader(vertex_handle_);
   }
@@ -207,4 +193,5 @@ void ShaderProgram::Cleanup() {
  **/
 
 
+}   // namespace shaders
 }   // namespace picasso
