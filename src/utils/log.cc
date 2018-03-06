@@ -28,6 +28,17 @@ namespace utils {
     va_end(arglist);                                                          \
   }
 
+#define SEPARATOR(file)                                                       \
+  void Separator(int length, const char *c) {                                 \
+    if (length > 128) { length = 128; }                                       \
+    char buf[128 + 1];                                                        \
+    char *p = (char*)&buf;                                                    \
+    for (int i = 0; i < length; i++) { *p++ = *c; }                           \
+    *p = 0;                                                                   \
+    fprintf(file, "%s\n", buf);                                               \
+    fflush(file);                                                             \
+  }
+
 namespace logout {
 
 DEFINE_LOG_FUNC(Info, "[INFO]", stdout);
@@ -39,6 +50,8 @@ DEFINE_INDENT_LOG_FUNC(IndentInfo, "[INFO]", stdout);
 DEFINE_INDENT_LOG_FUNC(IndentWarn, "[WARN]", stdout);
 DEFINE_INDENT_LOG_FUNC(IndentError, "[ERROR]", stdout);
 DEFINE_INDENT_LOG_FUNC(IndentDebug, "[DEBUG]", stdout);
+
+SEPARATOR(stdout);
 
 }   // namespace logout
 
@@ -53,6 +66,8 @@ DEFINE_INDENT_LOG_FUNC(IndentInfo, "[INFO]", stderr);
 DEFINE_INDENT_LOG_FUNC(IndentWarn, "[WARN]", stderr);
 DEFINE_INDENT_LOG_FUNC(IndentError, "[ERROR]", stderr);
 DEFINE_INDENT_LOG_FUNC(IndentDebug, "[DEBUG]", stderr);
+
+SEPARATOR(stdout);
 
 }   // namespace logerr
 

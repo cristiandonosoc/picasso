@@ -19,6 +19,8 @@ void IndentWarn(size_t indent, const char *fmt, ...);
 void IndentError(size_t indent, const char *fmt, ...);
 void IndentDebug(size_t indent, const char *fmt, ...);
 
+void Separator(int length = 30, const char *c = "-");
+
 }   // namespace logout
 
 namespace logerr {
@@ -32,6 +34,8 @@ void IndentInfo(size_t indent, const char *fmt, ...);
 void IndentWarn(size_t indent, const char *fmt, ...);
 void IndentError(size_t indent, const char *fmt, ...);
 void IndentDebug(size_t indent, const char *fmt, ...);
+
+void Separator(int length = 30, const char *c = "-");
 
 }   // namespace logerr
 

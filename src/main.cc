@@ -77,7 +77,8 @@ int main(int, char **) {
     return 1;
   }
 
-  logerr::Info("Printing shader attributes:");
+  logout::Separator();
+  logout::Info("Printing shader attributes:");
   const auto& attribs = shader->GetAttributes();
   for (const auto& attrib_it : attribs) {
     const std::string& attrib_name = attrib_it.first;
@@ -94,6 +95,7 @@ int main(int, char **) {
                        attrib.GetLocation());
   }
 
+  logout::Separator();
   logerr::Info("Printing shader uniforms. Length: %zu", shader->GetUniforms().size());
   for (auto&& it = shader->UniformBegin();
        it != shader->UniformEnd();
@@ -108,6 +110,7 @@ int main(int, char **) {
                        uniform.GetTypeSize());
   }
 
+  logout::Separator();
   logerr::Info("With the property. Length: %zu", shader->Uniforms.size());
 
 
