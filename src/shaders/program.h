@@ -16,6 +16,8 @@ using namespace utils;
 
 namespace shaders {
 
+class Material;   // Forward Declaration
+
 using VariableContainer = std::map<std::string, Variable>;
 
 class Program {
@@ -28,7 +30,7 @@ class Program {
                                     const std::string& fragment_src);
   // CONSTRUCTORS
  private:
-  Program();
+  Program() = default;
 
  public:
   ~Program();
@@ -46,7 +48,6 @@ class Program {
   int GetVertexHandle() const { return vertex_handle_; }
   int GetFragmentHandle() const { return fragment_handle_; }
 
-
   // ATTRIBUTES
  public:
   using ConstAttribIt = VariableContainer::const_iterator;
@@ -61,6 +62,11 @@ class Program {
   const VariableContainer& GetUniforms() const { return uniforms_; }
   ConstUniformIt UniformBegin() const { return uniforms_.cbegin(); }
   ConstUniformIt UniformEnd() const { return uniforms_.cend(); }
+
+  // MATERIAL INTERFACE
+ public:
+  void LinkMaterial(Material*);
+  void UnlinkMaterial(Material*);
 
  private:
   // Cleans up handles

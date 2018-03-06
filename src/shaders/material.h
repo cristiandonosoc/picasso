@@ -11,16 +11,52 @@
 #ifndef SRC_SHADERS_MATERIAL_H
 #define SRC_SHADERS_MATERIAL_H
 
-#include "shaders/program.h"
+#include "shaders/variable.h"
+#include "utils/macros.h"
+#include "utils/result.h"
+
+#include <map>
 
 namespace picasso {
+
+using namespace utils;
+
 namespace shaders {
 
-class Material {
+class Program;   // Forward Declaration
 
+class Material {
+ public:
+   DEFINE_PTR_TYPES(Material);
+  
+ private:
+  static ResultOr<UniquePtr> Create();
 
  private:
-  Program *program_;
+  Material() {}
+
+ public:
+  void SetProgram(Program *);
+  void UnsetProgram();
+
+ private:
+  void LinkProgram(Program *);
+  void UnlinkProgram();
+
+ public:
+  DISABLE_COPY(Material);
+  Material(Material&&) noexcept;
+  Material& operator=(Material&&) noexcept;
+
+ private:
+  class Data {
+   public:
+    Program *program;
+    std::map<std::string, Variable> attribs;
+    std::map<std::string, Variable> uniforms;
+   public:
+    friend class Material;
+  } data_;
 };
 
 }   // namepsace shaders

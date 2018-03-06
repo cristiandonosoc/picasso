@@ -11,6 +11,8 @@
 #ifndef SRC_UTILS_MACROS_H
 #define SRC_UTILS_MACROS_H
 
+#include <memory>
+
 #define DEFINE_PTR_TYPES(class_name) \
   using UniquePtr = std::unique_ptr<class_name>; \
   using SharedPtr = std::shared_ptr<class_name>; \

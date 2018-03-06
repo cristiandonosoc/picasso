@@ -28,7 +28,7 @@ namespace shaders {
 
 class ProgramRegistry : public Singleton<ProgramRegistry> {
  private:
-  ProgramRegistry() {}
+  ProgramRegistry() = default;
   DISABLE_COPY(ProgramRegistry);
   DISABLE_MOVE(ProgramRegistry);
 
@@ -46,7 +46,7 @@ class ProgramRegistry : public Singleton<ProgramRegistry> {
   }
 
  private:
-  std::map<std::string, std::unique_ptr<Program>> program_map_;
+  std::map<std::string, Program::UniquePtr> program_map_;
 
  public:
   friend class Singleton<ProgramRegistry>;

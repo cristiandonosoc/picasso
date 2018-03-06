@@ -89,8 +89,6 @@ ResultOr<Program::UniquePtr> Program::Create(const std::string& vertex_src,
   return program;
 }
 
-Program::Program() : attribs_() {}
-
 Program::~Program() {
   Cleanup();
 }
