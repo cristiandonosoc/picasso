@@ -192,11 +192,11 @@ void Program::Cleanup() {
  * MATERIAL INTERFACE
  **/
 void Program::LinkMaterial(Material*) {
-  assert(!"Not implemeted!");
+  logerr::Warn("%s: Not Implemented", __FUNCTION__);
 }
 
 void Program::UnlinkMaterial(Material*) {
-  assert(!"Not implemented");
+  logerr::Warn("%s: Not Implemented", __FUNCTION__);
 }
 
 

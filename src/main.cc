@@ -68,7 +68,8 @@ int main(int, char **) {
   // Load a shader
 	std::string vs = picasso::utils::ReadWholeFile("../shaders/simple.vert");
 	std::string fs = picasso::utils::ReadWholeFile("../shaders/simple.frag");
-  auto shader_res = ProgramRegistry::Create("test", vs, fs);
+  std::string shader_name = "test_shader";
+  auto shader_res = ProgramRegistry::Create(shader_name, vs, fs);
   Program *shader = nullptr;
   if (shader_res.Valid()) {
     shader = shader_res.ConsumeOrDie();
@@ -114,9 +115,48 @@ int main(int, char **) {
   logout::Separator();
   logout::Info("With the property. Length: %zu", shader->Uniforms.size());
 
-  /* logout::Separator(); */
-  /* logout::Info("Creating material"); */
-  /* auto material_res = MaterialRegistry::Create("mat0"); */
+  logout::Separator();
+  logout::Info("Creating material");
+  std::string mat_name = "mat0";
+  auto material_res = MaterialRegistry::Create(mat_name);
+
+  if (!material_res.Valid()) {
+    logerr::Error("Could not create material \"%s\"", mat_name.c_str());
+    return 1;
+  }
+
+  Material *material = material_res.ConsumeOrDie();
+  logout::Info("Created material \"%s\"", mat_name.c_str());
+
+  logout::Info("Setting program to \"%s\"", shader_name.c_str());
+  material->SetProgram(shader);
+
+
+  logout::Info("Listing attributes:");
+  for(auto&& it : material->Attributes) {
+    const std::string& attribute_name = it.first;
+    const Variable& attribute = it.second;
+
+    logout::IndentInfo(2, "NAME: %s, TYPE: %s, SIZE: %zu, LOCATION: %d",
+                       attribute_name.c_str(),
+                       attribute.GetTypeName().c_str(),
+                       attribute.GetSize(),
+                       attribute.GetLocation());
+  }
+
+
+  logout::Info("Listing uniforms:");
+  for (auto&& it : material->Uniforms) {
+    const std::string& uniform_name = it.first;
+    const Variable& uniform = it.second;
+    logout::IndentInfo(2, "NAME: %s, TYPE: %s, SIZE: %zu, LOCATION: %d, TYPE_SIZE: %zu",
+                       uniform_name.c_str(),
+                       uniform.GetTypeName().c_str(),
+                       uniform.GetSize(),
+                       uniform.GetLocation(),
+                       uniform.GetTypeSize());
+  }
+
 
 
   // We create some sample points

@@ -59,6 +59,10 @@ class Material {
   } data_;
 
  public:
+  decltype(data_.attributes)& Attributes = data_.attributes;
+  decltype(data_.uniforms)& Uniforms = data_.uniforms;
+
+ public:
   friend class MaterialRegistry;
 };
 
