@@ -1,4 +1,5 @@
-#include "shaders/program.h"
+#include "shaders/program_registry.h"
+
 #include "ui.h"
 #include "utils/file.h"
 #include "utils/gl.h"
@@ -66,13 +67,14 @@ int main(int, char **) {
   // Load a shader
 	std::string vs = picasso::utils::ReadWholeFile("../shaders/simple.vert");
 	std::string fs = picasso::utils::ReadWholeFile("../shaders/simple.frag");
-  auto shader_res = Program::Create(vs, fs);
-  Program::UniquePtr shader;
+  auto shader_res = ProgramRegistry::Instance().Create("test", vs, fs);
+  Program *shader = nullptr;
   if (shader_res.Valid()) {
     shader = shader_res.ConsumeOrDie();
     logout::Info("Successful shader");
   } else {
     logout::Info("Error getting shader: %s\n", shader_res.ErrorMsg().c_str());
+    return 1;
   }
 
   logerr::Info("Printing shader attributes:");

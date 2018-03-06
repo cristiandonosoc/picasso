@@ -23,12 +23,14 @@ class Program {
   DEFINE_PTR_TYPES(Program);
 
   // FACTORIES
- public:
+ private:
   static ResultOr<UniquePtr> Create(const std::string& vertex_src,
                                     const std::string& fragment_src);
   // CONSTRUCTORS
  private:
-  Program();  // Useful for creating stubs
+  Program();
+
+ public:
   ~Program();
 
   // COPY-MOVE CONSTRUCTORWS

@@ -14,6 +14,7 @@
 #include "shaders/program.h"
 #include "utils/macros.h"
 #include "utils/result.h"
+#include "utils/singleton.h"
 
 #include <map>
 #include <memory>
@@ -25,33 +26,30 @@ using namespace utils;
 
 namespace shaders {
 
-class ProgramRegistry {
- public:
-  static ProgramRegistry& Instance() {
-    static ProgramRegistry instance;
-    return instance;
-  }
-
+class ProgramRegistry : public Singleton<ProgramRegistry> {
  private:
   ProgramRegistry() {}
   DISABLE_COPY(ProgramRegistry);
   DISABLE_MOVE(ProgramRegistry);
 
  public:
-  ResultOr<Program::WeakPtr> CreateFromFiles(const std::string& name,
+  ResultOr<Program*> CreateFromFiles(const std::string& name,
                                              const std::string& vertex_path,
                                              const std::string& fragment_path);
-  ResultOr<Program::WeakPtr> CreateProgram(const std::string& name, 
+  ResultOr<Program*> Create(const std::string& name, 
                                            const std::string& vs,
                                            const std::string& fs);
 
-  Program::WeakPtr Get(const std::string& name) const;
-  Program::WeakPtr operator[](const std::string& name) const {
+  Program *Get(const std::string& name) const;
+  Program *operator[](const std::string& name) const {
     return Get(name);
   }
 
  private:
-  std::map<std::string, std::shared_ptr<Program>> program_map_;
+  std::map<std::string, std::unique_ptr<Program>> program_map_;
+
+ public:
+  friend class Singleton<ProgramRegistry>;
 };
 
 }   // namespace shaders

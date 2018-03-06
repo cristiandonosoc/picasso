@@ -17,46 +17,42 @@ using namespace utils;
 
 namespace shaders {
 
-ResultOr<Program::WeakPtr> ProgramRegistry::CreateFromFiles(
+ResultOr<Program*> ProgramRegistry::CreateFromFiles(
     const std::string& name,
     const std::string& vertex_path,
     const std::string& fragment_path) {
   std::string vs = ReadWholeFile(vertex_path);
   std::string fs = ReadWholeFile(fragment_path);
 
-  return CreateProgram(name, vs, fs);
+  return Create(name, vs, fs);
 }
-ResultOr<Program::WeakPtr> ProgramRegistry::CreateProgram(
-    const std::string& name,
-    const std::string& vs,
-    const std::string& fs) {
+
+ResultOr<Program*> ProgramRegistry::Create(const std::string& name,
+                                           const std::string& vs,
+                                           const std::string& fs) {
   // We check if it exists already
   auto it = program_map_.find(name);
   if (it != program_map_.end()) {
-    return ResultOr<Program::WeakPtr>::Error("Program %s already exists",
-                                             name.c_str());
+    return ResultOr<Program*>::Error("Program %s already exists",
+                                     name.c_str());
   }
 
   // We attempt to create it
   auto res = Program::Create(vs, fs); 
   if (!res.Valid()) { 
-    return ResultOr<Program::WeakPtr>::Error(res.ErrorMsg());
+    return ResultOr<Program*>::Error(res.ErrorMsg());
   }
 
-  // Promote
-  Program::SharedPtr shared_ptr(res.ConsumeOrDie());
   // Add it to the registry
-  program_map_[name] = shared_ptr;
-  
-  return Program::WeakPtr(shared_ptr);
+  return (program_map_[name] = res.ConsumeOrDie()).get();
 }
 
-Program::WeakPtr ProgramRegistry::Get(const std::string& name) const {
+Program *ProgramRegistry::Get(const std::string& name) const {
   auto it = program_map_.find(name);
   if (it == program_map_.end()) {
-    return Program::WeakPtr();
+    return nullptr;
   }
-  return it->second;
+  return it->second.get();
 }
 
 
