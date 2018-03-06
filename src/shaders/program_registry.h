@@ -26,24 +26,26 @@ using namespace utils;
 
 namespace shaders {
 
-class ProgramRegistry : public Singleton<ProgramRegistry> {
+class ProgramRegistry : Singleton<ProgramRegistry> {
  private:
   ProgramRegistry() = default;
   DISABLE_COPY(ProgramRegistry);
   DISABLE_MOVE(ProgramRegistry);
 
  public:
-  ResultOr<Program*> CreateFromFiles(const std::string& name,
+  static ResultOr<Program*> CreateFromFiles(const std::string& name,
                                              const std::string& vertex_path,
                                              const std::string& fragment_path);
-  ResultOr<Program*> Create(const std::string& name, 
+  static ResultOr<Program*> Create(const std::string& name, 
                                            const std::string& vs,
                                            const std::string& fs);
+  static Program *Get(const std::string& name);
 
-  Program *Get(const std::string& name) const;
-  Program *operator[](const std::string& name) const {
-    return Get(name);
-  }
+ protected:
+  ResultOr<Program*> InternalCreate(const std::string& name,
+                                    const std::string& vs,
+                                    const std::string& fs);
+  Program *InternalGet(const std::string& name) const;
 
  private:
   std::map<std::string, Program::UniquePtr> program_map_;

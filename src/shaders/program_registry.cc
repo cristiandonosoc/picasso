@@ -17,6 +17,9 @@ using namespace utils;
 
 namespace shaders {
 
+/**
+ * STATIC INTERFACE
+ **/
 ResultOr<Program*> ProgramRegistry::CreateFromFiles(
     const std::string& name,
     const std::string& vertex_path,
@@ -30,6 +33,19 @@ ResultOr<Program*> ProgramRegistry::CreateFromFiles(
 ResultOr<Program*> ProgramRegistry::Create(const std::string& name,
                                            const std::string& vs,
                                            const std::string& fs) {
+  return Instance().InternalCreate(name, vs, fs);
+}
+
+Program* ProgramRegistry::Get(const std::string& name) {
+  return Instance().InternalGet(name);
+}
+
+/**
+ * INSTANCE INTERFACE
+ **/
+ResultOr<Program*> ProgramRegistry::InternalCreate(const std::string& name,
+                                                   const std::string& vs,
+                                                   const std::string& fs) {
   // We check if it exists already
   auto it = program_map_.find(name);
   if (it != program_map_.end()) {
@@ -47,7 +63,7 @@ ResultOr<Program*> ProgramRegistry::Create(const std::string& name,
   return (program_map_[name] = res.ConsumeOrDie()).get();
 }
 
-Program *ProgramRegistry::Get(const std::string& name) const {
+Program *ProgramRegistry::InternalGet(const std::string& name) const {
   auto it = program_map_.find(name);
   if (it == program_map_.end()) {
     return nullptr;

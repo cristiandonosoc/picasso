@@ -57,6 +57,9 @@ class Material {
    public:
     friend class Material;
   } data_;
+
+ public:
+  friend class MaterialRegistry;
 };
 
 }   // namepsace shaders

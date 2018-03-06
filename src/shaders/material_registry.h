@@ -22,19 +22,19 @@ using namespace utils;
 
 namespace shaders {
 
-class MaterialRegistry : public Singleton<MaterialRegistry> {
+class MaterialRegistry : Singleton<MaterialRegistry> {
  private:
   MaterialRegistry() = default;
   DISABLE_COPY(MaterialRegistry);
   DISABLE_MOVE(MaterialRegistry);
 
  public:
-  ResultOr<Material*> Create(const std::string& name);
+  static ResultOr<Material*> Create(const std::string& name);
+  static Material *Get(const std::string& name);
 
-  Material *Get(const std::string& name) const;
-  Material *operator[](const std::string& name) const {
-    return Get(name);
-  }
+ protected:
+  ResultOr<Material*> InternalCreate(const std::string& name);
+  Material *InternalGet(const std::string& name) const;
 
  private:
   std::map<std::string, Material::UniquePtr> material_map_;

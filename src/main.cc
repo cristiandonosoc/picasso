@@ -1,4 +1,5 @@
 #include "shaders/program_registry.h"
+#include "shaders/material_registry.h"
 
 #include "ui.h"
 #include "utils/file.h"
@@ -67,7 +68,7 @@ int main(int, char **) {
   // Load a shader
 	std::string vs = picasso::utils::ReadWholeFile("../shaders/simple.vert");
 	std::string fs = picasso::utils::ReadWholeFile("../shaders/simple.frag");
-  auto shader_res = ProgramRegistry::Instance().Create("test", vs, fs);
+  auto shader_res = ProgramRegistry::Create("test", vs, fs);
   Program *shader = nullptr;
   if (shader_res.Valid()) {
     shader = shader_res.ConsumeOrDie();
@@ -96,7 +97,7 @@ int main(int, char **) {
   }
 
   logout::Separator();
-  logerr::Info("Printing shader uniforms. Length: %zu", shader->GetUniforms().size());
+  logout::Info("Printing shader uniforms. Length: %zu", shader->GetUniforms().size());
   for (auto&& it = shader->UniformBegin();
        it != shader->UniformEnd();
        it++) {
@@ -111,7 +112,11 @@ int main(int, char **) {
   }
 
   logout::Separator();
-  logerr::Info("With the property. Length: %zu", shader->Uniforms.size());
+  logout::Info("With the property. Length: %zu", shader->Uniforms.size());
+
+  /* logout::Separator(); */
+  /* logout::Info("Creating material"); */
+  /* auto material_res = MaterialRegistry::Create("mat0"); */
 
 
   // We create some sample points
