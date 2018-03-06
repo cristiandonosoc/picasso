@@ -25,17 +25,15 @@ class Program {
   // FACTORIES
  public:
   static ResultOr<UniquePtr> Create(const std::string& vertex_src,
-                                         const std::string& fragment_src);
+                                    const std::string& fragment_src);
   // CONSTRUCTORS
- public:
+ private:
   Program();  // Useful for creating stubs
   ~Program();
 
   // COPY-MOVE CONSTRUCTORWS
  public:
-  // No copy of shaders (we don't want to replicate GL state
-  Program(const Program&) = delete;
-  Program& operator=(const Program&) = delete;
+  DISABLE_COPY(Program);
   // no-except moving
   Program(Program&&) noexcept;
   Program& operator=(Program&&) noexcept;
@@ -76,6 +74,8 @@ class Program {
   int program_handle_ = 0;
   bool valid_ = false;
 
+ public:
+  friend class ProgramRegistry;
 };
 
 }   // namespace shaders
