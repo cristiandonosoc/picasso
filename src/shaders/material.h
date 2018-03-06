@@ -52,7 +52,7 @@ class Material {
   class Data {
    public:
     Program *program;
-    std::map<std::string, Variable> attribs;
+    std::map<std::string, Variable> attributes;
     std::map<std::string, Variable> uniforms;
    public:
     friend class Material;

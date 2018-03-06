@@ -110,7 +110,7 @@ Program& Program::operator=(Program&& other) noexcept {
     other.program_handle_ = 0;
     valid_ = other.valid_;
     other.valid_ = false;
-    attribs_ = std::move(other.attribs_);
+    attributes_ = std::move(other.attributes_);
     uniforms_ = std::move(other.uniforms_);
   }
   return *this;
@@ -140,7 +140,7 @@ void Program::ObtainAttributes() {
     GLint location = glGetAttribLocation(program_handle_, name_ptr.get());
     Variable attrib(VariableKind::ATTRIBUTE, name_ptr.get(), location,
                     type, size);
-    attribs_[attrib.GetName()] = std::move(attrib);
+    attributes_[attrib.GetName()] = std::move(attrib);
   }
 }
 
@@ -189,8 +189,15 @@ void Program::Cleanup() {
 }
 
 /**
- * GETTERS/SETTERS
+ * MATERIAL INTERFACE
  **/
+void Program::LinkMaterial(Material*) {
+  assert(!"Not implemeted!");
+}
+
+void Program::UnlinkMaterial(Material*) {
+  assert(!"Not implemented");
+}
 
 
 }   // namespace shaders

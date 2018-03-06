@@ -48,6 +48,16 @@ void Material::UnsetProgram() {
 void Material::LinkProgram(Program *program) {
   if (program) {
     program->LinkMaterial(this);
+
+    // Copy over attributes
+    for (auto&& it : program->Attributes) {
+      data_.attributes[it.first] = it.second;
+    }
+
+    // Copy over uniforms
+    for (auto&& it : program->Uniforms) {
+      data_.uniforms[it.first] = it.second;
+    }
   }
   data_.program = program;
 }
@@ -55,6 +65,8 @@ void Material::LinkProgram(Program *program) {
 void Material::UnlinkProgram() {
   if (data_.program) {
     data_.program->UnlinkMaterial(this);
+    data_.attributes.clear();
+    data_.uniforms.clear();
   }
   data_.program = nullptr;
 }

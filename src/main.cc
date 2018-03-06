@@ -100,13 +100,12 @@ int main(int, char **) {
        it++) {
     const std::string& uniform_name = it->first;
     const Variable& uniform = it->second;
-    logout::IndentInfo(2, "NAME: %s, TYPE: %s, SIZE: %zu, LOCATION: %d, TYPE_SIZE: %zu, BACKEND_SIZE: %zu",
+    logout::IndentInfo(2, "NAME: %s, TYPE: %s, SIZE: %zu, LOCATION: %d, TYPE_SIZE: %zu",
                        uniform_name.c_str(),
                        uniform.GetTypeName().c_str(),
                        uniform.GetSize(),
                        uniform.GetLocation(),
-                       uniform.GetTypeSize(),
-                       uniform.GetBackendSize());
+                       uniform.GetTypeSize());
   }
 
   logerr::Info("With the property. Length: %zu", shader->Uniforms.size());

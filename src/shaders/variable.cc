@@ -21,13 +21,7 @@ Variable::Variable(VariableKind kind, const std::string& name, int location,
   // We need to get the size of the backend
   auto size_res = GL_TYPES_TO_STRING.GetSize(data_.type_);
   assert(size_res.Valid());
-
   data_.type_size_ = size_res.ConsumeOrDie();
-
-  if (data_.type_size_ > 0) {
-    data_.backend_size_ = data_.type_size_ * data_.size_;
-    data_.backend_.reset(new uint8_t[data_.backend_size_]);
-  }
 }
 
 Variable::Variable(Variable&& other) noexcept {

@@ -33,8 +33,8 @@ class Variable {
            int location, GLenum type, GLsizei size);
 
  public:
-  Variable(const Variable&) = delete;
-  Variable& operator=(const Variable&) = delete;
+  Variable(const Variable&) = default;
+  Variable& operator=(const Variable&) = default;
   Variable(Variable&&) noexcept;
   Variable& operator=(Variable&&) noexcept;
 
@@ -44,9 +44,7 @@ class Variable {
   int GetLocation() const { return data_.location_; }
   GLenum GetType() const { return data_.type_; }
   size_t GetTypeSize() const { return data_.type_size_; }
-  size_t GetBackendSize() const { return data_.backend_size_; }
   size_t GetSize() const { return data_.size_; }
-  const uint8_t *GetBackend() const { return data_.backend_.get(); }
 
  public:
   std::string GetTypeName() const;
@@ -58,9 +56,7 @@ class Variable {
     std::string name_;
     GLenum type_;
     size_t type_size_;
-    size_t backend_size_;
     GLsizei size_;
-    std::unique_ptr<uint8_t[]> backend_;
    public:
     friend class Variable;
   } data_;

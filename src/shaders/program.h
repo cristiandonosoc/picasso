@@ -50,10 +50,11 @@ class Program {
 
   // ATTRIBUTES
  public:
+  const VariableContainer& Attributes = attributes_;
   using ConstAttribIt = VariableContainer::const_iterator;
-  const VariableContainer& GetAttributes() const { return attribs_; }
-  ConstAttribIt AttribBegin() const { return attribs_.cbegin(); }
-  ConstAttribIt AttribEnd() const { return attribs_.cend(); }
+  const VariableContainer& GetAttributes() const { return attributes_; }
+  ConstAttribIt AttribBegin() const { return attributes_.cbegin(); }
+  ConstAttribIt AttribEnd() const { return attributes_.cend(); }
 
   // UNIFORMS
  public:
@@ -75,7 +76,7 @@ class Program {
   void ObtainUniforms();
 
  private:
-  VariableContainer attribs_;
+  VariableContainer attributes_;
   VariableContainer uniforms_;
   int vertex_handle_ = 0;
   int fragment_handle_ = 0;
