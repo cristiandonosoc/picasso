@@ -67,7 +67,7 @@ int main(int, char **) {
 	std::string vs = picasso::utils::ReadWholeFile("../shaders/simple.vert");
 	std::string fs = picasso::utils::ReadWholeFile("../shaders/simple.frag");
   auto shader_res = Program::Create(vs, fs);
-  Program shader;
+  Program::UniquePtr shader;
   if (shader_res.Valid()) {
     shader = shader_res.ConsumeOrDie();
     logout::Info("Successful shader");
@@ -76,7 +76,7 @@ int main(int, char **) {
   }
 
   logerr::Info("Printing shader attributes:");
-  const auto& attribs = shader.GetAttributes();
+  const auto& attribs = shader->GetAttributes();
   for (const auto& attrib_it : attribs) {
     const std::string& attrib_name = attrib_it.first;
     const Variable& attrib = attrib_it.second;
@@ -92,9 +92,9 @@ int main(int, char **) {
                        attrib.GetLocation());
   }
 
-  logerr::Info("Printing shader uniforms. Length: %zu", shader.GetUniforms().size());
-  for (auto&& it = shader.UniformBegin();
-       it != shader.UniformEnd();
+  logerr::Info("Printing shader uniforms. Length: %zu", shader->GetUniforms().size());
+  for (auto&& it = shader->UniformBegin();
+       it != shader->UniformEnd();
        it++) {
     const std::string& uniform_name = it->first;
     const Variable& uniform = it->second;
@@ -107,7 +107,7 @@ int main(int, char **) {
                        uniform.GetBackendSize());
   }
 
-  logerr::Info("With the property. Length: %zu", shader.Uniforms.size());
+  logerr::Info("With the property. Length: %zu", shader->Uniforms.size());
 
 
   // We create some sample points
@@ -265,7 +265,7 @@ int main(int, char **) {
       glClear(GL_COLOR_BUFFER_BIT);
 
       // Use our program
-      glUseProgram(shader.GetProgramHandle());
+      glUseProgram(shader->GetProgramHandle());
       // Bind the VAO (and the VBO and EBO by proxy)
       glBindVertexArray(vao);
       // Draw indexed

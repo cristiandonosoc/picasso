@@ -3,6 +3,7 @@
 #include "utils/result.h"
 #include "utils/gl.h"
 #include "utils/log.h"
+#include "utils/make_unique.h"
 
 #include <cassert>
 #include <GL/gl3w.h>
@@ -45,46 +46,46 @@ ResultOr<int> CompileShader(const std::string& shader_name,
 /**
  * Program
  **/
-ResultOr<Program> Program::Create(const std::string& vertex_src,
-                                              const std::string& fragment_src) {
+ResultOr<Program::UniquePtr> Program::Create(const std::string& vertex_src,
+                                             const std::string& fragment_src) {
   // If some result is invalid, the Program destructor will
   // free the resources
-  Program program;
+  UniquePtr program = MakeUnique<Program>();
   // Vertex Shader
   auto vertex_res = CompileShader("Vertex", GL_VERTEX_SHADER, vertex_src);
   if (!vertex_res.Valid()) {
-    return ResultOr<Program>::Error(vertex_res.ErrorMsg());
+    return ResultOr<UniquePtr>::Error(vertex_res.ErrorMsg());
   }
-  program.vertex_handle_ = vertex_res.ConsumeOrDie();
+  program->vertex_handle_ = vertex_res.ConsumeOrDie();
 
   // Fragment Shader
   auto fragment_res = CompileShader("Fragment", GL_FRAGMENT_SHADER,
                                     fragment_src);
   if (!fragment_res.Valid()) {
-    return ResultOr<Program>::Error(fragment_res.ErrorMsg());
+    return ResultOr<UniquePtr>::Error(fragment_res.ErrorMsg());
   }
-  program.fragment_handle_ = fragment_res.ConsumeOrDie();
+  program->fragment_handle_ = fragment_res.ConsumeOrDie();
 
   // Program
-  program.program_handle_ = glCreateProgram();
-  if (!program.program_handle_) {
-    return ResultOr<Program>::Error("Could not get program handle");
+  program->program_handle_ = glCreateProgram();
+  if (!program->program_handle_) {
+    return ResultOr<UniquePtr>::Error("Could not get program handle");
   }
 
-  glAttachShader(program.program_handle_, program.vertex_handle_);
-  glAttachShader(program.program_handle_, program.fragment_handle_);
-  glLinkProgram(program.program_handle_);
+  glAttachShader(program->program_handle_, program->vertex_handle_);
+  glAttachShader(program->program_handle_, program->fragment_handle_);
+  glLinkProgram(program->program_handle_);
   GLint is_linked;
-  glGetProgramiv(program.program_handle_, GL_LINK_STATUS, &is_linked);
+  glGetProgramiv(program->program_handle_, GL_LINK_STATUS, &is_linked);
   if (is_linked == GL_FALSE) {
     GLchar log[2048];
-    glGetProgramInfoLog(program.program_handle_, sizeof(log), 0, log);
-    return ResultOr<Program>::Error("Error linkink program: %s\n", log);
+    glGetProgramInfoLog(program->program_handle_, sizeof(log), 0, log);
+    return ResultOr<UniquePtr>::Error("Error linkink program: %s\n", log);
   }
 
-  program.ObtainAttributes();
-  program.ObtainUniforms();
-  return ResultOr<Program>::Success(std::move(program));
+  program->ObtainAttributes();
+  program->ObtainUniforms();
+  return program;
 }
 
 Program::Program() : attribs_() {}

@@ -5,19 +5,27 @@
 #include "utils/result.h"
 
 #include <map>
+#include <memory>
 #include <string>
 #include <GL/gl3w.h>
 
 namespace picasso {
+
+using namespace utils;
+
 namespace shaders {
 
 using VariableContainer = std::map<std::string, Variable>;
 
 class Program {
+
+ public:
+  using UniquePtr = std::unique_ptr<Program>;
+
   // FACTORIES
  public:
-  static utils::ResultOr<Program> Create(const std::string& vertex_src,
-                                               const std::string& fragment_src);
+  static ResultOr<UniquePtr> Create(const std::string& vertex_src,
+                                         const std::string& fragment_src);
   // CONSTRUCTORS
  public:
   Program();  // Useful for creating stubs
