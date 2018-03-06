@@ -51,6 +51,7 @@ ResultOr<Program::UniquePtr> Program::Create(const std::string& vertex_src,
   // If some result is invalid, the Program destructor will
   // free the resources
   UniquePtr program = MakeUnique<Program>();
+
   // Vertex Shader
   auto vertex_res = CompileShader("Vertex", GL_VERTEX_SHADER, vertex_src);
   if (!vertex_res.Valid()) {

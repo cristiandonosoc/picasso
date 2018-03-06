@@ -3,6 +3,7 @@
 
 #include "shaders/variable.h"
 #include "utils/result.h"
+#include "utils/macros.h"
 
 #include <map>
 #include <memory>
@@ -18,9 +19,8 @@ namespace shaders {
 using VariableContainer = std::map<std::string, Variable>;
 
 class Program {
-
  public:
-  using UniquePtr = std::unique_ptr<Program>;
+  DEFINE_PTR_TYPES(Program);
 
   // FACTORIES
  public:
