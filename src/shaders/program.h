@@ -26,7 +26,8 @@ class Program {
 
   // FACTORIES
  private:
-  static ResultOr<UniquePtr> Create(const std::string& vertex_src,
+  static ResultOr<UniquePtr> Create(const std::string& name, 
+                                    const std::string& vertex_src,
                                     const std::string& fragment_src);
   // CONSTRUCTORS
  private:
@@ -44,6 +45,7 @@ class Program {
 
   // GETTERS/SETTERS
  public:
+  const std::string& GetName() { return name_; }
   int GetProgramHandle() const { return program_handle_; }
   int GetVertexHandle() const { return vertex_handle_; }
   int GetFragmentHandle() const { return fragment_handle_; }
@@ -76,6 +78,7 @@ class Program {
   void ObtainUniforms();
 
  private:
+  std::string name_;
   VariableContainer attributes_;
   VariableContainer uniforms_;
   int vertex_handle_ = 0;

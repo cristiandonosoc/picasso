@@ -46,11 +46,13 @@ ResultOr<int> CompileShader(const std::string& shader_name,
 /**
  * Program
  **/
-ResultOr<Program::UniquePtr> Program::Create(const std::string& vertex_src,
+ResultOr<Program::UniquePtr> Program::Create(const std::string& name,
+                                             const std::string& vertex_src,
                                              const std::string& fragment_src) {
   // If some result is invalid, the Program destructor will
   // free the resources
   UniquePtr program(new Program());   // private constructor
+  program->name_ = name;
 
   // Vertex Shader
   auto vertex_res = CompileShader("Vertex", GL_VERTEX_SHADER, vertex_src);

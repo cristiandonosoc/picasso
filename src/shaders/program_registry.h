@@ -19,6 +19,7 @@
 #include <map>
 #include <memory>
 #include <string>
+#include <vector>
 
 namespace picasso {
 
@@ -26,11 +27,15 @@ using namespace utils;
 
 namespace shaders {
 
+using ProgramMap = std::map<std::string, Program::UniquePtr>;
+
 class ProgramRegistry : Singleton<ProgramRegistry> {
+
  private:
   ProgramRegistry() = default;
   DISABLE_COPY(ProgramRegistry);
   DISABLE_MOVE(ProgramRegistry);
+
 
  public:
   static ResultOr<Program*> CreateFromFiles(const std::string& name,
@@ -41,14 +46,29 @@ class ProgramRegistry : Singleton<ProgramRegistry> {
                                            const std::string& fs);
   static Program *Get(const std::string& name);
 
+  static std::vector<Program*> GetPrograms() {
+    return Instance().InternalGetPrograms();
+  }
+
  protected:
   ResultOr<Program*> InternalCreate(const std::string& name,
                                     const std::string& vs,
                                     const std::string& fs);
   Program *InternalGet(const std::string& name) const;
 
+  std::vector<Program*> InternalGetPrograms() const {
+    std::vector<Program*> programs;
+    programs.reserve(program_map_.size());
+    for (auto&& it : program_map_) {
+      programs.push_back(it.second.get());
+    }
+
+    return programs;
+  }
+
  private:
   std::map<std::string, Program::UniquePtr> program_map_;
+
 
  public:
   friend class Singleton<ProgramRegistry>;

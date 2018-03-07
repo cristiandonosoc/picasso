@@ -54,7 +54,7 @@ ResultOr<Program*> ProgramRegistry::InternalCreate(const std::string& name,
   }
 
   // We attempt to create it
-  auto res = Program::Create(vs, fs); 
+  auto res = Program::Create(name, vs, fs); 
   if (!res.Valid()) { 
     return ResultOr<Program*>::Error(res.ErrorMsg());
   }

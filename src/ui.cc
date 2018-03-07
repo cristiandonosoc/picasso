@@ -1,4 +1,5 @@
 #include "ui.h"
+#include "shaders/program_registry.h"
 
 namespace picasso {
 
@@ -40,6 +41,33 @@ void ImGuiExample(const ImVec4& clear_color, bool show_demo_window,
       ImGui::SetNextWindowPos(ImVec2(650, 20), ImGuiCond_FirstUseEver); // Normally user code doesn't need/want to call this because positions are saved in .ini file anyway. Here we just want to make the demo initial state a bit more friendly!
       ImGui::ShowDemoWindow(&show_demo_window);
   }
+}
+
+void RunUi(UiData *ui_data) {
+  ImGuiIO& io = ImGui::GetIO();
+
+  /* ImGui::SetNextWindowSize({500, io.DisplaySize.y}, ImGuiCond_Once); */
+  ImGui::SetNextWindowPos({0, 0}, ImGuiCond_Once);
+  ImGui::SetNextWindowSize({0, io.DisplaySize.y}, ImGuiCond_Always);
+  ImGui::Begin("Shaders", nullptr);
+  ImGui::ColorEdit4("Clear Color", ui_data->clear_color);
+
+
+  ImGui::BeginChild("Left Pane", {150, 0}, true);
+  auto&& programs = shaders::ProgramRegistry::GetPrograms();
+  for (auto&& program : programs) {
+    char label[128];
+    sprintf(label, "Shader: %s", program->GetName().c_str());
+    ImGui::Text("%s\n", label);
+  }
+
+
+  ImGui::EndChild();
+
+
+
+  ImGui::End();
+
 }
 
 }   // namespace picasso

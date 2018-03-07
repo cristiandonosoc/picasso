@@ -277,9 +277,11 @@ int main(int, char **) {
   ImGui::StyleColorsDark();
   //ImGui::StyleColorsClassic();
 
-  bool show_demo_window = true;
-  bool show_another_window = false;
+  /* bool show_demo_window = true; */
+  /* bool show_another_window = false; */
   ImVec4 clear_color = ImVec4(0.137f, 0.152f, 0.637f, 1.00f);
+
+  picasso::UiData ui_data;
 
   // Main loop
   bool done = false;
@@ -303,9 +305,10 @@ int main(int, char **) {
 
       ImGui_ImplSdlGL3_NewFrame(window);
 
-
-
-      picasso::ImGuiExample(clear_color, show_demo_window, show_another_window);
+      /* picasso::ImGuiExample(clear_color, show_demo_window, show_another_window); */
+      picasso::RunUi(&ui_data);
+      ImGui::ShowMetricsWindow(nullptr);
+      ImGui::ShowDemoWindow(nullptr);
 
       // Rendering
       // Clear the window
