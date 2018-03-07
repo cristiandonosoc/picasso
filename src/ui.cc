@@ -43,28 +43,66 @@ void ImGuiExample(const ImVec4& clear_color, bool show_demo_window,
   }
 }
 
-void RunUi(UiData *ui_data) {
+void RunUi(UiData *) {
   ImGuiIO& io = ImGui::GetIO();
 
-  /* ImGui::SetNextWindowSize({500, io.DisplaySize.y}, ImGuiCond_Once); */
+  ImGui::SetNextWindowSize({500, io.DisplaySize.y}, ImGuiCond_Once);
   ImGui::SetNextWindowPos({0, 0}, ImGuiCond_Once);
-  ImGui::SetNextWindowSize({0, io.DisplaySize.y}, ImGuiCond_Always);
+  /* ImGui::SetNextWindowSize({0, io.DisplaySize.y}, ImGuiCond_Always); */
   ImGui::Begin("Shaders", nullptr);
-  ImGui::ColorEdit4("Clear Color", ui_data->clear_color);
-
 
   ImGui::BeginChild("Left Pane", {150, 0}, true);
   auto&& programs = shaders::ProgramRegistry::GetPrograms();
-  for (auto&& program : programs) {
+  static int selected_shader = -1;
+  int i = 0;
+  for (auto&& it = programs.begin();
+       it != programs.end();
+       it++, i++) {
+    auto&& program = *it;
     char label[128];
     sprintf(label, "Shader: %s", program->GetName().c_str());
-    ImGui::Text("%s\n", label);
+    if (ImGui::Selectable(label, selected_shader == i)) {
+      selected_shader = i;
+    }
   }
+
+  ImGui::Text("WINDOW Y: %f", ImGui::GetWindowHeight());
+  ImGui::Text("CONTENT Y: %f", ImGui::GetContentRegionMax().y);
+
 
 
   ImGui::EndChild();
+  ImGui::SameLine();
+
+  static char text[1024*16] =
+      "/*\n"
+      " The Pentium F00F bug, shorthand for F0 0F C7 C8,\n"
+      " the hexadecimal encoding of one offending instruction,\n"
+      " more formally, the invalid operand with locked CMPXCHG8B\n"
+      " instruction bug, is a design flaw in the majority of\n"
+      " Intel Pentium, Pentium MMX, and Pentium OverDrive\n"
+      " processors (all in the P5 microarchitecture).\n"
+      "*/\n\n"
+      "label:\n"
+      "\tlock cmpxchg8b eax\n";
 
 
+  float text_height = (ImGui::GetContentRegionAvail().y - 2 * ImGui::GetFontSize()) / 2;
+  /* ImGui::BeginGroup(); */
+    /* ImGui::BeginChild("Vertex Shader", {-1, -window_height / 2}); */
+    ImGui::BeginChild("Vertex Shader", {-1, -1});
+      ImGui::Text("Vertex Shader");
+      ImGui::Separator();
+      ImGui::InputTextMultiline("##vs", text, sizeof(text), {-1, text_height}, 
+                                ImGuiInputTextFlags_AllowTabInput);
+    /* ImGui::EndChild(); */
+    /* ImGui::BeginChild("Fragment Shader", {-1, -window_height / 2}); */
+      ImGui::Text("Fragment Shader");
+      ImGui::Separator();
+      ImGui::InputTextMultiline("##fs", text, sizeof(text), {-1, -1}, 
+                                ImGuiInputTextFlags_AllowTabInput);
+    ImGui::EndChild();
+  /* ImGui::EndGroup(); */
 
   ImGui::End();
 
