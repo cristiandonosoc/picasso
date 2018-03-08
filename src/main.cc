@@ -1,4 +1,4 @@
-#include "shaders/program_registry.h"
+#include "shaders/shader_registry.h"
 #include "shaders/material_registry.h"
 
 #include "ui.h"
@@ -69,8 +69,8 @@ int main(int, char **) {
 	std::string vs = picasso::utils::ReadWholeFile("../shaders/simple.vert");
 	std::string fs = picasso::utils::ReadWholeFile("../shaders/simple.frag");
   std::string shader_name = "test_shader";
-  auto shader_res = ProgramRegistry::Create(shader_name, vs, fs);
-  Program *shader = nullptr;
+  auto shader_res = ShaderRegistry::Create(shader_name, vs, fs);
+  Shader *shader = nullptr;
   if (shader_res.Valid()) {
     shader = shader_res.ConsumeOrDie();
     logout::Info("Successful shader");
@@ -129,7 +129,7 @@ int main(int, char **) {
   logout::Info("Created material \"%s\"", mat_name.c_str());
 
   logout::Info("Setting program to \"%s\"", shader_name.c_str());
-  material->SetProgram(shader);
+  material->SetShader(shader);
 
 
   logout::Info("Listing attributes:");
@@ -317,7 +317,7 @@ int main(int, char **) {
       glClear(GL_COLOR_BUFFER_BIT);
 
       // Use our program
-      glUseProgram(shader->GetProgramHandle());
+      glUseProgram(shader->GetShaderHandle());
       // Bind the VAO (and the VBO and EBO by proxy)
       glBindVertexArray(vao);
       // Draw indexed

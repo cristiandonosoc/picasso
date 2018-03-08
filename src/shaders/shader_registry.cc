@@ -1,5 +1,5 @@
 /******************************************************************************
- * @file: program_registry.cc
+ * @file: shader_registry.cc
  * @author: Cristián Donoso C.
  * @email: cristiandonosoc@gmail.com
  * @date: 2018-03-05
@@ -8,7 +8,7 @@
  * @description: TODO(Cristian): Add description
  ******************************************************************************/
 
-#include "shaders/program_registry.h"
+#include "shaders/shader_registry.h"
 #include "utils/file.h"
 
 namespace picasso {
@@ -20,7 +20,7 @@ namespace shaders {
 /**
  * STATIC INTERFACE
  **/
-ResultOr<Program*> ProgramRegistry::CreateFromFiles(
+ResultOr<Shader*> ShaderRegistry::CreateFromFiles(
     const std::string& name,
     const std::string& vertex_path,
     const std::string& fragment_path) {
@@ -30,40 +30,40 @@ ResultOr<Program*> ProgramRegistry::CreateFromFiles(
   return Create(name, vs, fs);
 }
 
-ResultOr<Program*> ProgramRegistry::Create(const std::string& name,
+ResultOr<Shader*> ShaderRegistry::Create(const std::string& name,
                                            const std::string& vs,
                                            const std::string& fs) {
   return Instance().InternalCreate(name, vs, fs);
 }
 
-Program* ProgramRegistry::Get(const std::string& name) {
+Shader* ShaderRegistry::Get(const std::string& name) {
   return Instance().InternalGet(name);
 }
 
 /**
  * INSTANCE INTERFACE
  **/
-ResultOr<Program*> ProgramRegistry::InternalCreate(const std::string& name,
+ResultOr<Shader*> ShaderRegistry::InternalCreate(const std::string& name,
                                                    const std::string& vs,
                                                    const std::string& fs) {
   // We check if it exists already
   auto it = program_map_.find(name);
   if (it != program_map_.end()) {
-    return ResultOr<Program*>::Error("Program %s already exists",
+    return ResultOr<Shader*>::Error("Shader %s already exists",
                                      name.c_str());
   }
 
   // We attempt to create it
-  auto res = Program::Create(name, vs, fs); 
+  auto res = Shader::Create(name, vs, fs); 
   if (!res.Valid()) { 
-    return ResultOr<Program*>::Error(res.ErrorMsg());
+    return ResultOr<Shader*>::Error(res.ErrorMsg());
   }
 
   // Add it to the registry
   return (program_map_[name] = res.ConsumeOrDie()).get();
 }
 
-Program *ProgramRegistry::InternalGet(const std::string& name) const {
+Shader *ShaderRegistry::InternalGet(const std::string& name) const {
   auto it = program_map_.find(name);
   if (it == program_map_.end()) {
     return nullptr;

@@ -62,7 +62,7 @@ class Variable {
   } data_;
 
  public:
-  friend class Program;
+  friend class Shader;
 };
 
 

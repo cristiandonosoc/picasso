@@ -1,5 +1,5 @@
-#ifndef SRC_SHADERS_PROGRAM_H
-#define SRC_SHADERS_PROGRAM_H
+#ifndef SRC_SHADERS_shader_H
+#define SRC_SHADERS_shader_H
 
 #include "shaders/variable.h"
 #include "utils/result.h"
@@ -20,9 +20,9 @@ class Material;   // Forward Declaration
 
 using VariableContainer = std::map<std::string, Variable>;
 
-class Program {
+class Shader {
  public:
-  DEFINE_PTR_TYPES(Program);
+  DEFINE_PTR_TYPES(Shader);
 
   // FACTORIES
  private:
@@ -31,22 +31,22 @@ class Program {
                                     const std::string& fragment_src);
   // CONSTRUCTORS
  private:
-  Program() = default;
+  Shader() = default;
 
  public:
-  ~Program();
+  ~Shader();
 
   // COPY-MOVE CONSTRUCTORWS
  public:
-  DISABLE_COPY(Program);
+  DISABLE_COPY(Shader);
   // no-except moving
-  Program(Program&&) noexcept;
-  Program& operator=(Program&&) noexcept;
+  Shader(Shader&&) noexcept;
+  Shader& operator=(Shader&&) noexcept;
 
   // GETTERS/SETTERS
  public:
   const std::string& GetName() { return name_; }
-  int GetProgramHandle() const { return program_handle_; }
+  int GetShaderHandle() const { return shader_handle_; }
   int GetVertexHandle() const { return vertex_handle_; }
   int GetFragmentHandle() const { return fragment_handle_; }
 
@@ -83,14 +83,14 @@ class Program {
   VariableContainer uniforms_;
   int vertex_handle_ = 0;
   int fragment_handle_ = 0;
-  int program_handle_ = 0;
+  int shader_handle_ = 0;
   bool valid_ = false;
 
  public:
-  friend class ProgramRegistry;
+  friend class ShaderRegistry;
 };
 
 }   // namespace shaders
 }   // namespace picasso
 
-#endif  // SRC_SHADERS_PROGRAM_H
+#endif  // SRC_SHADERS_shader_H

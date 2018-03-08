@@ -9,7 +9,7 @@
  ******************************************************************************/
 
 #include "shaders/material.h"
-#include "shaders/program.h"
+#include "shaders/shader.h"
 
 namespace picasso {
 namespace shaders {
@@ -35,40 +35,40 @@ Material& Material::operator=(Material&& other) noexcept {
 /**
  * SHADER INTERFACE
  **/
-void Material::SetProgram(Program *program) {
-  if (data_.program == program) { return; }
-  UnlinkProgram();
-  LinkProgram(program);
+void Material::SetShader(Shader *shader) {
+  if (data_.shader == shader) { return; }
+  UnlinkShader();
+  LinkShader(shader);
 }
 
-void Material::UnsetProgram() {
-  UnlinkProgram();
+void Material::UnsetShader() {
+  UnlinkShader();
 }
 
-void Material::LinkProgram(Program *program) {
-  if (program) {
-    program->LinkMaterial(this);
+void Material::LinkShader(Shader *shader) {
+  if (shader) {
+    shader->LinkMaterial(this);
 
     // Copy over attributes
-    for (auto&& it : program->Attributes) {
+    for (auto&& it : shader->Attributes) {
       data_.attributes[it.first] = it.second;
     }
 
     // Copy over uniforms
-    for (auto&& it : program->Uniforms) {
+    for (auto&& it : shader->Uniforms) {
       data_.uniforms[it.first] = it.second;
     }
   }
-  data_.program = program;
+  data_.shader = shader;
 }
 
-void Material::UnlinkProgram() {
-  if (data_.program) {
-    data_.program->UnlinkMaterial(this);
+void Material::UnlinkShader() {
+  if (data_.shader) {
+    data_.shader->UnlinkMaterial(this);
     data_.attributes.clear();
     data_.uniforms.clear();
   }
-  data_.program = nullptr;
+  data_.shader = nullptr;
 }
 
 }   // namespace shaders

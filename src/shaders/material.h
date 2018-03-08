@@ -23,7 +23,7 @@ using namespace utils;
 
 namespace shaders {
 
-class Program;   // Forward Declaration
+class Shader;   // Forward Declaration
 
 class Material {
  public:
@@ -36,12 +36,12 @@ class Material {
   Material() {}
 
  public:
-  void SetProgram(Program *);
-  void UnsetProgram();
+  void SetShader(Shader *);
+  void UnsetShader();
 
  private:
-  void LinkProgram(Program *);
-  void UnlinkProgram();
+  void LinkShader(Shader *);
+  void UnlinkShader();
 
  public:
   DISABLE_COPY(Material);
@@ -51,7 +51,7 @@ class Material {
  private:
   class Data {
    public:
-    Program *program;
+    Shader *shader;
     std::map<std::string, Variable> attributes;
     std::map<std::string, Variable> uniforms;
    public:

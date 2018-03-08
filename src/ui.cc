@@ -1,5 +1,5 @@
 #include "ui.h"
-#include "shaders/program_registry.h"
+#include "shaders/shader_registry.h"
 
 namespace picasso {
 
@@ -52,15 +52,15 @@ void RunUi(UiData *) {
   ImGui::Begin("Shaders", nullptr);
 
   ImGui::BeginChild("Left Pane", {150, 0}, true);
-  auto&& programs = shaders::ProgramRegistry::GetPrograms();
+  auto&& programs = shaders::ShaderRegistry::GetShaders();
   static int selected_shader = -1;
   int i = 0;
   for (auto&& it = programs.begin();
        it != programs.end();
        it++, i++) {
-    auto&& program = *it;
+    auto&& shader = *it;
     char label[128];
-    sprintf(label, "Shader: %s", program->GetName().c_str());
+    sprintf(label, "Shader: %s", shader->GetName().c_str());
     if (ImGui::Selectable(label, selected_shader == i)) {
       selected_shader = i;
     }
