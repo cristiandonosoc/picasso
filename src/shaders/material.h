@@ -30,10 +30,13 @@ class Material {
    DEFINE_PTR_TYPES(Material);
   
  private:
-  static ResultOr<UniquePtr> Create();
+  static ResultOr<UniquePtr> Create(const std::string& name);
 
  private:
   Material() {}
+
+ public:
+  const std::string& GetName() const { return data_.name_; }
 
  public:
   void SetShader(Shader *);
@@ -51,6 +54,7 @@ class Material {
  private:
   class Data {
    public:
+    std::string name_;
     Shader *shader;
     std::map<std::string, Variable> attributes;
     std::map<std::string, Variable> uniforms;

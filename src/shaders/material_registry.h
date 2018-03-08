@@ -16,6 +16,9 @@
 #include "utils/result.h"
 #include "utils/singleton.h"
 
+#include <map>
+#include <vector>
+
 namespace picasso {
 
 using namespace utils; 
@@ -32,9 +35,23 @@ class MaterialRegistry : Singleton<MaterialRegistry> {
   static ResultOr<Material*> Create(const std::string& name);
   static Material *Get(const std::string& name);
 
+  static std::vector<Material*> GetMaterials() {
+    return Instance().InternalGetMaterials();
+  }
+
  protected:
   ResultOr<Material*> InternalCreate(const std::string& name);
   Material *InternalGet(const std::string& name) const;
+
+  std::vector<Material*> InternalGetMaterials() const {
+    std::vector<Material*> materials;
+    materials.reserve(material_map_.size());
+    for (auto&& it : material_map_) {
+      materials.push_back(it.second.get());
+    }
+
+    return materials;
+  }
 
  private:
   std::map<std::string, Material::UniquePtr> material_map_;

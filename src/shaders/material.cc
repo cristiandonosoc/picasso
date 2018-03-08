@@ -17,8 +17,10 @@ namespace shaders {
 /**
  * CONSTRUCTORS
  **/
-ResultOr<Material::UniquePtr> Material::Create() {
-  return UniquePtr(new Material());   // Private Constructor
+ResultOr<Material::UniquePtr> Material::Create(const std::string& name) {
+  UniquePtr material(new Material());   // Private Constructor
+  material->data_.name_ = name;
+  return material;
 }
 
 Material::Material(Material&& other) noexcept {

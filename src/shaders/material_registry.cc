@@ -30,7 +30,7 @@ ResultOr<Material*> MaterialRegistry::InternalCreate(const std::string& name) {
   }
 
   // Attempt to create 
-  auto res = Material::Create();
+  auto res = Material::Create(name);
   if (!res.Valid()) {
     return ResultOr<Material*>::Error(res.ErrorMsg());
   }

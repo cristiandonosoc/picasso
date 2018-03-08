@@ -1,11 +1,13 @@
 #include "ui.h"
 #include "shaders/shader_registry.h"
+#include "shaders/material_registry.h"
 
 #include <cstring>
 
 namespace picasso {
 
 using ::picasso::shaders::Shader;
+using ::picasso::shaders::Material;
 
 void ImGuiExample(const ImVec4& clear_color, bool show_demo_window,
                   bool show_another_window) {
@@ -47,11 +49,11 @@ void ImGuiExample(const ImVec4& clear_color, bool show_demo_window,
   }
 }
 
-void RunUi(UiData *) {
-  ImGuiIO& io = ImGui::GetIO();
+void ShaderWindow() {
+  /* ImGuiIO& io = ImGui::GetIO(); */
 
-  ImGui::SetNextWindowSize({500, io.DisplaySize.y}, ImGuiCond_Once);
-  ImGui::SetNextWindowPos({0, 0}, ImGuiCond_Once);
+  /* ImGui::SetNextWindowSize({500, io.DisplaySize.y}, ImGuiCond_Once); */
+  /* ImGui::SetNextWindowPos({0, 0}, ImGuiCond_Once); */
   /* ImGui::SetNextWindowSize({0, io.DisplaySize.y}, ImGuiCond_Always); */
   ImGui::Begin("Shaders", nullptr);
 
@@ -119,5 +121,88 @@ void RunUi(UiData *) {
   ImGui::End();
 
 }
+
+void MaterialWindow() {
+  /* ImGuiIO& io = ImGui::GetIO(); */
+
+  /* ImGui::SetNextWindowSize({500, io.DisplaySize.y}, ImGuiCond_Once); */
+  /* ImGui::SetNextWindowPos({0, 0}, ImGuiCond_Once); */
+  /* ImGui::SetNextWindowSize({0, io.DisplaySize.y}, ImGuiCond_Always); */
+  ImGui::Begin("Materials", nullptr);
+
+  ImGui::BeginChild("Left Pane", {150, 0}, true);
+  auto&& materials = shaders::MaterialRegistry::GetMaterials();
+  static int selected_material = -1;
+  int i = 0;
+  for (auto&& it = materials.begin();
+       it != materials.end();
+       it++, i++) {
+    Material* material = *it;
+    char label[128];
+    sprintf(label, "%s", material->GetName().c_str());
+    if (ImGui::Selectable(label, selected_material == i)) {
+      selected_material = i;
+    }
+  }
+
+  ImGui::EndChild();
+  ImGui::SameLine();
+
+  Material *material= nullptr;
+  if (selected_material >= 0) {
+    material = materials[selected_material];
+  }
+
+  float text_height = (ImGui::GetContentRegionAvail().y - 2 * ImGui::GetFontSize()) / 2;
+  (void)text_height;
+  /* ImGui::BeginGroup(); */
+    /* ImGui::BeginChild("Vertex Shader", {-1, -window_height / 2}); */
+    /* ImGui::BeginChild("Vertex Shader", {-1, -1}); */
+    /*   ImGui::Text("Vertex Shader"); */
+    /*   ImGui::Separator(); */
+    /*   { */
+
+    /*     char buf[4096] = "No source available"; */
+    /*     size_t len = 0; */
+
+    /*     if (shader) { */
+    /*       const std::string& vertex_src = shader->GetVertexSource(); */
+    /*       len = min(vertex_src.size(), sizeof(buf)); */
+    /*       memcpy(buf, vertex_src.c_str(), len); */
+    /*     } */
+
+    /*     ImGui::InputTextMultiline("##vs", buf, len, {-1, text_height}, */ 
+    /*                               ImGuiInputTextFlags_AllowTabInput); */
+    /*   } */
+    /*   { */
+    /*     char buf[4096] = "No source available"; */
+    /*     size_t len = 0; */
+
+    /*     if (shader) { */
+    /*       const std::string& fragment_src = shader->GetFragmentSource(); */
+    /*       len = min(fragment_src.size(), sizeof(buf)); */
+    /*       memcpy(buf, fragment_src.c_str(), len); */
+    /*     } */
+
+    /*     ImGui::Text("Fragment Shader"); */
+    /*     ImGui::Separator(); */
+    /*     ImGui::InputTextMultiline("##fs", buf, len, {-1, -1}, */ 
+    /*                             ImGuiInputTextFlags_AllowTabInput); */
+    /*   } */
+    /* ImGui::EndChild(); */
+  /* ImGui::EndGroup(); */
+
+  ImGui::End();
+
+}
+
+
+
+void RunUi(UiData *) {
+  ShaderWindow();
+  MaterialWindow();
+}
+
+
 
 }   // namespace picasso
