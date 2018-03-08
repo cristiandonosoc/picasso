@@ -88,6 +88,9 @@ ResultOr<Shader::UniquePtr> Shader::Create(const std::string& name,
 
   shader->ObtainAttributes();
   shader->ObtainUniforms();
+  
+  shader->vertex_src_ = vertex_src;
+  shader->fragment_src_ = fragment_src;
   return shader;
 }
 

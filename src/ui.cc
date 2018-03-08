@@ -1,7 +1,11 @@
 #include "ui.h"
 #include "shaders/shader_registry.h"
 
+#include <cstring>
+
 namespace picasso {
+
+using ::picasso::shaders::Shader;
 
 void ImGuiExample(const ImVec4& clear_color, bool show_demo_window,
                   bool show_another_window) {
@@ -52,11 +56,11 @@ void RunUi(UiData *) {
   ImGui::Begin("Shaders", nullptr);
 
   ImGui::BeginChild("Left Pane", {150, 0}, true);
-  auto&& programs = shaders::ShaderRegistry::GetShaders();
+  auto&& shaders = shaders::ShaderRegistry::GetShaders();
   static int selected_shader = -1;
   int i = 0;
-  for (auto&& it = programs.begin();
-       it != programs.end();
+  for (auto&& it = shaders.begin();
+       it != shaders.end();
        it++, i++) {
     auto&& shader = *it;
     char label[128];
@@ -66,26 +70,13 @@ void RunUi(UiData *) {
     }
   }
 
-  ImGui::Text("WINDOW Y: %f", ImGui::GetWindowHeight());
-  ImGui::Text("CONTENT Y: %f", ImGui::GetContentRegionMax().y);
-
-
-
   ImGui::EndChild();
   ImGui::SameLine();
 
-  static char text[1024*16] =
-      "/*\n"
-      " The Pentium F00F bug, shorthand for F0 0F C7 C8,\n"
-      " the hexadecimal encoding of one offending instruction,\n"
-      " more formally, the invalid operand with locked CMPXCHG8B\n"
-      " instruction bug, is a design flaw in the majority of\n"
-      " Intel Pentium, Pentium MMX, and Pentium OverDrive\n"
-      " processors (all in the P5 microarchitecture).\n"
-      "*/\n\n"
-      "label:\n"
-      "\tlock cmpxchg8b eax\n";
-
+  Shader *shader = nullptr;
+  if (selected_shader >= 0) {
+    shader = shaders[selected_shader];
+  }
 
   float text_height = (ImGui::GetContentRegionAvail().y - 2 * ImGui::GetFontSize()) / 2;
   /* ImGui::BeginGroup(); */
@@ -93,14 +84,35 @@ void RunUi(UiData *) {
     ImGui::BeginChild("Vertex Shader", {-1, -1});
       ImGui::Text("Vertex Shader");
       ImGui::Separator();
-      ImGui::InputTextMultiline("##vs", text, sizeof(text), {-1, text_height}, 
+      {
+
+        char buf[4096] = "No source available";
+        size_t len = 0;
+
+        if (shader) {
+          const std::string& vertex_src = shader->GetVertexSource();
+          len = min(vertex_src.size(), sizeof(buf));
+          memcpy(buf, vertex_src.c_str(), len);
+        }
+
+        ImGui::InputTextMultiline("##vs", buf, len, {-1, text_height}, 
+                                  ImGuiInputTextFlags_AllowTabInput);
+      }
+      {
+        char buf[4096] = "No source available";
+        size_t len = 0;
+
+        if (shader) {
+          const std::string& fragment_src = shader->GetFragmentSource();
+          len = min(fragment_src.size(), sizeof(buf));
+          memcpy(buf, fragment_src.c_str(), len);
+        }
+
+        ImGui::Text("Fragment Shader");
+        ImGui::Separator();
+        ImGui::InputTextMultiline("##fs", buf, len, {-1, -1}, 
                                 ImGuiInputTextFlags_AllowTabInput);
-    /* ImGui::EndChild(); */
-    /* ImGui::BeginChild("Fragment Shader", {-1, -window_height / 2}); */
-      ImGui::Text("Fragment Shader");
-      ImGui::Separator();
-      ImGui::InputTextMultiline("##fs", text, sizeof(text), {-1, -1}, 
-                                ImGuiInputTextFlags_AllowTabInput);
+      }
     ImGui::EndChild();
   /* ImGui::EndGroup(); */
 

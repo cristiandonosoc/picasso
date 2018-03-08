@@ -50,6 +50,9 @@ class Shader {
   int GetVertexHandle() const { return vertex_handle_; }
   int GetFragmentHandle() const { return fragment_handle_; }
 
+  const std::string& GetVertexSource() const { return vertex_src_; }
+  const std::string& GetFragmentSource() const { return fragment_src_; }
+
   // ATTRIBUTES
  public:
   const VariableContainer& Attributes = attributes_;
@@ -78,9 +81,11 @@ class Shader {
   void ObtainUniforms();
 
  private:
-  std::string name_;
   VariableContainer attributes_;
   VariableContainer uniforms_;
+  std::string name_;
+  std::string vertex_src_;
+  std::string fragment_src_;
   int vertex_handle_ = 0;
   int fragment_handle_ = 0;
   int shader_handle_ = 0;
