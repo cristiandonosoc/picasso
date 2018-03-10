@@ -307,8 +307,8 @@ int main(int, char **) {
 
       /* picasso::ImGuiExample(clear_color, show_demo_window, show_another_window); */
       picasso::RunUi(&ui_data);
-      static bool show_demo = true;
       /* ImGui::ShowMetricsWindow(nullptr); */
+      static bool show_demo = true;
       ImGui::ShowDemoWindow(&show_demo);
 
       // Rendering
