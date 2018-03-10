@@ -158,7 +158,7 @@ void Shader::ObtainUniforms() {
   // We obtain the uniforms
   GLint uniform_count;
   glGetShaderiv(shader_handle_, GL_ACTIVE_UNIFORMS, &uniform_count);
-  logerr::Debug("Uniform count: %d", uniform_count);
+  LOGERR_DEBUG("Uniform count: %d", uniform_count);
   for (GLint i = 0; i < uniform_count; i++) {
     std::unique_ptr<char[]> name_ptr(new char[max_uniform_size]);
 
@@ -171,13 +171,13 @@ void Shader::ObtainUniforms() {
     // Obtain the location
     GLint location = glGetUniformLocation(shader_handle_, name_ptr.get());
 
-    logerr::Debug("Uniform name: %s", name_ptr.get());
+    LOGERR_DEBUG("Uniform name: %s", name_ptr.get());
 
     Variable uniform(VariableKind::UNIFORM, name_ptr.get(), location,
                      type, size);
     uniforms_[uniform.GetName()] = std::move(uniform);
   }
-  logerr::Debug("Saved uniforms: %zu", uniforms_.size());
+  LOGERR_DEBUG("Saved uniforms: %zu", uniforms_.size());
 }
 
 
@@ -197,11 +197,11 @@ void Shader::Cleanup() {
  * MATERIAL INTERFACE
  **/
 void Shader::LinkMaterial(Material*) {
-  logerr::Warn("%s: Not Implemented", __FUNCTION__);
+  LOGERR_DEBUG("%s: Not Implemented", __FUNCTION__);
 }
 
 void Shader::UnlinkMaterial(Material*) {
-  logerr::Warn("%s: Not Implemented", __FUNCTION__);
+  LOGERR_DEBUG("%s: Not Implemented", __FUNCTION__);
 }
 
 

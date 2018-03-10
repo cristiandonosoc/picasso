@@ -2,76 +2,46 @@
 
 #include <cstdio>
 #include <cstdarg>
+#include <map>
+#include <string>
 
 namespace picasso {
 namespace utils {
+namespace log {
 
-#define DEFINE_LOG_FUNC(func_name, prefix, file)                              \
-  void func_name(const char *fmt, ...) {                                      \
-    char buf[1024];                                                           \
-    snprintf(buf, sizeof(buf), prefix " %s\n", fmt);                          \
-    va_list arglist;                                                          \
-    va_start(arglist, fmt);                                                   \
-    vfprintf(file, buf, arglist);                                             \
-    fflush(file);                                                             \
-    va_end(arglist);                                                          \
-  }
+static std::map<LogLevel, const char*> level_map = {
+  { LogLevel::LOG_DEBUG,  "[DEBUG]" },
+  { LogLevel::LOG_INFO,   "[INFO]" },
+  { LogLevel::LOG_WARN,   "[WARN]" },
+  { LogLevel::LOG_ERROR,  "[ERROR]" },
+};
 
-#define DEFINE_INDENT_LOG_FUNC(func_name, prefix, file)                       \
-  void func_name(size_t indent, const char *fmt, ...) {                       \
-    char buf[1024];                                                           \
-    snprintf(buf, sizeof(buf), prefix " %*s%s\n", (int)indent, " ", fmt);     \
-    va_list arglist;                                                          \
-    va_start(arglist, fmt);                                                   \
-    vfprintf(file, buf, arglist);                                             \
-    fflush(file);                                                             \
-    va_end(arglist);                                                          \
-  }
+void Log(FILE *output, LogLevel level, const char *file, int line,
+         int indent, const char *fmt, ...) {
+  const char *prefix = level_map[level];
+  char buf[1024];
+  // Log output will be like
+  // <INDENT>[INFO] (main.cc:234): Created shader
+  snprintf(buf, sizeof(buf), 
+           "%*s%s (%s:%d): %s\n", indent, " ", prefix, file, line, fmt);
+  va_list arglist;
+  va_start(arglist, fmt);
+  vfprintf(output, buf, arglist);
+  va_end(arglist);
+  fflush(output);
+}
 
-#define SEPARATOR(file)                                                       \
-  void Separator(int length, const char *c) {                                 \
-    if (length > 128) { length = 128; }                                       \
-    char buf[128 + 1];                                                        \
-    char *p = (char*)&buf;                                                    \
-    for (int i = 0; i < length; i++) { *p++ = *c; }                           \
-    *p = 0;                                                                   \
-    fprintf(file, "%s\n", buf);                                               \
-    fflush(file);                                                             \
-  }
+void Separator(FILE *output, int length, const char *c) {                                 
+  if (length > 128) { length = 128; }                                       
+  char buf[128 + 1];                                                        
+  char *p = (char*)&buf;                                                    
+  for (int i = 0; i < length; i++) { *p++ = *c; }                           
+  *p = 0;                                                                   
+  fprintf(output, "%s\n", buf);                                               
+  fflush(output);                                                             
+}
 
-namespace logout {
 
-DEFINE_LOG_FUNC(Info, "[INFO]", stdout);
-DEFINE_LOG_FUNC(Warn, "[WARN]", stdout);
-DEFINE_LOG_FUNC(Error, "[ERROR]", stdout);
-DEFINE_LOG_FUNC(Debug, "[DEBUG]", stdout);
-
-DEFINE_INDENT_LOG_FUNC(IndentInfo, "[INFO]", stdout);
-DEFINE_INDENT_LOG_FUNC(IndentWarn, "[WARN]", stdout);
-DEFINE_INDENT_LOG_FUNC(IndentError, "[ERROR]", stdout);
-DEFINE_INDENT_LOG_FUNC(IndentDebug, "[DEBUG]", stdout);
-
-SEPARATOR(stdout);
-
-}   // namespace logout
-
-namespace logerr {
-
-DEFINE_LOG_FUNC(Info, "[INFO]", stderr);
-DEFINE_LOG_FUNC(Warn, "[WARN]", stderr);
-DEFINE_LOG_FUNC(Error, "[ERROR]", stderr);
-DEFINE_LOG_FUNC(Debug, "[DEBUG]", stderr);
-
-DEFINE_INDENT_LOG_FUNC(IndentInfo, "[INFO]", stderr);
-DEFINE_INDENT_LOG_FUNC(IndentWarn, "[WARN]", stderr);
-DEFINE_INDENT_LOG_FUNC(IndentError, "[ERROR]", stderr);
-DEFINE_INDENT_LOG_FUNC(IndentDebug, "[DEBUG]", stderr);
-
-SEPARATOR(stdout);
-
-}   // namespace logerr
-
+}   // namespaec log
 }   // namespace utils
 }   // namespace picasso
-
-
