@@ -191,7 +191,7 @@ int main(int, char **) {
                    ui_data.clear_color.w);
       glClear(GL_COLOR_BUFFER_BIT);
 
-      glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+      /* glPolygonMode(GL_FRONT_AND_BACK, GL_LINE); */
       model.Render();
 
       ImGui::Render();

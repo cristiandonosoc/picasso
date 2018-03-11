@@ -221,6 +221,11 @@ bool Model::Render() const {
     // We bind our set VAO
     glBindVertexArray(vao_);
 
+    // We bind the uniforms
+    for (auto&& it : material->Uniforms) {
+      it.second.SendValue();
+    }
+
     if (indexed_) {
       // TODO(Cristian): Actually calculate the sizes
       glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);

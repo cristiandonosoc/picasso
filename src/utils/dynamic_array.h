@@ -53,6 +53,7 @@ class DynamicArray {
 
  public:
   T *Get() { return buffer_.get(); }
+  const T* Get() const { return buffer_.get(); }
   size_t Count() const { return count_; }
   size_t Size() const { return sizeof(T) * count_; }
 

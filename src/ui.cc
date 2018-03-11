@@ -187,9 +187,9 @@ void MaterialWindow(UiData *, ImVec2 start_pos, ImVec2 start_size) {
 
       if (std::regex_search(name, color_regex)) {
         if (variable->GetTypeSize() == 4) {
-          ImGui::ColorEdit4("", (float*)value.GetValue());
+          ImGui::ColorEdit4("", value.GetValue<float>());
         } else {
-          ImGui::ColorEdit3("", (float*)value.GetValue());
+          ImGui::ColorEdit3("", value.GetValue<float>());
         }
       }
       ImGui::Separator();
