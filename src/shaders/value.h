@@ -34,13 +34,20 @@ class Value {
   const Variable *GetVariable() const { return variable_; }
 
  public:
-  void *GetValue() { return backend_.Get(); }
+  template <typename T>
+  T *GetValue() { return (T*)backend_.Get(); }
+  template <typename T>
+  const T *GetValue() const { return (T*)backend_.Get(); }
 
-  template<typename T>
+ public:
+  template <typename T>
   void SetValue(const T&);
-
-  template<typename T>
+  template <typename T>
   void SetValues(size_t count, const T*);
+
+ public:
+  // Send the value to the GPU
+  bool SendValue() const;
 
  private:
   const Variable *variable_;  // Holds a reference to its variable
