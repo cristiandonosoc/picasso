@@ -51,11 +51,21 @@ void ImGuiExample(const ImVec4& clear_color, bool show_demo_window,
   }
 }
 
-void ShaderWindow() {
-  ImGuiIO& io = ImGui::GetIO();
+void SystemWindow(UiData *ui_data, ImVec2 start_pos, ImVec2 start_size) {
+  ImGui::SetNextWindowPos(start_pos, ImGuiCond_Once);
+  ImGui::SetNextWindowSize(start_size, ImGuiCond_Once);
+  static bool open = true;
+  ImGui::Begin("System", &open);
+  ImGui::ColorEdit3("Clear Color", (float*)&ui_data->clear_color);
 
-  ImGui::SetNextWindowSize({500, io.DisplaySize.y}, ImGuiCond_Once);
-  ImGui::Begin("Shaders", nullptr);
+  ImGui::End();
+}
+
+void ShaderWindow(UiData *, ImVec2 start_pos, ImVec2 start_size) {
+  ImGui::SetNextWindowPos(start_pos, ImGuiCond_Once);
+  ImGui::SetNextWindowSize(start_size, ImGuiCond_Once);
+  static bool open = true;
+  ImGui::Begin("Shaders", &open);
 
   ImGui::BeginChild("Left Pane", {150, 0}, true);
   auto&& shaders = shaders::ShaderRegistry::GetShaders();
@@ -122,10 +132,11 @@ void ShaderWindow() {
 
 }
 
-void MaterialWindow() {
-  ImGuiIO& io = ImGui::GetIO();
-  ImGui::SetNextWindowSize({500, io.DisplaySize.y}, ImGuiCond_Once);
-  ImGui::Begin("Materials", nullptr);
+void MaterialWindow(UiData *, ImVec2 start_pos, ImVec2 start_size) {
+  ImGui::SetNextWindowPos(start_pos, ImGuiCond_Once);
+  ImGui::SetNextWindowSize(start_size, ImGuiCond_Once);
+  static bool open = true;
+  ImGui::Begin("Materials", &open);
 
   ImGui::BeginChild("Left Pane", {150, 0}, true);
   auto&& materials = shaders::MaterialRegistry::GetMaterials();
@@ -172,9 +183,10 @@ void MaterialWindow() {
 
 
 
-void RunUi(UiData *) {
-  ShaderWindow();
-  MaterialWindow();
+void RunUi(UiData *ui_data) {
+  SystemWindow(ui_data,   {0, 0},     {500, 500});
+  ShaderWindow(ui_data,   {0, 500},   {500, 500});
+  MaterialWindow(ui_data, {0, 1000},  {500, 500});
 }
 
 
