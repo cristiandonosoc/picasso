@@ -3,6 +3,7 @@
 #include "shaders/material_registry.h"
 
 #include <cstring>
+#include <regex>
 
 namespace picasso {
 
@@ -168,9 +169,30 @@ void MaterialWindow(UiData *, ImVec2 start_pos, ImVec2 start_size) {
     ImGui::Text("Uniforms");
     ImGui::Separator();
 
+    static std::regex color_regex("color", std::regex_constants::ECMAScript | 
+                                           std::regex_constants::icase);
+
     for (auto&& it : material->Uniforms) {
-      const Variable *variable = it.second.GetVariable();
-      ImGui::BulletText("%s", variable->GetName().c_str());
+      Value& value = it.second;
+      const Variable *variable = value.GetVariable();
+      const std::string& name = variable->GetName();
+
+      if(ImGui::TreeNode(name.c_str(), "%s", variable->GetName().c_str())) {
+        ImGui::BulletText("Location: %d", variable->GetLocation());
+        ImGui::BulletText("Type: %s", variable->GetTypeName().c_str());
+        ImGui::BulletText("Type Size: %zu", variable->GetTypeSize());
+        ImGui::BulletText("Size: %zu", variable->GetSize());
+        ImGui::TreePop();
+      }
+
+      if (std::regex_search(name, color_regex)) {
+        if (variable->GetTypeSize() == 4) {
+          ImGui::ColorEdit4("", (float*)value.GetValue());
+        } else {
+          ImGui::ColorEdit3("", (float*)value.GetValue());
+        }
+      }
+      ImGui::Separator();
     }
 
     ImGui::EndChild();

@@ -29,6 +29,8 @@ class Value {
   const Variable *GetVariable() const { return variable_; }
 
  public:
+  void *GetValue() { return backend_.get(); }
+
   template<typename T>
   void SetValue(const T&);
 

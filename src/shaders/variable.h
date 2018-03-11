@@ -47,10 +47,8 @@ class Variable {
   int GetLocation() const { return data_.location_; }
   GLenum GetType() const { return data_.type_; }
   size_t GetTypeSize() const { return data_.type_size_; }
+  const std::string& GetTypeName() const { return data_.type_name_; }
   size_t GetSize() const { return data_.size_; }
-
- public:
-  std::string GetTypeName() const;
 
  private:
   class Data {
@@ -59,6 +57,7 @@ class Variable {
     std::string name_;
     GLenum type_;
     size_t type_size_;
+    std::string type_name_;
     GLsizei size_;
    public:
     friend class Variable;

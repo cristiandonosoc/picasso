@@ -24,6 +24,7 @@ Variable::Variable(VariableKind kind, const std::string& name, int location,
   auto size_res = GL_TYPES_TO_STRING.GetSize(data_.type_);
   assert(size_res.Valid());
   data_.type_size_ = size_res.ConsumeOrDie();
+  data_.type_name_ = GL_TYPES_TO_STRING.GetName(data_.type_).ConsumeOrDie();
 }
 
 Variable::Variable(Variable&& other) noexcept {
@@ -37,16 +38,6 @@ Variable& Variable::operator=(Variable&& other) noexcept {
   return *this;
 }
 
-
-std::string Variable::GetTypeName() const {
-  auto res = GL_TYPES_TO_STRING.GetName(data_.type_);
-  if (!res.Valid()) {
-    return "INVALID";
-  }
-  return res.ConsumeOrDie();
-}
-
-
 void Variable::DebugPrint(int indent) const {
   LOGERR_INDENT_DEBUG(indent, "Variable debug print for \"%s\"", data_.name_.c_str());
   if (data_.kind_ == VariableKind::ATTRIBUTE) {
@@ -57,7 +48,7 @@ void Variable::DebugPrint(int indent) const {
     LOGERR_INDENT_DEBUG(indent, "Kind: NONE");
   }
   LOGERR_INDENT_DEBUG(indent, "Location: %d", data_.location_);
-  LOGERR_INDENT_DEBUG(indent, "Type: %s", GL_TYPES_TO_STRING.GetName(data_.type_).ConsumeOrDie().c_str());
+  LOGERR_INDENT_DEBUG(indent, "Type: %s", data_.type_name_.c_str());
   LOGERR_INDENT_DEBUG(indent, "Type Size: %zu", data_.type_size_);
   LOGERR_INDENT_DEBUG(indent, "Size: %d", data_.size_);
 }
