@@ -17,23 +17,23 @@ namespace models {
 
 using ::picasso::shaders::Shader;
 
-void Model::SetVertices(size_t count, GLfloat *vertices) {
-  vertices_.Reset(count, vertices);
+void Model::SetVertexBuffer(size_t count, GLfloat *vertices) {
+  vertex_buffer_.Reset(count, vertices);
 }
 
-void Model::SetIndices(size_t count, GLuint *indices) {
-  indices_.Reset(count, indices);
+void Model::SetIndexBuffer(size_t count, GLuint *indices) {
+  index_buffer_.Reset(count, indices);
 }
 
-void Model::SetupBuffers() {
+bool Model::SetupBuffers() {
   if (setup_) {
     LOGERR_WARN("Model already setup!");
-    return;
+    return false;
   }
 
-  if (vertices_.Count() == 0) {
-    LOGERR_WARN("Model without vertices");
-    return;
+  if (vertex_buffer_.Count() == 0) {
+    LOGERR_WARN("Model without Vertex Buffer set up");
+    return false;
   }
 
   // We add the vertices to the GPU
@@ -62,10 +62,10 @@ void Model::SetupBuffers() {
   // 1.3 Send data to the active buffer (vbo in this case).
   //     This call will scale the buffer to the size specified here.
   //     Any previous data associated with the buffer will be discarded.
-  glBufferData(GL_ARRAY_BUFFER,     //  Buffer being sent data
-               vertices_.Size(),    // New size of the buffer
-               vertices_.Get(),     // Pointer to the array to send
-               GL_STATIC_DRAW);     // Type of memory storing the data
+  glBufferData(GL_ARRAY_BUFFER,         //  Buffer being sent data
+               vertex_buffer_.Size(),   // New size of the buffer
+               vertex_buffer_.Get(),    // Pointer to the array to send
+               GL_STATIC_DRAW);         // Type of memory storing the data
 
   // 2. [OPTIONAL] 
   //  OpenGL now has a buffer with data. But it can be when drawing
@@ -83,7 +83,7 @@ void Model::SetupBuffers() {
   //
   //  In order to render with indices, we simply need to bind an EBO
   //  and call glDrawElements instead of glDrawArrays
-  if (indices_.Count() > 0) {
+  if (index_buffer_.Count() > 0) {
     // 2.1 Create the EBO buffer (Same as VBO)
     glGenBuffers(1, &ebo_);
 
@@ -92,7 +92,9 @@ void Model::SetupBuffers() {
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ebo_);
 
     // 2.3 Send the indices data
-    glBufferData(GL_ELEMENT_ARRAY_BUFFER, indices_.Size(), indices_.Get(), 
+    glBufferData(GL_ELEMENT_ARRAY_BUFFER, 
+                 index_buffer_.Size(), 
+                 index_buffer_.Get(), 
                  GL_STATIC_DRAW);
     indexed_ =  true;
   }
@@ -134,20 +136,32 @@ void Model::SetupBuffers() {
   // 4.1 Declare the vertex attribute
   // TODO(Cristian): Have a way to query for attributes
   int pos_attrib_location = 0;
+  auto pos_it = attribute_pointer_map_.find(AttributeKind::VERTEX);
+  if (pos_it == attribute_pointer_map_.end()) {
+    LOGERR_ERROR("Model doesn't have VERTEX attribute specification");
+    return false;
+  }
+  const AttributePointer& attrib_pointer = pos_it->second;
+
   glVertexAttribPointer(
       pos_attrib_location,  // Attribute location int he shader
       // Size: How many types are per attrib "element".
       //       Effectivelly this is saying where we have
       //       a vec, vec2, vec3 or vec4
-      3,    // We are specifying a vec3
-      GL_FLOAT,             // Type of value this attribute is
-      GL_FALSE,             // Whether to normalize the data
+      attrib_pointer.GetSize(),    
+      // Type of value this attribute is (GL_FLOAT, GL_DOUBLE, etc)
+      attrib_pointer.GetType(), 
+      // Whether to normalize the data
+      attrib_pointer.GetNormalize(),
       // Stride: Space in bytes between two consecutive values of this 
       //         attribute in the array. 
-      0,    // A value of 0 is saying that the buffer is densely packed.
+      // A value of 0 is saying that the buffer is densely packed.
+      attrib_pointer.GetStride(),    
       // Offset: Space in bytes from the start of the array where the
-      //        first value is.
-      0);   // Value starts from the beginning of the array
+      //        first value is. 
+      // Value starts from the beginning of the array
+      attrib_pointer.GetGLOffset());
+
 
   // 4.2 Enable the attribute
   glEnableVertexAttribArray(pos_attrib_location);
@@ -162,6 +176,7 @@ void Model::SetupBuffers() {
   glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
 
   setup_ = true;
+  return true;
 }
 
 bool Model::AddMaterial(Material *material) {
@@ -187,6 +202,27 @@ bool Model::RemoveMaterial(Material *material) {
   }
 
   material_map_.erase(it);
+  return true;
+}
+
+// TODO(Cristian): Use Status
+bool Model::AddAttributePointer(const AttributePointer& attrib_pointer) {
+  auto it = attribute_pointer_map_.find(attrib_pointer.GetKind());
+  if (it != attribute_pointer_map_.end()) {
+    return false;
+  }
+
+  attribute_pointer_map_[attrib_pointer.GetKind()] = attrib_pointer;
+  return true;
+}
+
+// TODO(Cristian): Use Status
+bool Model::RemoveAttributePointer(const AttributePointer& attrib_pointer) {
+  auto it = attribute_pointer_map_.find(attrib_pointer.GetKind());
+  if (it == attribute_pointer_map_.end()) {
+    return false;
+  }
+  attribute_pointer_map_.erase(it);
   return true;
 }
 

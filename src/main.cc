@@ -6,6 +6,7 @@
 #include <imgui.h>
 #include <imgui_impl_sdl_gl3.h>
 
+#include "models/attrib_pointer.h"
 #include "models/model.h"
 #include "shaders/shader_registry.h"
 #include "shaders/material_registry.h"
@@ -28,6 +29,8 @@ using ::picasso::shaders::Variable;
 using ::picasso::shaders::Material;
 using ::picasso::shaders::MaterialRegistry;
 
+using ::picasso::models::AttributeKind;
+using ::picasso::models::AttributePointer;
 using ::picasso::models::Model;
 
 namespace {
@@ -140,12 +143,20 @@ int main(int, char **) {
   };
 
   Model model;
-  model.SetVertices(sizeof(vertices), vertices);
-  model.SetIndices(sizeof(indices), indices);
+  model.SetVertexBuffer(sizeof(vertices), vertices);
+  model.SetIndexBuffer(sizeof(indices), indices);
+
+
+  model.AddAttributePointer({AttributeKind::VERTEX, 3, GL_FLOAT, true,
+                             0, 0});
+  LOGERR_DEBUG("Attribute pointer count: %zu", model.AttributePointers.size());
+  for (auto&& it : model.AttributePointers) {
+    it.second.DebugPrint();
+  }
+
   model.SetupBuffers();
 
   model.AddMaterial(material);
-
 
   // Setup style
   ImGui::StyleColorsDark();

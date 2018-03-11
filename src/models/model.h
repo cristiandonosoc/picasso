@@ -15,6 +15,7 @@
 #include <map>
 #include <string>
 
+#include "models/attrib_pointer.h"
 #include "shaders/material.h"
 #include "utils/dynamic_array.h"
 
@@ -27,6 +28,7 @@ using ::picasso::utils::DynamicArray;
 class Model {
  public:
   using MaterialMap = std::map<std::string, Material*>;
+  using AttributePointerMap = std::map<AttributeKind, AttributePointer>;
 
  public:
   Model() = default;
@@ -35,13 +37,19 @@ class Model {
   bool Valid() const { return setup_; }
 
  public:
-  void SetVertices(size_t count, GLfloat *vertices);
-  void SetColors(size_t, GLfloat *colors);
-  void SetIndices(size_t count, GLuint *indices);
-  void SetupBuffers();
+  void SetVertexBuffer(size_t count, GLfloat *vertices);
+  void SetIndexBuffer(size_t count, GLuint *indices);
+  bool SetupBuffers();
+
+ public:
+  const AttributePointerMap& AttributePointers = attribute_pointer_map_;
+  // TODO(Cristian): Use Status
+  bool AddAttributePointer(const AttributePointer&);
+  bool RemoveAttributePointer(const AttributePointer&);
 
  public:
   const MaterialMap& Materials = material_map_;
+  // TODO(Cristian): Use Status
   bool AddMaterial(Material*);
   bool RemoveMaterial(Material*);
 
@@ -49,11 +57,13 @@ class Model {
   bool Render() const;
 
  private:
+  AttributePointerMap attribute_pointer_map_;
   MaterialMap material_map_;
-  DynamicArray<GLfloat> vertices_;
+
+  DynamicArray<GLfloat> vertex_buffer_;
   GLuint vbo_ = 0;
 
-  DynamicArray<GLuint> indices_;
+  DynamicArray<GLuint> index_buffer_;
   GLuint ebo_ = 0;
 
   GLuint vao_ = 0;
