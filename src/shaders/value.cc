@@ -19,10 +19,10 @@ Value::Value(const Variable *variable) : variable_(variable) {
   assert(variable);
   if (variable->GetKind() == VariableKind::UNIFORM) {
     // We allocate the amount of data needed for the value
-    backend_size_ = variable->GetTypeSize() * variable->GetSize();
-    backend_.reset(new uint8_t[backend_size_]);
+    backend_.Reset(variable->GetTypeSize() * variable->GetSize());
   }
 }
+
  
 
 }   // namespace shaders 

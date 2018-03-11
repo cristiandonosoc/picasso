@@ -16,9 +16,14 @@
 #include <memory>
 
 #include "shaders/variable.h"
+#include "utils/dynamic_array.h"
+
+using ::picasso::utils::DynamicArray;
 
 namespace picasso {
 namespace shaders {
+
+
 
 class Value {
  public:
@@ -29,7 +34,7 @@ class Value {
   const Variable *GetVariable() const { return variable_; }
 
  public:
-  void *GetValue() { return backend_.get(); }
+  void *GetValue() { return backend_.Get(); }
 
   template<typename T>
   void SetValue(const T&);
@@ -37,12 +42,10 @@ class Value {
   template<typename T>
   void SetValues(size_t count, const T*);
 
-
  private:
   const Variable *variable_;  // Holds a reference to its variable
   // Buffer to hold in the memory
-  std::unique_ptr<uint8_t[]> backend_;
-  size_t backend_size_ = 0;
+  DynamicArray<uint8_t> backend_;
 };
 
 /***************************************************************
@@ -51,15 +54,15 @@ class Value {
 
 template <typename T>
 void Value::SetValue(const T& value) {
-  assert(sizeof(T) == backend_size_);
-  T *ptr = reinterpret_cast<T*>(backend_.get());
+  assert(sizeof(T) == backend_.Size());
+  T *ptr = reinterpret_cast<T*>(backend_.Get());
   *ptr = value;
 }
 
 template <typename T>
 void Value::SetValues(size_t count, const T* values) {
-  assert((count * sizeof(T)) == backend_size_);
-  T *ptr = reinterpret_cast<T*>(backend_.get());
+  assert((count * sizeof(T)) == backend_.Size());
+  T *ptr = reinterpret_cast<T*>(backend_.Get());
   for (size_t i = 0; i < count; i++) {
     *ptr++ = *values++;
   }
