@@ -66,8 +66,6 @@ void Model::SetupBuffers() {
                vertices_.Get(),     // Pointer to the array to send
                GL_STATIC_DRAW);     // Type of memory storing the data
 
-  LOGERR_DEBUG("Set VBO: %d", vbo_);
-
   // 2. [OPTIONAL] 
   //  OpenGL now has a buffer with data. But it can be when drawing
   //  primitives that a lot of them averlap (ie. a rectangle made out of
@@ -96,7 +94,6 @@ void Model::SetupBuffers() {
     glBufferData(GL_ELEMENT_ARRAY_BUFFER, indices_.Size(), indices_.Get(), 
                  GL_STATIC_DRAW);
     indexed_ =  true;
-    LOGERR_DEBUG("Set EBO: %d", ebo_);
   }
 
   // 3. OpenGL has buffer with vertices in it, but has no idea how to interpret them
@@ -156,11 +153,12 @@ void Model::SetupBuffers() {
 
   // 5. Disable all the GL state so that subsequent calls
   //    separete from the models don't modify the state
+  // IMPORTANT(Cristian): Remember to unbind the VAO first!!!!!!
+  //          Otherwise the other unbinding will get set in the VAO too
+  //          and you *will* lose a lot of time debugging it
+  glBindVertexArray(0);
   glBindBuffer(GL_ARRAY_BUFFER, 0);
   glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
-  glBindVertexArray(0);
-
-  LOGERR_DEBUG("Set VAO: %d", vao_);
 
   setup_ = true;
 }
@@ -222,11 +220,9 @@ bool Model::Render() const {
 
     // We bind our set VAO
     glBindVertexArray(vao_);
-    LOGERR_DEBUG("Binding VAO: %d", vao_);
 
     if (indexed_) {
       // TODO(Cristian): Actually calculate the sizes
-      LOGERR_DEBUG("Calling indexed draw call");
       glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
     }
 

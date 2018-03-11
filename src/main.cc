@@ -1,17 +1,19 @@
-#include "shaders/shader_registry.h"
-#include "shaders/material_registry.h"
-
-#include "ui.h"
-#include "utils/file.h"
-#include "utils/gl.h"
-#include "utils/log.h"
-
 #include <cstdio>
 #include <GL/gl3w.h>
 #include <SDL.h>
 
 #include <imgui.h>
 #include <imgui_impl_sdl_gl3.h>
+
+
+#include "shaders/shader_registry.h"
+#include "shaders/material_registry.h"
+#include "model.h"
+
+#include "ui.h"
+#include "utils/file.h"
+#include "utils/gl.h"
+#include "utils/log.h"
 
 void SetupSDL() {
   // Setup window
@@ -25,7 +27,15 @@ void SetupSDL() {
 }
 
 using namespace ::picasso::utils;
-using namespace ::picasso::shaders;
+
+using ::picasso::shaders::Shader;
+using ::picasso::shaders::ShaderRegistry;
+using ::picasso::shaders::Variable;
+
+using ::picasso::shaders::Material;
+using ::picasso::shaders::MaterialRegistry;
+
+using ::picasso::Model;
 
 int main(int, char **) {
 
@@ -39,7 +49,6 @@ int main(int, char **) {
 
 
   if (SDL_Init(SDL_INIT_VIDEO|SDL_INIT_TIMER) != 0) {
-    /* logerr::Error("SDL_Init Error: %s", SDL_GetError()); */
     LOGERR_FATAL("SDL_Init Error: %s", SDL_GetError());
     return 1;
   }
@@ -85,41 +94,7 @@ int main(int, char **) {
     return 1;
   }
 
-  LOGERR_SEPARATOR;
-  LOGERR_INFO("Printing shader attributes:");
-  const auto& attribs = shader->GetAttributes();
-  for (const auto& attrib_it : attribs) {
-    const std::string& attrib_name = attrib_it.first;
-    const Variable& attrib = attrib_it.second;
-    std::string type_name;
-    auto type_name_res = GL_TYPES_TO_STRING.GetName(attrib.GetType());
-    if (type_name_res.Valid()) {
-      type_name = type_name_res.ConsumeOrDie();
-    }
-    LOGERR_INDENT_INFO(2, "NAME: %s, TYPE: %s, SIZE: %zu, LOCATION: %d",
-                       attrib_name.c_str(),
-                       type_name.c_str(),
-                       attrib.GetSize(),
-                       attrib.GetLocation());
-  }
-
-  LOGERR_SEPARATOR;
-  LOGERR_INFO("Printing shader uniforms. Length: %zu", shader->GetUniforms().size());
-  for (auto&& it = shader->UniformBegin();
-       it != shader->UniformEnd();
-       it++) {
-    const std::string& uniform_name = it->first;
-    const Variable& uniform = it->second;
-    LOGERR_INDENT_INFO(2, "NAME: %s, TYPE: %s, SIZE: %zu, LOCATION: %d, TYPE_SIZE: %zu",
-                       uniform_name.c_str(),
-                       uniform.GetTypeName().c_str(),
-                       uniform.GetSize(),
-                       uniform.GetLocation(),
-                       uniform.GetTypeSize());
-  }
-
-  LOGERR_SEPARATOR;
-  LOGERR_INFO("With the property. Length: %zu", shader->Uniforms.size());
+  shader->DebugPrint();
 
   LOGERR_SEPARATOR;
   LOGERR_INFO("Creating material");
@@ -127,7 +102,7 @@ int main(int, char **) {
   auto material_res = MaterialRegistry::Create(mat_name);
 
   if (!material_res.Valid()) {
-    /* logerr::Error("Could not create material \"%s\"", mat_name.c_str()); */
+    LOGERR_FATAL("Could not create material \"%s\"", mat_name.c_str());
     return 1;
   }
 
@@ -136,33 +111,6 @@ int main(int, char **) {
 
   LOGERR_INFO("Setting program to \"%s\"", shader_name.c_str());
   material->SetShader(shader);
-
-
-  /* LOGERR_INFO("Listing attributes:"); */
-  /* for(auto&& it : material->Attributes) { */
-  /*   const std::string& attribute_name = it.first; */
-  /*   const Variable& attribute = it.second; */
-
-  /*   LOGERR_INDENT_INFO(2, "NAME: %s, TYPE: %s, SIZE: %zu, LOCATION: %d", */
-  /*                      attribute_name.c_str(), */
-  /*                      attribute.GetTypeName().c_str(), */
-  /*                      attribute.GetSize(), */
-  /*                      attribute.GetLocation()); */
-  /* } */
-
-
-  /* LOGERR_INFO("Listing uniforms:"); */
-  /* for (auto&& it : material->Uniforms) { */
-  /*   const std::string& uniform_name = it.first; */
-  /*   const Variable& uniform = it.second; */
-  /*   LOGERR_INDENT_INFO(2, "NAME: %s, TYPE: %s, SIZE: %zu, LOCATION: %d, TYPE_SIZE: %zu", */
-  /*                      uniform_name.c_str(), */
-  /*                      uniform.GetTypeName().c_str(), */
-  /*                      uniform.GetSize(), */
-  /*                      uniform.GetLocation(), */
-  /*                      uniform.GetTypeSize()); */
-  /* } */
-
 
 
   // We create some sample points
@@ -179,6 +127,15 @@ int main(int, char **) {
     0, 1, 3,   // first triangle
     1, 2, 3    // second triangle
   };
+
+  Model model;
+  model.SetVertices(sizeof(vertices), vertices);
+  model.SetIndices(sizeof(indices), indices);
+  model.SetupBuffers();
+
+  model.AddMaterial(material);
+
+#if 0
 
   // Establishing data to the GPU
 
@@ -279,6 +236,12 @@ int main(int, char **) {
   //    If disabled, apparently they are not accesible from the shader (?)
   glEnableVertexAttribArray(pos_attrib_location);
 
+  glBindVertexArray(0);
+  glBindBuffer(GL_ARRAY_BUFFER, 0);
+  glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
+
+#endif
+
   // Setup style
   ImGui::StyleColorsDark();
   //ImGui::StyleColorsClassic();
@@ -323,14 +286,8 @@ int main(int, char **) {
       glClearColor(clear_color.x, clear_color.y, clear_color.z, clear_color.w);
       glClear(GL_COLOR_BUFFER_BIT);
 
-      // Use our program
-      glUseProgram(shader->GetShaderHandle());
-      // Bind the VAO (and the VBO and EBO by proxy)
-      glBindVertexArray(vao);
-      // Draw indexed
       glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
-      glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
-      /* glPolygonMode(GL_FRONT_AND_BACK, GL_LINE); */
+      model.Render();
 
       ImGui::Render();
       ImGui_ImplSdlGL3_RenderDrawData(ImGui::GetDrawData());
