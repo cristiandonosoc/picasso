@@ -1,15 +1,16 @@
+
 /******************************************************************************
  * @file: model.h
  * @author: Cristián Donoso C.
  * @email: cristiandonosoc@gmail.com
- * @date: 2018-03-10
+ * @date: 2018-03-11
  * @license: 2018 Cristián Donoso C. - All Rights Reserved.
  *
- * @description: Base class for models
+ * @description: TODO(Cristian): Add description
  ******************************************************************************/
 
-#ifndef SRC_MODEL_H
-#define SRC_MODEL_H
+#ifndef SRC_MODELS_MODEL_H
+#define SRC_MODELS_MODEL_H
 
 #include <map>
 #include <string>
@@ -18,6 +19,7 @@
 #include "utils/dynamic_array.h"
 
 namespace picasso {
+namespace models {
 
 using ::picasso::shaders::Material;
 using ::picasso::utils::DynamicArray;
@@ -34,6 +36,7 @@ class Model {
 
  public:
   void SetVertices(size_t count, GLfloat *vertices);
+  void SetColors(size_t, GLfloat *colors);
   void SetIndices(size_t count, GLuint *indices);
   void SetupBuffers();
 
@@ -59,6 +62,7 @@ class Model {
   bool setup_ = false;
 };  // class Model
 
+}   // namespace models
 }   // namespace picasso
 
-#endif  // SRC_MODEL_H
+#endif  // SRC_MODELS_MODEL_H

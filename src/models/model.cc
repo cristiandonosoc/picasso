@@ -2,17 +2,18 @@
  * @file: model.cc
  * @author: Cristián Donoso C.
  * @email: cristiandonosoc@gmail.com
- * @date: 2018-03-10
+ * @date: 2018-03-11
  * @license: 2018 Cristián Donoso C. - All Rights Reserved.
  *
  * @description: TODO(Cristian): Add description
  ******************************************************************************/
 
-#include "model.h"
+#include "models/model.h"
 #include "shaders/shader.h"
 #include "utils/log.h"
 
 namespace picasso {
+namespace models {
 
 using ::picasso::shaders::Shader;
 
@@ -239,4 +240,5 @@ bool Model::Render() const {
   return true;
 }
 
+}   // namespace models
 }   // namespace picasso

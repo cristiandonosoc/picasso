@@ -6,10 +6,9 @@
 #include <imgui.h>
 #include <imgui_impl_sdl_gl3.h>
 
-
+#include "models/model.h"
 #include "shaders/shader_registry.h"
 #include "shaders/material_registry.h"
-#include "model.h"
 
 #include "ui.h"
 #include "utils/file.h"
@@ -29,7 +28,7 @@ using ::picasso::shaders::Variable;
 using ::picasso::shaders::Material;
 using ::picasso::shaders::MaterialRegistry;
 
-using ::picasso::Model;
+using ::picasso::models::Model;
 
 namespace {
 
