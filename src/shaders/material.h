@@ -11,9 +11,9 @@
 #ifndef SRC_SHADERS_MATERIAL_H
 #define SRC_SHADERS_MATERIAL_H
 
-#include "shaders/variable.h"
 #include "utils/macros.h"
 #include "utils/result.h"
+#include "shaders/value.h"
 
 #include <map>
 
@@ -22,6 +22,8 @@ namespace picasso {
 using namespace utils;
 
 namespace shaders {
+
+using ValueMap = std::map<std::string, Value>;
 
 class Shader;   // Forward Declaration
 
@@ -37,6 +39,10 @@ class Material {
 
  public:
   const std::string& GetName() const { return data_.name_; }
+
+ public:
+  ValueMap& Uniforms = data_.uniforms;
+  ValueMap& Attributes = data_.attributes;
 
  public:
   void SetShader(Shader *);
@@ -56,15 +62,11 @@ class Material {
    public:
     std::string name_;
     Shader *shader;
-    std::map<std::string, Variable> attributes;
-    std::map<std::string, Variable> uniforms;
+    ValueMap attributes;
+    ValueMap uniforms;
    public:
     friend class Material;
   } data_;
-
- public:
-  decltype(data_.attributes)& Attributes = data_.attributes;
-  decltype(data_.uniforms)& Uniforms = data_.uniforms;
 
  public:
   friend class MaterialRegistry;

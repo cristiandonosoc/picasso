@@ -18,7 +18,7 @@ namespace shaders {
 
 class Material;   // Forward Declaration
 
-using VariableContainer = std::map<std::string, Variable>;
+using VariableMap = std::map<std::string, Variable>;
 
 class Shader {
  public:
@@ -55,17 +55,17 @@ class Shader {
 
   // ATTRIBUTES
  public:
-  const VariableContainer& Attributes = attributes_;
-  using ConstAttribIt = VariableContainer::const_iterator;
-  const VariableContainer& GetAttributes() const { return attributes_; }
+  const VariableMap& Attributes = attributes_;
+  using ConstAttribIt = VariableMap::const_iterator;
+  const VariableMap& GetAttributes() const { return attributes_; }
   ConstAttribIt AttribBegin() const { return attributes_.cbegin(); }
   ConstAttribIt AttribEnd() const { return attributes_.cend(); }
 
   // UNIFORMS
  public:
-  const VariableContainer& Uniforms = uniforms_;
-  using ConstUniformIt = VariableContainer::const_iterator;
-  const VariableContainer& GetUniforms() const { return uniforms_; }
+  const VariableMap& Uniforms = uniforms_;
+  using ConstUniformIt = VariableMap::const_iterator;
+  const VariableMap& GetUniforms() const { return uniforms_; }
   ConstUniformIt UniformBegin() const { return uniforms_.cbegin(); }
   ConstUniformIt UniformEnd() const { return uniforms_.cend(); }
 
@@ -81,8 +81,8 @@ class Shader {
   void ObtainUniforms();
 
  private:
-  VariableContainer attributes_;
-  VariableContainer uniforms_;
+  VariableMap attributes_;
+  VariableMap uniforms_;
   std::string name_;
   std::string vertex_src_;
   std::string fragment_src_;

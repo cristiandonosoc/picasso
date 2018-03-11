@@ -53,12 +53,12 @@ void Material::LinkShader(Shader *shader) {
 
     // Copy over attributes
     for (auto&& it : shader->Attributes) {
-      data_.attributes[it.first] = it.second;
+      data_.attributes[it.first] = Value(&it.second);
     }
 
     // Copy over uniforms
     for (auto&& it : shader->Uniforms) {
-      data_.uniforms[it.first] = it.second;
+      data_.uniforms[it.first] = Value(&it.second);
     }
   }
   data_.shader = shader;

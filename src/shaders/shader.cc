@@ -88,7 +88,7 @@ ResultOr<Shader::UniquePtr> Shader::Create(const std::string& name,
 
   shader->ObtainAttributes();
   shader->ObtainUniforms();
-  
+
   shader->vertex_src_ = vertex_src;
   shader->fragment_src_ = fragment_src;
   return shader;
@@ -156,7 +156,7 @@ void Shader::ObtainUniforms() {
                  &max_uniform_size);
 
   // We obtain the uniforms
-  GLint uniform_count;
+  GLint uniform_count = 0;
   glGetShaderiv(shader_handle_, GL_ACTIVE_UNIFORMS, &uniform_count);
   LOGERR_DEBUG("Uniform count: %d", uniform_count);
   for (GLint i = 0; i < uniform_count; i++) {

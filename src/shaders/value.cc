@@ -15,7 +15,7 @@
 namespace picasso {
 namespace shaders {
 
-Value::Value(Variable *variable) : variable_(variable) {
+Value::Value(const Variable *variable) : variable_(variable) {
   assert(variable);
   if (variable->GetKind() == VariableKind::UNIFORM) {
     // We allocate the amount of data needed for the value

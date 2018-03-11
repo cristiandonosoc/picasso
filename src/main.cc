@@ -64,11 +64,16 @@ int main(int, char **) {
   // Mainly sets up the HDC and SDL Keyboard/Mouse stuf
   ImGui_ImplSdlGL3_Init(window);
 
-  LOGOUT_INFO("GL_VERSION: %s", "test");
+  LOGERR_INFO("OpenGL Vendor: %s", glGetString(GL_VENDOR));
+  LOGERR_INFO("OpenGL Renderer: %s", glGetString(GL_RENDERER));
+  LOGERR_INFO("OpenGL Version: %s", glGetString(GL_VERSION));
+  LOGERR_INFO("OpenGL Shading Language Version: %s", 
+              glGetString(GL_SHADING_LANGUAGE_VERSION));
+  LOGERR_INFO("OpenGL Extension: %s", glGetString(GL_EXTENSIONS));
 
   // Load a shader
-	std::string vs = picasso::utils::ReadWholeFile("../shaders/simple.vert");
-	std::string fs = picasso::utils::ReadWholeFile("../shaders/simple.frag");
+	std::string vs = ::picasso::utils::ReadWholeFile("../shaders/simple.vert");
+	std::string fs = ::picasso::utils::ReadWholeFile("../shaders/simple.frag");
   std::string shader_name = "test_shader";
   auto shader_res = ShaderRegistry::Create(shader_name, vs, fs);
   Shader *shader = nullptr;
@@ -80,8 +85,8 @@ int main(int, char **) {
     return 1;
   }
 
-  LOGOUT_SEPARATOR;
-  LOGOUT_INFO("Printing shader attributes:");
+  LOGERR_SEPARATOR;
+  LOGERR_INFO("Printing shader attributes:");
   const auto& attribs = shader->GetAttributes();
   for (const auto& attrib_it : attribs) {
     const std::string& attrib_name = attrib_it.first;
@@ -91,21 +96,21 @@ int main(int, char **) {
     if (type_name_res.Valid()) {
       type_name = type_name_res.ConsumeOrDie();
     }
-    LOGOUT_INDENT_INFO(2, "NAME: %s, TYPE: %s, SIZE: %zu, LOCATION: %d",
+    LOGERR_INDENT_INFO(2, "NAME: %s, TYPE: %s, SIZE: %zu, LOCATION: %d",
                        attrib_name.c_str(),
                        type_name.c_str(),
                        attrib.GetSize(),
                        attrib.GetLocation());
   }
 
-  LOGOUT_SEPARATOR;
-  LOGOUT_INFO("Printing shader uniforms. Length: %zu", shader->GetUniforms().size());
+  LOGERR_SEPARATOR;
+  LOGERR_INFO("Printing shader uniforms. Length: %zu", shader->GetUniforms().size());
   for (auto&& it = shader->UniformBegin();
        it != shader->UniformEnd();
        it++) {
     const std::string& uniform_name = it->first;
     const Variable& uniform = it->second;
-    LOGOUT_INDENT_INFO(2, "NAME: %s, TYPE: %s, SIZE: %zu, LOCATION: %d, TYPE_SIZE: %zu",
+    LOGERR_INDENT_INFO(2, "NAME: %s, TYPE: %s, SIZE: %zu, LOCATION: %d, TYPE_SIZE: %zu",
                        uniform_name.c_str(),
                        uniform.GetTypeName().c_str(),
                        uniform.GetSize(),
@@ -113,11 +118,11 @@ int main(int, char **) {
                        uniform.GetTypeSize());
   }
 
-  LOGOUT_SEPARATOR;
-  LOGOUT_INFO("With the property. Length: %zu", shader->Uniforms.size());
+  LOGERR_SEPARATOR;
+  LOGERR_INFO("With the property. Length: %zu", shader->Uniforms.size());
 
-  LOGOUT_SEPARATOR;
-  LOGOUT_INFO("Creating material");
+  LOGERR_SEPARATOR;
+  LOGERR_INFO("Creating material");
   std::string mat_name = "mat0";
   auto material_res = MaterialRegistry::Create(mat_name);
 
@@ -127,36 +132,36 @@ int main(int, char **) {
   }
 
   Material *material = material_res.ConsumeOrDie();
-  LOGOUT_INFO("Created material \"%s\"", mat_name.c_str());
+  LOGERR_INFO("Created material \"%s\"", mat_name.c_str());
 
-  LOGOUT_INFO("Setting program to \"%s\"", shader_name.c_str());
+  LOGERR_INFO("Setting program to \"%s\"", shader_name.c_str());
   material->SetShader(shader);
 
 
-  LOGOUT_INFO("Listing attributes:");
-  for(auto&& it : material->Attributes) {
-    const std::string& attribute_name = it.first;
-    const Variable& attribute = it.second;
+  /* LOGERR_INFO("Listing attributes:"); */
+  /* for(auto&& it : material->Attributes) { */
+  /*   const std::string& attribute_name = it.first; */
+  /*   const Variable& attribute = it.second; */
 
-    LOGOUT_INDENT_INFO(2, "NAME: %s, TYPE: %s, SIZE: %zu, LOCATION: %d",
-                       attribute_name.c_str(),
-                       attribute.GetTypeName().c_str(),
-                       attribute.GetSize(),
-                       attribute.GetLocation());
-  }
+  /*   LOGERR_INDENT_INFO(2, "NAME: %s, TYPE: %s, SIZE: %zu, LOCATION: %d", */
+  /*                      attribute_name.c_str(), */
+  /*                      attribute.GetTypeName().c_str(), */
+  /*                      attribute.GetSize(), */
+  /*                      attribute.GetLocation()); */
+  /* } */
 
 
-  LOGOUT_INFO("Listing uniforms:");
-  for (auto&& it : material->Uniforms) {
-    const std::string& uniform_name = it.first;
-    const Variable& uniform = it.second;
-    LOGOUT_INDENT_INFO(2, "NAME: %s, TYPE: %s, SIZE: %zu, LOCATION: %d, TYPE_SIZE: %zu",
-                       uniform_name.c_str(),
-                       uniform.GetTypeName().c_str(),
-                       uniform.GetSize(),
-                       uniform.GetLocation(),
-                       uniform.GetTypeSize());
-  }
+  /* LOGERR_INFO("Listing uniforms:"); */
+  /* for (auto&& it : material->Uniforms) { */
+  /*   const std::string& uniform_name = it.first; */
+  /*   const Variable& uniform = it.second; */
+  /*   LOGERR_INDENT_INFO(2, "NAME: %s, TYPE: %s, SIZE: %zu, LOCATION: %d, TYPE_SIZE: %zu", */
+  /*                      uniform_name.c_str(), */
+  /*                      uniform.GetTypeName().c_str(), */
+  /*                      uniform.GetSize(), */
+  /*                      uniform.GetLocation(), */
+  /*                      uniform.GetTypeSize()); */
+  /* } */
 
 
 

@@ -22,7 +22,8 @@ namespace shaders {
 
 class Value {
  public:
-  Value(Variable *variable);
+  Value() = default;
+  Value(const Variable *variable);
 
  public:
   const Variable *GetVariable() const { return variable_; }
@@ -36,7 +37,7 @@ class Value {
 
 
  private:
-  Variable *variable_;  // Holds a reference to its variable
+  const Variable *variable_;  // Holds a reference to its variable
   // Buffer to hold in the memory
   std::unique_ptr<uint8_t[]> backend_;
   size_t backend_size_ = 0;
