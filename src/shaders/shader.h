@@ -43,9 +43,13 @@ class Shader {
   Shader(Shader&&) noexcept;
   Shader& operator=(Shader&&) noexcept;
 
+ public:
+  void DebugPrint(int indent = 0) const;
+
   // GETTERS/SETTERS
  public:
-  const std::string& GetName() { return name_; }
+  bool Valid() const { return valid_; }
+  const std::string& GetName() const { return name_; }
   int GetShaderHandle() const { return shader_handle_; }
   int GetVertexHandle() const { return vertex_handle_; }
   int GetFragmentHandle() const { return fragment_handle_; }
@@ -81,11 +85,11 @@ class Shader {
   void ObtainUniforms();
 
  private:
-  VariableMap attributes_;
-  VariableMap uniforms_;
   std::string name_;
   std::string vertex_src_;
   std::string fragment_src_;
+  VariableMap attributes_;
+  VariableMap uniforms_;
   int vertex_handle_ = 0;
   int fragment_handle_ = 0;
   int shader_handle_ = 0;

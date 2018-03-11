@@ -39,6 +39,7 @@ class Material {
 
  public:
   const std::string& GetName() const { return data_.name_; }
+  const Shader *GetShader() const { return data_.shader; }
 
  public:
   ValueMap& Uniforms = data_.uniforms;

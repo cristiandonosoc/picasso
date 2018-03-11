@@ -79,7 +79,7 @@ ResultOr<Shader::UniquePtr> Shader::Create(const std::string& name,
   glAttachShader(shader->shader_handle_, shader->fragment_handle_);
   glLinkProgram(shader->shader_handle_);
   GLint is_linked;
-  glGetShaderiv(shader->shader_handle_, GL_LINK_STATUS, &is_linked);
+  glGetProgramiv(shader->shader_handle_, GL_LINK_STATUS, &is_linked);
   if (is_linked == GL_FALSE) {
     GLchar log[2048];
     glGetShaderInfoLog(shader->shader_handle_, sizeof(log), 0, log);
@@ -91,6 +91,7 @@ ResultOr<Shader::UniquePtr> Shader::Create(const std::string& name,
 
   shader->vertex_src_ = vertex_src;
   shader->fragment_src_ = fragment_src;
+  shader->valid_ = true;
   return shader;
 }
 
@@ -127,11 +128,11 @@ Shader& Shader::operator=(Shader&& other) noexcept {
 void Shader::ObtainAttributes() {
   // Obtain the max size of the attribute names
   GLint max_attrib_size;
-  glGetShaderiv(shader_handle_, GL_ACTIVE_ATTRIBUTE_MAX_LENGTH, &max_attrib_size);
+  glGetProgramiv(shader_handle_, GL_ACTIVE_ATTRIBUTE_MAX_LENGTH, &max_attrib_size);
 
   // We obtain the attributes
-  GLint attrib_count;
-  glGetShaderiv(shader_handle_, GL_ACTIVE_ATTRIBUTES, &attrib_count);
+  GLint attrib_count = 0;
+  glGetProgramiv(shader_handle_, GL_ACTIVE_ATTRIBUTES, &attrib_count);
   for (GLint i = 0; i < attrib_count; i++) {
     std::unique_ptr<char[]> name_ptr(new char[max_attrib_size]);
 
@@ -152,13 +153,12 @@ void Shader::ObtainAttributes() {
 void Shader::ObtainUniforms() {
   // Obtain the max size of the uniforms names
   GLint max_uniform_size;
-  glGetShaderiv(shader_handle_, GL_ACTIVE_UNIFORM_MAX_LENGTH,
+  glGetProgramiv(shader_handle_, GL_ACTIVE_UNIFORM_MAX_LENGTH,
                  &max_uniform_size);
 
   // We obtain the uniforms
   GLint uniform_count = 0;
-  glGetShaderiv(shader_handle_, GL_ACTIVE_UNIFORMS, &uniform_count);
-  LOGERR_DEBUG("Uniform count: %d", uniform_count);
+  glGetProgramiv(shader_handle_, GL_ACTIVE_UNIFORMS, &uniform_count);
   for (GLint i = 0; i < uniform_count; i++) {
     std::unique_ptr<char[]> name_ptr(new char[max_uniform_size]);
 
@@ -171,13 +171,10 @@ void Shader::ObtainUniforms() {
     // Obtain the location
     GLint location = glGetUniformLocation(shader_handle_, name_ptr.get());
 
-    LOGERR_DEBUG("Uniform name: %s", name_ptr.get());
-
     Variable uniform(VariableKind::UNIFORM, name_ptr.get(), location,
                      type, size);
     uniforms_[uniform.GetName()] = std::move(uniform);
   }
-  LOGERR_DEBUG("Saved uniforms: %zu", uniforms_.size());
 }
 
 
@@ -197,11 +194,35 @@ void Shader::Cleanup() {
  * MATERIAL INTERFACE
  **/
 void Shader::LinkMaterial(Material*) {
-  LOGERR_DEBUG("%s: Not Implemented", __FUNCTION__);
+  LOGERR_WARN("%s: Not Implemented", __FUNCTION__);
 }
 
 void Shader::UnlinkMaterial(Material*) {
-  LOGERR_DEBUG("%s: Not Implemented", __FUNCTION__);
+  LOGERR_WARN("%s: Not Implemented", __FUNCTION__);
+}
+
+
+void Shader::DebugPrint(int indent) const {
+  LOGERR_INDENT_DEBUG(indent, "Shader debug print for \"%s\"", name_.c_str());
+
+  // Vertex Shader
+  LOGERR_INDENT_DEBUG(indent, "Vertex Handle: %d", vertex_handle_);
+  LOGERR_INDENT_DEBUG(indent, "Vertex Source: \n%s", vertex_src_.c_str());
+
+  // Fragment Shader
+  LOGERR_INDENT_DEBUG(indent, "Fragment Handle: %d", fragment_handle_);
+  LOGERR_INDENT_DEBUG(indent, "Fragment Source: \n%s", fragment_src_.c_str());
+
+  // Attributes
+  LOGERR_INDENT_DEBUG(indent, "Found %zu attributes", Attributes.size());
+  for (auto&& it : Attributes) {
+    it.second.DebugPrint(indent + 4);
+  }
+
+  LOGERR_INDENT_DEBUG(indent, "Found %zu uniforms", Uniforms.size());
+  for (auto&& it : Uniforms) {
+    it.second.DebugPrint(indent + 4);
+  }
 }
 
 

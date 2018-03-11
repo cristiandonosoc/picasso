@@ -39,6 +39,9 @@ class Variable {
   Variable& operator=(Variable&&) noexcept;
 
  public:
+  void DebugPrint(int indent = 0) const;
+
+ public:
   VariableKind GetKind() const { return data_.kind_; }
   const std::string& GetName() const { return data_.name_; }
   int GetLocation() const { return data_.location_; }
