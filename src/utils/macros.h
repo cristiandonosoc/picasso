@@ -26,4 +26,8 @@
   class_name(class_name&&) = delete; \
   class_name& operator=(class_name&&) = delete;
 
+#define DECLARE_NOEXCEPT_MOVE(class_name) \
+  class_name(class_name&&) noexcept; \
+  class_name& operator=(class_name&&) noexcept;
+
 #endif  // SRC_UTILS_MACROS_H

@@ -13,6 +13,8 @@
 
 #include <memory>
 
+#include "utils/macros.h"
+
 namespace picasso {
 namespace utils {
 
@@ -20,11 +22,18 @@ template <typename T>
 class DynamicArray {
  public:
   DynamicArray() = default;
-  DynamicArray(size_t count) : count_(count), buffer_(new T[count_]) {}
+  DynamicArray(size_t count) : count_(count), buffer_(new T[count_]) {
+    ClearArray();
+  }
   DynamicArray(size_t count, T* array) 
     : count_(count), buffer_(new T[count_]) {
     FillArray(count, array);
   }
+
+ public:
+  DISABLE_COPY(DynamicArray);
+  DynamicArray(DynamicArray&&) noexcept = default;
+  DynamicArray& operator=(DynamicArray&&) noexcept = default;
 
  public:
   void Reset() {
@@ -34,10 +43,12 @@ class DynamicArray {
   void Reset(size_t count) {
     count_ = count;
     buffer_.reset(new T[count_]);
+    ClearArray();
   }
   void Reset(size_t count, T* array) {
-    Reset(count);
-    FillArray(count, array);
+    count_ = count;
+    buffer_.reset(new T[count_]);
+    FillArray(count_, array);
   }
 
  public:
@@ -50,6 +61,13 @@ class DynamicArray {
     T *ptr = Get();
     for (size_t i = 0; i < count; i++) {
       *ptr++ = *array++;
+    }
+  }
+
+  void ClearArray() {
+    T *ptr = Get();
+    for (size_t i = 0; i < count_; i++) {
+      *ptr++ = 0;
     }
   }
 
