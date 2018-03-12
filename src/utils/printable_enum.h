@@ -30,6 +30,7 @@
 #include <string>
 #include <type_traits>
 
+#include "utils/macros.h"
 #include "utils/map_macro.h"
 
 // TODO(Cristian): Actually write some unit tests for this
@@ -49,62 +50,74 @@
  *
  * The other required part is the MAP_ARG_ALL macro
  * that enables us to map a macro to each __VA_ARGS__.
+ * That macro is defined and explained in utils/map_macro.h
  *
  * With this we can call ADD_TO_MAPPING (defined later this file),
  * which actually ouputs the code that will add each string
  * into the map.
  */
-#define PRINTABLE_ENUM(EnumType, ...)                         \
-  class EnumType final {                                      \
-   public:                                                    \
-    enum InternalEnum { __VA_ARGS__ } ;                       \
-                                                              \
-   public:                                                    \
-    EnumType(InternalEnum val) : val_(val) {}                 \
-    EnumType& operator=(InternalEnum val) {                   \
-      val_ = val;                                             \
-      return *this;                                           \
-    }                                                         \
-    operator InternalEnum() const { return val_; }            \
-                                                              \
-   public:                                                    \
-    using EnumMap = std::map<InternalEnum, std::string>;      \
-                                                              \
-   private:                                                   \
-    class Mapping final {                                     \
-     private:                                                 \
-      Mapping() {                                             \
-        MAP_ARG_ALL(ADD_TO_MAPPING, EnumType, __VA_ARGS__)    \
-      }                                                       \
-     private:                                                 \
-      EnumMap map_;                                           \
-     public:                                                  \
-      friend class EnumType;                                  \
-    };                                                        \
-                                                              \
-    static const Mapping& MappingInstance() {                 \
-      static Mapping mapping;                                 \
-      return mapping;                                         \
-    }                                                         \
-                                                              \
-   public:                                                    \
-    static const EnumMap& GetMap() {                          \
-      const Mapping& mapping = MappingInstance();             \
-      return mapping.map_;                                    \
-    }                                                         \
-                                                              \
-    static const std::string ToString(InternalEnum val) {     \
-      const Mapping& mapping = MappingInstance();             \
-      auto it = mapping.map_.find(val);                       \
-      assert(it != mapping.map_.end());                       \
-      return it->second;                                      \
-    }                                                         \
-                                                              \
-   private:                                                   \
-    InternalEnum val_;                                        \
+#define PRINTABLE_ENUM(EnumType, ...)                                         \
+  class EnumType final {                                                      \
+   public:                                                                    \
+    enum InternalEnum { __VA_ARGS__ } ;                                       \
+                                                                              \
+   public:                                                                    \
+    EnumType() = default;                                                     \
+    DEFAULT_COPY(EnumType);                                                   \
+    DEFAULT_MOVE(EnumType);                                                   \
+                                                                              \
+   public:                                                                    \
+    EnumType(InternalEnum val) : val_(val) {}                                 \
+    EnumType& operator=(InternalEnum val) {                                   \
+      val_ = val;                                                             \
+      return *this;                                                           \
+    }                                                                         \
+    operator InternalEnum() const { return val_; }                            \
+                                                                              \
+   public:                                                                    \
+    using EnumMap = std::map<InternalEnum, std::string>;                      \
+                                                                              \
+   private:                                                                   \
+    class Mapping final {                                                     \
+     private:                                                                 \
+      Mapping() {                                                             \
+        MAP_ARG_ALL(ADD_TO_MAPPING, EnumType, __VA_ARGS__)                    \
+      }                                                                       \
+     private:                                                                 \
+      EnumMap map_;                                                           \
+     public:                                                                  \
+      friend class EnumType;                                                  \
+    };                                                                        \
+                                                                              \
+    static const Mapping& MappingInstance() {                                 \
+      static Mapping mapping;                                                 \
+      return mapping;                                                         \
+    }                                                                         \
+                                                                              \
+   public:                                                                    \
+    static const EnumMap& GetMap() {                                          \
+      const Mapping& mapping = MappingInstance();                             \
+      return mapping.map_;                                                    \
+    }                                                                         \
+                                                                              \
+    static const std::string ToString(InternalEnum val) {                     \
+      const Mapping& mapping = MappingInstance();                             \
+      auto it = mapping.map_.find(val);                                       \
+      assert(it != mapping.map_.end());                                       \
+      return it->second;                                                      \
+    }                                                                         \
+                                                                              \
+   private:                                                                   \
+    InternalEnum val_;                                                        \
   };
 
 
+/**
+ * This is the function mapped foreach __VA_ARGS__ that are the 
+ * enum options. It's basically creating the correct string that's
+ * added to the correct key from the pre-coordinated map name
+ * available in the context.
+ */
 #define ADD_TO_MAPPING(enum_name, field) \
   map_[enum_name::field] = #enum_name "::" #field;
 

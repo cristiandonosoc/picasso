@@ -18,6 +18,14 @@
   using SharedPtr = std::shared_ptr<class_name>; \
   using WeakPtr = std::weak_ptr<class_name>; 
 
+#define DEFAULT_COPY(class_name) \
+  class_name(const class_name&) = default; \
+  class_name& operator=(const class_name&) = default;
+
+#define DEFAULT_MOVE(class_name) \
+  class_name(class_name&&) = default; \
+  class_name& operator=(class_name&&) = default;
+
 #define DISABLE_COPY(class_name) \
   class_name(const class_name&) = delete; \
   class_name& operator=(const class_name&) = delete;
