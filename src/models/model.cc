@@ -239,8 +239,8 @@ bool Model::Render() const {
     return false;
   }
 
-  for (auto&& it : material_map_) {
-    Material *material = it.second;
+  for (auto&& mat_it : material_map_) {
+    Material *material = mat_it.second;
     const Shader *shader = material->GetShader();
     if (!shader) { 
       LOGERR_WARN("Rendering with null shader");
@@ -259,8 +259,8 @@ bool Model::Render() const {
     glBindVertexArray(vao_);
 
     // We bind the uniforms
-    for (auto&& it : material->Uniforms) {
-      it.second.SendValue();
+    for (auto&& u_it : material->Uniforms) {
+      u_it.second.SendValue();
     }
 
     if (indexed_) {

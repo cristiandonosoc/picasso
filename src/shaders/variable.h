@@ -8,14 +8,12 @@
 #include <memory>
 #include <string>
 
+#include "utils/printable_enum.h"
+
 namespace picasso {
 namespace shaders {
 
-enum VariableKind {
-  NONE,
-  ATTRIBUTE,
-  UNIFORM,
-};
+PRINTABLE_ENUM(VariableKind, ATTRIBUTE, UNIFORM)
 
 /**
  * Variable
@@ -66,8 +64,6 @@ class Variable {
  public:
   friend class Shader;
 };
-
-
 
 }   // namespace shaders
 }   // namespace picasso

@@ -16,6 +16,8 @@
 #include "utils/gl.h"
 #include "utils/log.h"
 
+#include "utils/printable_enum.h"
+
 #ifdef _WIN32
 #include "Windows.h"
 #endif
@@ -32,6 +34,7 @@ using ::picasso::shaders::MaterialRegistry;
 using ::picasso::models::AttributeKind;
 using ::picasso::models::AttributePointer;
 using ::picasso::models::Model;
+
 
 namespace {
 
@@ -56,11 +59,30 @@ SDL_Window *SetupSDL() {
 
 }   // namespace
 
+PRINTABLE_ENUM(SuperEnum, VERTEX, FRAGMENT, COMPUTE, GEOMETRY);
+
 int main(int, char **) {
   if (SDL_Init(SDL_INIT_VIDEO|SDL_INIT_TIMER) != 0) {
     LOGERR_FATAL("SDL_Init Error: %s", SDL_GetError());
     return 1;
   }
+
+  /* auto&& mapping = PrintableEnum<TestEnum>::GetMap(); */
+  SuperEnum test = SuperEnum::VERTEX;
+  test = SuperEnum::FRAGMENT;
+  if (test == SuperEnum::FRAGMENT) {
+    LOGERR_DEBUG("I can compare!");
+  }
+
+  LOGERR_DEBUG("Printing enum");
+  auto&& mapping = SuperEnum::GetMap();
+  for (auto&& it : mapping) {
+    LOGERR_INDENT_DEBUG(4, "Printing enum option %s: %d", SuperEnum::ToString(it.first).c_str(), it.first);
+  }
+
+
+
+
 
   // Setup window
   SDL_Window *window = SetupSDL();
