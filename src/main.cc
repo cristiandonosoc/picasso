@@ -35,6 +35,8 @@ using ::picasso::models::AttributeKind;
 using ::picasso::models::AttributePointer;
 using ::picasso::models::Model;
 
+#define DG_MISC_IMPLEMENTATION
+#include <DG_misc.h>
 
 namespace {
 
@@ -61,11 +63,21 @@ SDL_Window *SetupSDL() {
 
 PRINTABLE_ENUM(SuperEnum, VERTEX, FRAGMENT, COMPUTE, GEOMETRY);
 
+
 int main(int, char **) {
   if (SDL_Init(SDL_INIT_VIDEO|SDL_INIT_TIMER) != 0) {
     LOGERR_FATAL("SDL_Init Error: %s", SDL_GetError());
     return 1;
   }
+
+
+  const char *path = DG_GetExecutableDir();
+  LOGERR_INFO("PATH: %s", path);
+
+  std::string p = ::picasso::utils::ReadWholeFile(std::string(path) + "shaders/simple.vert");
+  LOGERR_INFO("SHADER: %s", p.c_str());
+
+  if (true) { return 0; }
 
   /* auto&& mapping = PrintableEnum<TestEnum>::GetMap(); */
   SuperEnum test = SuperEnum::VERTEX;

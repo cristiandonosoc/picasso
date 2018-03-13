@@ -18,6 +18,8 @@ set(EXTERNAL_DIR ${CMAKE_SOURCE_DIR}/external)
 set(INCLUDE_DIR ${CMAKE_SOURCE_DIR}/include)
 set(BUILD_DIR ${CMAKE_SOURCE_DIR}/bin)
 set(IMGUI_DIR ${CMAKE_SOURCE_DIR}/imgui)
+set(SHADERS_DIR ${CMAKE_SOURCE_DIR}/shaders)
+set(BOOST_DIR ${CMAKE_SOURCE_DIR}/boost)
 
 #####################################################
 # SOURCE GLOBBING
@@ -45,6 +47,7 @@ set(SOURCES ${INTERNAL_SRCS} ${EXTERNAL_SRCS} ${IMGUI_SRCS})
 file(GLOB_RECURSE NO_WARN_AS_ERROR ${EXTERNAL_DIR}/*
                                    ${INCLUDE_DIR}/*
                                    ${IMGUI_DIR}/*
+                                   src/main.cc
 )
 
 #####################################################
@@ -52,9 +55,10 @@ file(GLOB_RECURSE NO_WARN_AS_ERROR ${EXTERNAL_DIR}/*
 #####################################################
 
 include_directories(${SOURCE_DIR})
-include_directories(${INCLUDE_DIR})
-include_directories(${CMAKE_SOURCE_DIR}/imgui)
-include_directories(${SDL2_INCLUDE_DIR})
+include_directories(SYSTEM ${INCLUDE_DIR} 
+                           ${IMGUI_DIR}
+                           ${SDL2_INCLUDE_DIR} 
+                           ${BOOST_DIR})
 
 #####################################################
 # COMPILER FLAGS
@@ -64,7 +68,7 @@ if (UNIX)
   message(FATAL_ERROR "UNIX not supported yet")
 else()
   message(STATUS "Setting MSVC flags")
-  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /W4 /WX /EHsc /std=c++14")
+  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /W4 /WX /EHsc")
 endif()
 
 #####################################################
@@ -98,6 +102,14 @@ endif()
 add_executable(picasso ${SOURCES})
 target_link_libraries(picasso ${SDL2_LIBRARY})
 target_link_libraries(picasso ${OPENGL_LIBRARIES})
+
+#####################################################
+# SHADER COPY
+#####################################################
+
+add_custom_command(TARGET picasso POST_BUILD
+                   COMMAND ${CMAKE_COMMAND} -E copy_directory
+                   ${SHADERS_DIR} $<TARGET_FILE_DIR:picasso>/shaders)
 
 #####################################################
 # OUTPUT
