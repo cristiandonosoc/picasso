@@ -25,6 +25,31 @@ void Model::SetIndexBuffer(size_t count, GLuint *indices) {
   index_buffer_.Reset(count, indices);
 }
 
+namespace {
+
+void BindAttributePointer(int location, const AttributePointer& attrib_pointer) {
+  glVertexAttribPointer(
+      location,  // Attribute location int he shader
+      // Size: How many types are per attrib "element".
+      //       Effectivelly this is saying where we have
+      //       a vec, vec2, vec3 or vec4
+      attrib_pointer.GetSize(),    
+      // Type of value this attribute is (GL_FLOAT, GL_DOUBLE, etc)
+      attrib_pointer.GetType(), 
+      // Whether to normalize the data
+      attrib_pointer.GetNormalize(),
+      // Stride: Space in bytes between two consecutive values of this 
+      //         attribute in the array. 
+      // A value of 0 is saying that the buffer is densely packed.
+      attrib_pointer.GetGLStride(),    
+      // Offset: Space in bytes from the start of the array where the
+      //        first value is. 
+      // Value starts from the beginning of the array
+      attrib_pointer.GetGLOffset());
+}
+
+}   // namespace
+
 bool Model::SetupBuffers() {
   if (setup_) {
     LOGERR_WARN("Model already setup!");
@@ -135,36 +160,18 @@ bool Model::SetupBuffers() {
   
   // 4.1 Declare the vertex attribute
   // TODO(Cristian): Have a way to query for attributes
-  int pos_attrib_location = 0;
   auto pos_it = attribute_pointer_map_.find(AttributeKind::VERTEX);
   if (pos_it == attribute_pointer_map_.end()) {
     LOGERR_ERROR("Model doesn't have VERTEX attribute specification");
     return false;
   }
   const AttributePointer& attrib_pointer = pos_it->second;
-
-  glVertexAttribPointer(
-      pos_attrib_location,  // Attribute location int he shader
-      // Size: How many types are per attrib "element".
-      //       Effectivelly this is saying where we have
-      //       a vec, vec2, vec3 or vec4
-      attrib_pointer.GetSize(),    
-      // Type of value this attribute is (GL_FLOAT, GL_DOUBLE, etc)
-      attrib_pointer.GetType(), 
-      // Whether to normalize the data
-      attrib_pointer.GetNormalize(),
-      // Stride: Space in bytes between two consecutive values of this 
-      //         attribute in the array. 
-      // A value of 0 is saying that the buffer is densely packed.
-      attrib_pointer.GetStride(),    
-      // Offset: Space in bytes from the start of the array where the
-      //        first value is. 
-      // Value starts from the beginning of the array
-      attrib_pointer.GetGLOffset());
-
+  BindAttributePointer(0, attrib_pointer);
+  glEnableVertexAttribArray(0);
+  BindAttributePointer(1, attribute_pointer_map_[AttributeKind::COLOR]);
+  glEnableVertexAttribArray(1);
 
   // 4.2 Enable the attribute
-  glEnableVertexAttribArray(pos_attrib_location);
 
   // 5. Disable all the GL state so that subsequent calls
   //    separete from the models don't modify the state

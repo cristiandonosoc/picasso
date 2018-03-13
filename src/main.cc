@@ -80,10 +80,6 @@ int main(int, char **) {
     LOGERR_INDENT_DEBUG(4, "Printing enum option %s: %d", SuperEnum::ToString(it.first).c_str(), it.first);
   }
 
-
-
-
-
   // Setup window
   SDL_Window *window = SetupSDL();
   SDL_GLContext glcontext = SDL_GL_CreateContext(window);
@@ -106,8 +102,6 @@ int main(int, char **) {
   // Maximize the window
   ShowWindow((HWND)io.ImeWindowHandle, SW_MAXIMIZE);
 #endif
-
-
 
   LOGERR_INFO("OpenGL Vendor: %s", glGetString(GL_VENDOR));
   LOGERR_INFO("OpenGL Renderer: %s", glGetString(GL_RENDERER));
@@ -151,11 +145,13 @@ int main(int, char **) {
 
   // We create some sample points
   // Actual points to be renderer
+  // There are 6 floats from each element. So stride is 24
   float vertices[] = {
-     0.5f,  0.5f, 0.0f,  // top right
-     0.5f, -0.5f, 0.0f,  // bottom right
-    -0.5f, -0.5f, 0.0f,  // bottom left
-    -0.5f,  0.5f, 0.0f   // top left
+     // positions         // colors
+     0.5f,  0.5f, 0.0f,   1.0f, 0.0f, 0.0f,   // top right
+     0.5f, -0.5f, 0.0f,   0.0f, 1.0f, 0.0f,   // bottom right
+    -0.5f, -0.5f, 0.0f,   0.0f, 0.0f, 1.0f,   // bottom left
+    -0.5f,  0.5f, 0.0f,   0.5f, 0.7f, 0.2f,   // top left
   };
   // Indices that OpenGL will use to generate the primitives
   // This enables us to send much less data
@@ -169,10 +165,13 @@ int main(int, char **) {
   model.SetIndexBuffer(sizeof(indices), indices);
 
 
-  model.AddAttributePointer({AttributeKind::VERTEX, 3, GL_FLOAT, true,
-                             0, 0});
+  model.AddAttributePointer({AttributeKind::VERTEX, 3, GL_FLOAT, true, 6, 0});
+  model.AddAttributePointer({AttributeKind::COLOR, 3, GL_FLOAT, true, 6, 3});
+
+
   LOGERR_DEBUG("Attribute pointer count: %zu", model.AttributePointers.size());
   for (auto&& it : model.AttributePointers) {
+    LOGERR_SEPARATOR;
     it.second.DebugPrint();
   }
 

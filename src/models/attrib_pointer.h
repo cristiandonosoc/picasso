@@ -17,6 +17,7 @@
 #include <GL/gl3w.h>
 #include "utils/log.h"
 #include "utils/gl.h"
+#include "utils/printable_enum.h"
 
 namespace picasso {
 namespace models {
@@ -24,12 +25,7 @@ namespace models {
 using ::picasso::utils::GL_TYPES_TO_STRING;
 
 // TODO(Cristian): Find out how to bind arbitraty points
-enum AttributeKind {
-  VERTEX,
-  COLOR, 
-  NORMAL,
-  UV,
-};
+PRINTABLE_ENUM(AttributeKind, VERTEX, COLOR, NORMAL, UV);
 
 class AttributePointer {
  public:
@@ -49,6 +45,7 @@ class AttributePointer {
   GLsizei GetStride() const { return stride_; }
   GLsizei GetOffset() const { return offset_; }
   GLboolean GetNormalize() const { return normalize_; }
+  GLsizei GetGLStride() const { return stride_ * type_size_; }
   void *GetGLOffset() const {
     return (void*)(size_t)(offset_ * type_size_);
   }
@@ -72,6 +69,7 @@ class AttributePointer {
     LOGERR_INDENT_DEBUG(indent, "NORMALIZE: %s",  GetNormalize() ? "true" : "false");
     LOGERR_INDENT_DEBUG(indent, "STRIDE: %d", GetStride());
     LOGERR_INDENT_DEBUG(indent, "OFFSET: %d", GetOffset());
+    LOGERR_INDENT_DEBUG(indent, "GL_STRIDE: %d", GetGLStride());
     LOGERR_INDENT_DEBUG(indent, "GL_OFFSET: %d", GetOffset() * GetTypeSize());
   }
 };  // class AttributePointer
