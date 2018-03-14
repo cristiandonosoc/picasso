@@ -142,15 +142,18 @@ void MaterialWindow(UiData *, ImVec2 start_pos, ImVec2 start_size) {
   ImGui::BeginChild("Left Pane", {150, 0}, true);
   auto&& materials = shaders::MaterialRegistry::GetMaterials();
   static int selected_material = -1;
+  static shaders::MaterialRegistry::Key selected_key;
   int i = 0;
   for (auto&& it = materials.begin();
        it != materials.end();
        it++, i++) {
-    Material* material = *it;
+    shaders::MaterialRegistry::Key key = it->first;
+    /* Material* material = it->second; */
     char label[128];
-    sprintf(label, "%s", material->GetName().c_str());
+    sprintf(label, "%s", key.c_str());
     if (ImGui::Selectable(label, selected_material == i)) {
       selected_material = i;
+      selected_key = key;
     }
   }
 
@@ -159,7 +162,8 @@ void MaterialWindow(UiData *, ImVec2 start_pos, ImVec2 start_size) {
 
   Material *material= nullptr;
   if (selected_material >= 0) {
-    material = materials[selected_material];
+    auto it = materials.find(selected_key);
+    material = it != materials.end() ? it->second.get() : nullptr;
   }
 
   /* float height = ImGui::GetContentRegionAvail().y; */

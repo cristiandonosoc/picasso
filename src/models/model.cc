@@ -8,14 +8,26 @@
  * @description: TODO(Cristian): Add description
  ******************************************************************************/
 
+#include <algorithm>
+
 #include "models/model.h"
 #include "shaders/shader.h"
 #include "utils/log.h"
 
+
 namespace picasso {
 namespace models {
 
+// TODO(Cristian): Move to a better place
+//                 And make it configurable through the UI or INI file
+static std::map<AttributeKind, std::string> AttributeKindToAttributeName = {
+  { AttributeKind::VERTEX, "SV_POSITION" },
+  { AttributeKind::COLOR, "SV_COLOR" },
+  { AttributeKind::UV, "SV_UV" }
+};
+
 using ::picasso::shaders::Shader;
+using ::picasso::shaders::Material;
 
 void Model::SetVertexBuffer(size_t count, GLfloat *vertices) {
   vertex_buffer_.Reset(count, vertices);
@@ -130,12 +142,27 @@ bool Model::SetupBuffers() {
   //    That configuration can (and should) be stored in an object that can then
   //    be binded to the current buffer so that OpenGL knows how to interpret it.
   //    These objects are called VERTEX ATTRIBUTE OBJECTS
+  //
+  //    This is a mapping to a particular location, so we need a shader to which
+  //    to know the locations to.
+  //    This means that this is a per material object.
+  for (const MaterialRegistry::Key& key : material_keys_) {
+    GLuint vao = SetupMaterialVAO(key);
+    // We store it in the map
+    material_vao_map_[key] = vao;
+  }
   
+  setup_ = true;
+  return true;
+}
+
+GLuint Model::SetupMaterialVAO(const MaterialRegistry::Key& key) {
   // 3.1 Generate the VAO buffer
-  glGenVertexArrays(1, &vao_); 
+  GLuint vao = 0;
+  glGenVertexArrays(1, &vao); 
 
   // 3.2 Bind the current VAO
-  glBindVertexArray(vao_);
+  glBindVertexArray(vao);
 
   // From this moment on, the current state of the buffers is saved on the VAO
   // We could leave it as it is, but being explicit is never bad
@@ -159,17 +186,16 @@ bool Model::SetupBuffers() {
   //    need to do it once every vertex setup.
   
   // 4.1 Declare the vertex attribute
-  // TODO(Cristian): Have a way to query for attributes
-  auto pos_it = attribute_pointer_map_.find(AttributeKind::VERTEX);
-  if (pos_it == attribute_pointer_map_.end()) {
-    LOGERR_ERROR("Model doesn't have VERTEX attribute specification");
-    return false;
+  //
+  // For this we need the locations in the shader, and we obtain
+  // that through the material
+  Material *material = MaterialRegistry::Get(key);
+  if (material) {
+    SetupAttributeByAttributeKind(material, AttributeKind::VERTEX);
+    SetupAttributeByAttributeKind(material, AttributeKind::COLOR);
+  } else {
+    // TODO(Cristian): Log? At least show in the UI...
   }
-  const AttributePointer& attrib_pointer = pos_it->second;
-  BindAttributePointer(0, attrib_pointer);
-  glEnableVertexAttribArray(0);
-  BindAttributePointer(1, attribute_pointer_map_[AttributeKind::COLOR]);
-  glEnableVertexAttribArray(1);
 
   // 4.2 Enable the attribute
 
@@ -182,33 +208,57 @@ bool Model::SetupBuffers() {
   glBindBuffer(GL_ARRAY_BUFFER, 0);
   glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
 
-  setup_ = true;
-  return true;
+  return vao;
 }
 
-bool Model::AddMaterial(Material *material) {
-  // TODO(Cristian): Send error message
-  if (!material) { return false; }
-  auto it = material_map_.find(material->GetName());
-  if (it != material_map_.end()) {
-    // TODO(Cristian): Send error message
+bool Model::SetupAttributeByAttributeKind(Material* material, AttributeKind kind)  {
+  // We get the name we should be looking for
+  std::string attrib_name = AttributeKindToAttributeName[kind];
+  if (attrib_name.empty()) {
+    LOGERR_ERROR("There is no attribute name map for the kind: \"%s\"",
+                 AttributeKind::ToString(kind).c_str());
     return false;
   }
 
-  material_map_[material->GetName()] = material;
-  return true;
-}
-
-bool Model::RemoveMaterial(Material *material) {
-  // TODO(Cristian): Send error message
-  if (!material) { return false; }
-  auto it = material_map_.find(material->GetName());
-  if (it == material_map_.end()) {
-  // TODO(Cristian): Send error message
+  // We see if we actually have the attribute
+  auto it = material->Attributes.find(attrib_name);
+  if (it == material->Attributes.end()) {
+    LOGERR_ERROR("Model doesn't have an SV_POSITION attribute specification");
     return false;
   }
 
-  material_map_.erase(it);
+  // We try to set the VERTEX
+  // We get the location
+  auto pos_it = attribute_pointer_map_.find(AttributeKind::VERTEX);
+  if (pos_it == attribute_pointer_map_.end()) {
+    LOGERR_ERROR("Model doesn't have VERTEX attribute specification");
+    return false;
+  }
+  GLuint location = it->second.GetVariable()->GetLocation();
+  const AttributePointer& attrib_pointer = pos_it->second;
+
+  // We finally are able to allocate the attribte to the location
+  BindAttributePointer(location, attrib_pointer);
+  glEnableVertexAttribArray(location);
+  return true;
+}
+
+bool Model::AddMaterialKey(const MaterialRegistry::Key& key) {
+  // TODO(Cristian): Send error message
+  auto it = find(material_keys_.begin(), material_keys_.end(), key);
+  if (it != material_keys_.end()) {
+    return false; // Already got it
+  }
+  material_keys_.push_back(key);
+  return true;
+}
+
+bool Model::RemoveMaterialKey(const MaterialRegistry::Key& key) {
+  auto it = find(material_keys_.begin(), material_keys_.end(), key);
+  if (it == material_keys_.end()) {
+    return false;   // Cannot find it
+  }
+  material_keys_.erase(it);
   return true;
 }
 
@@ -240,15 +290,16 @@ bool Model::Render() const {
     return false;
   }
 
-  if (Materials.empty()) {
+  if (MaterialKeys.empty()) {
     // TODO(Cristian): Send error message
     LOGERR_WARN("Calling render on a model without materials");
     return false;
   }
 
-  for (auto&& mat_it : material_map_) {
-    Material *material = mat_it.second;
+  for (const MaterialRegistry::Key& key : MaterialKeys) {
+    Material *material = MaterialRegistry::Get(key);
     const Shader *shader = material->GetShader();
+
     if (!shader) { 
       LOGERR_WARN("Rendering with null shader");
       continue; 
@@ -263,7 +314,10 @@ bool Model::Render() const {
     glUseProgram(shader->GetShaderHandle());
 
     // We bind our set VAO
-    glBindVertexArray(vao_);
+    auto it = material_vao_map_.find(key);
+    if (it != material_vao_map_.end()) {
+      glBindVertexArray(it->second);
+    }
 
     // We bind the uniforms
     for (auto&& u_it : material->Uniforms) {

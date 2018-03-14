@@ -129,7 +129,9 @@ int main(int, char **) {
     return 1;
   }
 
-  Material *material = material_res.ConsumeOrDie();
+  const MaterialRegistry::Key mat_key = material_res.ConsumeOrDie();
+  Material *material = MaterialRegistry::Get(mat_key);
+  
   LOGERR_INFO("Created material \"%s\"", mat_name.c_str());
 
   LOGERR_INFO("Setting program to \"%s\"", shader_name.c_str());
@@ -170,7 +172,7 @@ int main(int, char **) {
 
   model.SetupBuffers();
 
-  model.AddMaterial(material);
+  model.AddMaterialKey(mat_key);
 
   // Setup style
   ImGui::StyleColorsDark();
