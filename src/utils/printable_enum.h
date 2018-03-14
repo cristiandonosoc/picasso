@@ -32,6 +32,7 @@
 
 #include "utils/macros.h"
 #include "utils/map_macro.h"
+#include "utils/result.h"
 
 // TODO(Cristian): Actually write some unit tests for this
 
@@ -76,6 +77,7 @@
                                                                               \
    public:                                                                    \
     using EnumMap = std::map<InternalEnum, std::string>;                      \
+    using StringMap = std::map<std::string, InternalEnum>;                    \
                                                                               \
    private:                                                                   \
     class Mapping final {                                                     \
@@ -84,7 +86,8 @@
         MAP_ARG_ALL(ADD_TO_MAPPING, EnumType, __VA_ARGS__)                    \
       }                                                                       \
      private:                                                                 \
-      EnumMap map_;                                                           \
+      EnumMap enum_map_;                                                      \
+      StringMap string_map_;                                                  \
      public:                                                                  \
       friend class EnumType;                                                  \
     };                                                                        \
@@ -95,21 +98,39 @@
     }                                                                         \
                                                                               \
    public:                                                                    \
-    static const EnumMap& GetMap() {                                          \
-      const Mapping& mapping = MappingInstance();                             \
-      return mapping.map_;                                                    \
+    static const EnumMap& GetEnumMap() {                                      \
+      return MappingInstance().enum_map_;                                     \
     }                                                                         \
                                                                               \
-    static const std::string ToString(InternalEnum val) {                     \
+    static const std::string& ToString(EnumType val) {                        \
       const Mapping& mapping = MappingInstance();                             \
-      auto it = mapping.map_.find(val);                                       \
-      assert(it != mapping.map_.end());                                       \
+      auto it = mapping.enum_map_.find(val);                                  \
+      assert(it != mapping.enum_map_.end());                                  \
       return it->second;                                                      \
     }                                                                         \
                                                                               \
+   public:                                                                    \
+    static const StringMap& GetStringMap() {                                  \
+      const Mapping& mapping = MappingInstance();                             \
+      return mapping.string_map_;                                             \
+    }                                                                         \
+                                                                              \
+    static ::picasso::utils::ResultOr<InternalEnum>                           \
+    FromString(const std::string& val) {                                      \
+      const Mapping& mapping = MappingInstance();                             \
+      auto it = mapping.string_map_.find(std::string(#EnumType) + val);       \
+      if (it == mapping.string_map_.end()) {                                  \
+        return ::picasso::utils::ResultOr<InternalEnum>::Error(               \
+            "Cannot find %s", val.c_str());                                   \
+      }                                                                       \
+      return it->second;                                                      \
+    }                                                                         \
+                                                                              \
+                                                                              \
+                                                                              \
    private:                                                                   \
     InternalEnum val_;                                                        \
-  };
+  };                                                                          \
 
 
 /**
@@ -119,7 +140,8 @@
  * available in the context.
  */
 #define ADD_TO_MAPPING(enum_name, field) \
-  map_[enum_name::field] = #enum_name "::" #field;
-
+  std::string enum_name ## field = #enum_name "::" #field; \
+  enum_map_[enum_name::field] = enum_name ## field; \
+  string_map_[enum_name ## field] = enum_name::field;
 
 #endif  // SRC_UTILS_PRINTABLE_ENUM_H
