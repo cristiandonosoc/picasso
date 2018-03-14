@@ -26,35 +26,44 @@ using namespace utils;
 namespace shaders {
 
 class MaterialRegistry : Singleton<MaterialRegistry> {
+ public:
+  using Key = std::string;
+  using MaterialMap = std::map<Key, Material::UniquePtr>;
+
  private:
   MaterialRegistry() = default;
   DISABLE_COPY(MaterialRegistry);
   DISABLE_MOVE(MaterialRegistry);
 
  public:
-  static ResultOr<Material*> Create(const std::string& name);
-  static Material *Get(const std::string& name);
+  static ResultOr<Key> Create(const std::string& name);
+  static Material *Get(const Key& key);
 
-  static std::vector<Material*> GetMaterials() {
+  // IMPORTANT: The pointers are not assured to be valid 
+  //            through time, so they should be *always*
+  //            be obtained through here
+  // TODO(Cristian): Use shared pointer to represent this relationship
+  static const MaterialMap& GetMaterials() {
     return Instance().InternalGetMaterials();
   }
 
  protected:
-  ResultOr<Material*> InternalCreate(const std::string& name);
+  ResultOr<Key> InternalCreate(const std::string& name);
   Material *InternalGet(const std::string& name) const;
 
-  std::vector<Material*> InternalGetMaterials() const {
-    std::vector<Material*> materials;
-    materials.reserve(material_map_.size());
-    for (auto&& it : material_map_) {
-      materials.push_back(it.second.get());
-    }
-
-    return materials;
+  /* std::map<Key, Material*> InternalGetMaterials() const { */
+  /*   std::map<Key, Material*> materials; */
+  /*   for (auto&& it : material_map_) { */
+  /*     materials[it.first] = it.second.get(); */
+  /*   } */
+  /*   return materials; */
+  /* } */
+  const MaterialMap& InternalGetMaterials() const {
+    return material_map_;
   }
 
  private:
-  std::map<std::string, Material::UniquePtr> material_map_;
+  MaterialMap material_map_;
 
  public:
   friend class Singleton<MaterialRegistry>;
