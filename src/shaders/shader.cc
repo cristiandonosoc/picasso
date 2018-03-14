@@ -8,11 +8,13 @@
 #include <cassert>
 #include <GL/gl3w.h>
 #include <memory>
+#include <regex>
 
 namespace picasso {
 namespace shaders {
 
 using namespace utils;
+using ::picasso::models::AttributeKind;
 
 namespace {
 
@@ -47,8 +49,8 @@ ResultOr<int> CompileShader(const std::string& shader_name,
  * Shader
  **/
 ResultOr<Shader::UniquePtr> Shader::Create(const std::string& name,
-                                             const std::string& vertex_src,
-                                             const std::string& fragment_src) {
+                                           const std::string& vertex_src,
+                                           const std::string& fragment_src) {
   // If some result is invalid, the Shader destructor will
   // free the resources
   UniquePtr shader(new Shader());   // private constructor
@@ -86,11 +88,13 @@ ResultOr<Shader::UniquePtr> Shader::Create(const std::string& name,
     return ResultOr<UniquePtr>::Error("Error linkink shader: %s\n", log);
   }
 
+  // We set the sources
+  shader->vertex_src_ = vertex_src;
+  shader->fragment_src_ = fragment_src;
+
   shader->ObtainAttributes();
   shader->ObtainUniforms();
 
-  shader->vertex_src_ = vertex_src;
-  shader->fragment_src_ = fragment_src;
   shader->valid_ = true;
   return shader;
 }
@@ -147,6 +151,26 @@ void Shader::ObtainAttributes() {
     Variable attrib(VariableKind::ATTRIBUTE, name_ptr.get(), location,
                     type, size);
     attributes_[attrib.GetName()] = std::move(attrib);
+  }
+
+
+  // TODO(Cristian): Eventually remove this
+  std::regex attr_regex("in\\s+\\w+\\s+(\\w+)\\s*;\\s+//\\s+ATTR:(\\w+)");
+  std::sregex_iterator regend;
+  std::sregex_iterator regit(vertex_src_.begin(), vertex_src_.end(), attr_regex);
+  for (; regit != regend; regit++) {
+    LOGERR_DEBUG("Found!");
+    // We get the match
+    std::smatch match = *regit;
+    const std::string& attr_name = match[1].str();
+    const std::string& attr_type = match[2].str();
+    
+    // We see if its a valid enum option
+    auto res = AttributeKind::FromString(attr_type);
+    if (res.Valid()) {
+      AttributeKind kind = res.ConsumeOrDie();
+      attribute_map_[kind] = attr_name;
+    }
   }
 }
 
@@ -213,10 +237,20 @@ void Shader::DebugPrint(int indent) const {
   LOGERR_INDENT_DEBUG(indent, "Fragment Handle: %d", fragment_handle_);
   LOGERR_INDENT_DEBUG(indent, "Fragment Source: \n%s", fragment_src_.c_str());
 
+
   // Attributes
   LOGERR_INDENT_DEBUG(indent, "Found %zu attributes", Attributes.size());
   for (auto&& it : Attributes) {
     it.second.DebugPrint(indent + 4);
+  }
+
+  LOGERR_INDENT_DEBUG(indent, "Found %zu attribte mappings", 
+                      AttributeMapping.size());
+  for (auto&& it : AttributeMapping) {
+    LOGERR_INDENT_DEBUG(indent + 4, "%s: %s", 
+                        AttributeKind::ToString(it.first).c_str(),
+                        it.second.c_str());
+
   }
 
   LOGERR_INDENT_DEBUG(indent, "Found %zu uniforms", Uniforms.size());

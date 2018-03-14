@@ -64,32 +64,13 @@ SDL_Window *SetupSDL() {
 PRINTABLE_ENUM(SuperEnum, VERTEX, FRAGMENT, COMPUTE, GEOMETRY);
 
 
+#include <regex>
+#include <iostream>
+
 int main(int, char **) {
   if (SDL_Init(SDL_INIT_VIDEO|SDL_INIT_TIMER) != 0) {
     LOGERR_FATAL("SDL_Init Error: %s", SDL_GetError());
     return 1;
-  }
-
-
-  const std::string& path = GetExecutableDir();
-  LOGERR_INFO("PATH: %s", path.c_str());
-
-  std::string p = ::picasso::utils::ReadWholeFile(path + "shaders/simple.vert");
-  LOGERR_INFO("SHADER: %s", p.c_str());
-
-  if (true) { return 0; }
-
-  /* auto&& mapping = PrintableEnum<TestEnum>::GetMap(); */
-  SuperEnum test = SuperEnum::VERTEX;
-  test = SuperEnum::FRAGMENT;
-  if (test == SuperEnum::FRAGMENT) {
-    LOGERR_DEBUG("I can compare!");
-  }
-
-  LOGERR_DEBUG("Printing enum");
-  auto&& mapping = SuperEnum::GetMap();
-  for (auto&& it : mapping) {
-    LOGERR_INDENT_DEBUG(4, "Printing enum option %s: %d", SuperEnum::ToString(it.first).c_str(), it.first);
   }
 
   // Setup window
@@ -123,8 +104,8 @@ int main(int, char **) {
   LOGERR_INFO("OpenGL Extension: %s", glGetString(GL_EXTENSIONS));
 
   // Load a shader
-	std::string vs = ::picasso::utils::ReadWholeFile("../shaders/simple.vert");
-	std::string fs = ::picasso::utils::ReadWholeFile("../shaders/simple.frag");
+	std::string vs = ::picasso::utils::ReadWholeFile(GetExecutableDir() + "/shaders/simple.vert");
+	std::string fs = ::picasso::utils::ReadWholeFile(GetExecutableDir() + "/shaders/simple.frag");
   std::string shader_name = "test_shader";
   auto shader_res = ShaderRegistry::Create(shader_name, vs, fs);
   Shader *shader = nullptr;

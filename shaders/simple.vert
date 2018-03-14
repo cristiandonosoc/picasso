@@ -1,8 +1,8 @@
 #version 150
 
-in vec3 pos;
-in vec3 color;
-in vec2 uv;
+in vec3 pos;        // ATTR:VERTEX
+in vec3 color;      // ATTR:COLOR
+in vec2 uv;         // ATTR:UV
 
 out vec2 frag_uv;
 out vec3 frag_color;

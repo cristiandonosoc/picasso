@@ -4,6 +4,7 @@
 #include "shaders/variable.h"
 #include "utils/result.h"
 #include "utils/macros.h"
+#include "models/attrib_pointer.h"
 
 #include <map>
 #include <memory>
@@ -16,11 +17,16 @@ using namespace utils;
 
 namespace shaders {
 
+using ::picasso::models::AttributeKind;
+
 class Material;   // Forward Declaration
 
-using VariableMap = std::map<std::string, Variable>;
 
 class Shader {
+ public:
+  using VariableMap = std::map<std::string, Variable>;
+  using AttributeMap = std::map<AttributeKind, std::string>;
+
  public:
   DEFINE_PTR_TYPES(Shader);
 
@@ -60,6 +66,7 @@ class Shader {
   // ATTRIBUTES
  public:
   const VariableMap& Attributes = attributes_;
+  const AttributeMap& AttributeMapping = attribute_map_;
   using ConstAttribIt = VariableMap::const_iterator;
   const VariableMap& GetAttributes() const { return attributes_; }
   ConstAttribIt AttribBegin() const { return attributes_.cbegin(); }
@@ -88,8 +95,12 @@ class Shader {
   std::string name_;
   std::string vertex_src_;
   std::string fragment_src_;
+
   VariableMap attributes_;
+  AttributeMap attribute_map_;
+
   VariableMap uniforms_;
+
   int vertex_handle_ = 0;
   int fragment_handle_ = 0;
   int shader_handle_ = 0;
