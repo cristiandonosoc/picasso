@@ -17,6 +17,7 @@
 #include "utils/log.h"
 
 #include "utils/printable_enum.h"
+#include "utils/paths.h"
 
 #ifdef _WIN32
 #include "Windows.h"
@@ -35,8 +36,7 @@ using ::picasso::models::AttributeKind;
 using ::picasso::models::AttributePointer;
 using ::picasso::models::Model;
 
-#define DG_MISC_IMPLEMENTATION
-#include <DG_misc.h>
+using ::picasso::utils::paths::GetExecutableDir;
 
 namespace {
 
@@ -71,10 +71,10 @@ int main(int, char **) {
   }
 
 
-  const char *path = DG_GetExecutableDir();
-  LOGERR_INFO("PATH: %s", path);
+  const std::string& path = GetExecutableDir();
+  LOGERR_INFO("PATH: %s", path.c_str());
 
-  std::string p = ::picasso::utils::ReadWholeFile(std::string(path) + "shaders/simple.vert");
+  std::string p = ::picasso::utils::ReadWholeFile(path + "shaders/simple.vert");
   LOGERR_INFO("SHADER: %s", p.c_str());
 
   if (true) { return 0; }
