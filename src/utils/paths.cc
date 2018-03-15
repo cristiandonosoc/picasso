@@ -8,17 +8,19 @@
  * @description: TODO(Cristian): Add description
  ******************************************************************************/
 
-#pragma warning(push, 0)
-#include <DG_misc.h>
-#pragma warning(push)
-
+#include "utils/macros.h"
 #include "utils/paths.h"
+
+BEGIN_IGNORE_WARNINGS();
+#include <DG_misc.h>
+END_IGNORE_WARNINGS();
+
 
 namespace picasso {
 namespace utils {
 namespace paths {
 
-namespace { 
+namespace {
 
 class PathHolder {
   // Interface

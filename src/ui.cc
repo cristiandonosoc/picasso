@@ -6,8 +6,9 @@
 #include "shaders/shader_registry.h"
 #include "shaders/material_registry.h"
 #include "logging/log.h"
+#include "utils/snprintf.h"
 
-#undef min 
+#undef min
 #undef max
 
 namespace picasso {
@@ -17,6 +18,7 @@ using ::picasso::shaders::Material;
 using ::picasso::shaders::Variable;
 using ::picasso::shaders::Value;
 using ::picasso::logging::LogBuffer;
+using ::picasso::utils::picasso_snprintf;
 
 #if 0
 void ImGuiExample(const ImVec4& clear_color, bool show_demo_window,
@@ -86,7 +88,7 @@ void ShaderWindow(UiData *, ImVec2 start_pos, ImVec2 start_size) {
        it++, i++) {
     auto&& shader = *it;
     char label[128];
-    sprintf_s(label, sizeof(label), "Shader: %s", shader->GetName().c_str());
+    picasso_snprintf(label, sizeof(label), "Shader: %s", shader->GetName().c_str());
     if (ImGui::Selectable(label, selected_shader == i)) {
       selected_shader = i;
     }
@@ -159,7 +161,7 @@ void MaterialWindow(UiData *, ImVec2 start_pos, ImVec2 start_size) {
     shaders::MaterialRegistry::Key key = it->first;
     /* Material* material = it->second; */
     char label[128];
-    sprintf_s(label, sizeof(label), "%s", key.c_str());
+    picasso_snprintf(label, sizeof(label), "%s", key.c_str());
     if (ImGui::Selectable(label, selected_material == i)) {
       selected_material = i;
       selected_key = key;
@@ -232,7 +234,7 @@ void LogWindow(UiData *, ImVec2 start_pos, ImVec2 start_size) {
     ImGui::TextUnformatted(log_entry.c_str());
   }
 
-  if (scroll_bottom) { 
+  if (scroll_bottom) {
     ImGui::SetScrollHere(1.0f);
   }
 

@@ -8,11 +8,13 @@
  * @description: Implementation of the header only libraries
  ******************************************************************************/
 
+#include "utils/macros.h"
+
 // No warnings
-#pragma warning(push, 0)
+BEGIN_IGNORE_WARNINGS();
 
 // DG_MISC
 #define DG_MISC_IMPLEMENTATION
 #include <DG_misc.h>
 
-#pragma warning(push)
+END_IGNORE_WARNINGS();
