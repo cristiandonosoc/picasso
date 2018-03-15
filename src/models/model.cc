@@ -10,10 +10,9 @@
 
 #include <algorithm>
 
+#include "logging/log.h"
 #include "models/model.h"
 #include "shaders/shader.h"
-#include "utils/log.h"
-
 
 namespace picasso {
 namespace models {

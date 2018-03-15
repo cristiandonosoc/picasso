@@ -1,7 +1,7 @@
 #include "shaders/variable.h"
 
+#include "logging/log.h"
 #include "utils/gl.h"
-#include "utils/log.h"
 
 namespace picasso {
 

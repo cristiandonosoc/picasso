@@ -14,7 +14,7 @@
 #include "ui.h"
 #include "utils/file.h"
 #include "utils/gl.h"
-#include "utils/log.h"
+#include "logging/log.h"
 
 #include "utils/printable_enum.h"
 #include "utils/paths.h"

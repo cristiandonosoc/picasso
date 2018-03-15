@@ -11,7 +11,7 @@
 #include <cassert>
 
 #include "shaders/value.h"
-#include "utils/log.h"
+#include "logging/log.h"
 
 namespace picasso {
 namespace shaders {

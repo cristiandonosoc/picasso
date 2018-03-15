@@ -1,8 +1,8 @@
 #include "shaders/shader.h"
 
+#include "logging/log.h"
 #include "utils/result.h"
 #include "utils/gl.h"
-#include "utils/log.h"
 #include "utils/make_unique.h"
 
 #include <cassert>

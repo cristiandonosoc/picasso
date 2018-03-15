@@ -15,7 +15,8 @@
 #define SRC_MODELS_ATTRIB_POINTER_H
 
 #include <GL/gl3w.h>
-#include "utils/log.h"
+
+#include "logging/log.h"
 #include "utils/gl.h"
 #include "utils/printable_enum.h"
 
