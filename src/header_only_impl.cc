@@ -8,8 +8,11 @@
  * @description: Implementation of the header only libraries
  ******************************************************************************/
 
+// No warnings
+#pragma warning(push, 0)
+
 // DG_MISC
 #define DG_MISC_IMPLEMENTATION
 #include <DG_misc.h>
 
-
+#pragma warning(push)

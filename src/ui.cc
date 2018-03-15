@@ -1,9 +1,13 @@
+#include <algorithm>
+#include <cstring>
+#include <regex>
+
 #include "ui.h"
 #include "shaders/shader_registry.h"
 #include "shaders/material_registry.h"
 
-#include <cstring>
-#include <regex>
+#undef min 
+#undef max
 
 namespace picasso {
 
@@ -12,6 +16,7 @@ using ::picasso::shaders::Material;
 using ::picasso::shaders::Variable;
 using ::picasso::shaders::Value;
 
+#if 0
 void ImGuiExample(const ImVec4& clear_color, bool show_demo_window,
                   bool show_another_window) {
   // 1. Show a simple window.
@@ -52,6 +57,8 @@ void ImGuiExample(const ImVec4& clear_color, bool show_demo_window,
   }
 }
 
+#endif
+
 void SystemWindow(UiData *ui_data, ImVec2 start_pos, ImVec2 start_size) {
   ImGui::SetNextWindowPos(start_pos, ImGuiCond_Once);
   ImGui::SetNextWindowSize(start_size, ImGuiCond_Once);
@@ -77,7 +84,7 @@ void ShaderWindow(UiData *, ImVec2 start_pos, ImVec2 start_size) {
        it++, i++) {
     auto&& shader = *it;
     char label[128];
-    sprintf(label, "Shader: %s", shader->GetName().c_str());
+    sprintf_s(label, sizeof(label), "Shader: %s", shader->GetName().c_str());
     if (ImGui::Selectable(label, selected_shader == i)) {
       selected_shader = i;
     }
@@ -150,7 +157,7 @@ void MaterialWindow(UiData *, ImVec2 start_pos, ImVec2 start_size) {
     shaders::MaterialRegistry::Key key = it->first;
     /* Material* material = it->second; */
     char label[128];
-    sprintf(label, "%s", key.c_str());
+    sprintf_s(label, sizeof(label), "%s", key.c_str());
     if (ImGui::Selectable(label, selected_material == i)) {
       selected_material = i;
       selected_key = key;

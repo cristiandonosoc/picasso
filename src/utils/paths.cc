@@ -8,7 +8,9 @@
  * @description: TODO(Cristian): Add description
  ******************************************************************************/
 
+#pragma warning(push, 0)
 #include <DG_misc.h>
+#pragma warning(push)
 
 #include "utils/paths.h"
 
