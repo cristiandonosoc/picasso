@@ -5,6 +5,7 @@
 #include "ui.h"
 #include "shaders/shader_registry.h"
 #include "shaders/material_registry.h"
+#include "logging/log.h"
 
 #undef min 
 #undef max
@@ -15,6 +16,7 @@ using ::picasso::shaders::Shader;
 using ::picasso::shaders::Material;
 using ::picasso::shaders::Variable;
 using ::picasso::shaders::Value;
+using ::picasso::logging::LogBuffer;
 
 #if 0
 void ImGuiExample(const ImVec4& clear_color, bool show_demo_window,
@@ -211,15 +213,30 @@ void MaterialWindow(UiData *, ImVec2 start_pos, ImVec2 start_size) {
 
 
   ImGui::End();
-
 }
 
 
+void LogWindow(UiData *, ImVec2 start_pos, ImVec2 start_size) {
+  ImGui::SetNextWindowPos(start_pos, ImGuiCond_Once);
+  ImGui::SetNextWindowSize(start_size, ImGuiCond_Once);
+  static bool open = true;
+  ImGui::Begin("Log", &open);
+
+  ImGui::BeginChild("scrolling", {0, 0}, false, ImGuiWindowFlags_HorizontalScrollbar);
+
+  for (const std::string log_entry : LogBuffer::Instance().Logs) {
+    ImGui::TextUnformatted(log_entry.c_str());
+  }
+
+  ImGui::EndChild();
+  ImGui::End();
+}
 
 void RunUi(UiData *ui_data) {
   SystemWindow(ui_data,   {0, 0},     {500, 500});
   ShaderWindow(ui_data,   {0, 500},   {500, 500});
   MaterialWindow(ui_data, {0, 1000},  {500, 500});
+  LogWindow(ui_data, {600, 500}, {500, 500});
 }
 
 

@@ -58,14 +58,14 @@ class AttributePointer {
 
  public:
   void DebugPrint(int indent = 0) const {
-    LOGERR_INDENT_DEBUG(indent, "Debug print of AttributePointer");
-    LOGERR_INDENT_DEBUG(indent, "KIND: %s", AttributeKind::ToString(GetKind()).c_str());
-    LOGERR_INDENT_DEBUG(indent, "SIZE: %d", GetSize());
-    LOGERR_INDENT_DEBUG(indent, "TYPE %s", GL_TYPES_TO_STRING.GetName(GetType()).ConsumeOrDie().c_str());
-    LOGERR_INDENT_DEBUG(indent, "TYPE SIZE: %d", GetTypeSize());
-    LOGERR_INDENT_DEBUG(indent, "NORMALIZE: %s",  GetNormalize() ? "true" : "false");
-    LOGERR_INDENT_DEBUG(indent, "STRIDE: %d", GetStride());
-    LOGERR_INDENT_DEBUG(indent, "OFFSET: %d", GetOffset());
+    LOG_INDENT_DEBUG(indent, "Debug print of AttributePointer");
+    LOG_INDENT_DEBUG(indent, "KIND: %s", AttributeKind::ToString(GetKind()).c_str());
+    LOG_INDENT_DEBUG(indent, "SIZE: %d", GetSize());
+    LOG_INDENT_DEBUG(indent, "TYPE %s", GL_TYPES_TO_STRING.GetName(GetType()).ConsumeOrDie().c_str());
+    LOG_INDENT_DEBUG(indent, "TYPE SIZE: %d", GetTypeSize());
+    LOG_INDENT_DEBUG(indent, "NORMALIZE: %s",  GetNormalize() ? "true" : "false");
+    LOG_INDENT_DEBUG(indent, "STRIDE: %d", GetStride());
+    LOG_INDENT_DEBUG(indent, "OFFSET: %d", GetOffset());
   }
 };  // class AttributePointer
 

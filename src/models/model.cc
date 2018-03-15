@@ -63,12 +63,12 @@ void BindAttributePointer(int location, const AttributePointer& attrib_pointer) 
 
 bool Model::SetupBuffers() {
   if (setup_) {
-    LOGERR_WARN("Model already setup!");
+    LOG_WARN("Model already setup!");
     return false;
   }
 
   if (vertex_buffer_.Count() == 0) {
-    LOGERR_WARN("Model without Vertex Buffer set up");
+    LOG_WARN("Model without Vertex Buffer set up");
     return false;
   }
 
@@ -214,7 +214,7 @@ bool Model::SetupAttributeByAttributeKind(Material* material, AttributeKind kind
   // We get the name we should be looking for
   std::string attrib_name = AttributeKindToAttributeName[kind];
   if (attrib_name.empty()) {
-    LOGERR_ERROR("There is no attribute name map for the kind: \"%s\"",
+    LOG_ERROR("There is no attribute name map for the kind: \"%s\"",
                  AttributeKind::ToString(kind).c_str());
     return false;
   }
@@ -222,21 +222,20 @@ bool Model::SetupAttributeByAttributeKind(Material* material, AttributeKind kind
   // We see if we actually have the attribute mapping
   auto it = material->Attributes.find(attrib_name);
   if (it == material->Attributes.end()) {
-    LOGERR_ERROR("Model doesn't have an %s attribute specification",
+    LOG_ERROR("Model doesn't have an %s attribute specification",
                  AttributeKind::ToString(kind).c_str());
     return false;
   }
 
   auto pos_it = attribute_pointer_map_.find(kind);
   if (pos_it == attribute_pointer_map_.end()) {
-    LOGERR_ERROR("Model doesn't have VERTEX attribute specification");
+    LOG_ERROR("Model doesn't have VERTEX attribute specification");
     return false;
   }
   GLuint location = it->second.GetVariable()->GetLocation();
   const AttributePointer& attrib_pointer = pos_it->second;
 
   // We finally are able to allocate the attribte to the location
-  LOGERR_DEBUG("LOCATION: %d", location);
   attrib_pointer.DebugPrint();
   BindAttributePointer(location, attrib_pointer);
   glEnableVertexAttribArray(location);
@@ -286,13 +285,13 @@ bool Model::RemoveAttributePointer(const AttributePointer& attrib_pointer) {
 bool Model::Render() const {
   if (!setup_) {
     // TODO(Cristian): Send error message
-    LOGERR_WARN("Calling render on an not ready model");
+    LOG_WARN("Calling render on an not ready model");
     return false;
   }
 
   if (MaterialKeys.empty()) {
     // TODO(Cristian): Send error message
-    LOGERR_WARN("Calling render on a model without materials");
+    LOG_WARN("Calling render on a model without materials");
     return false;
   }
 
@@ -301,11 +300,11 @@ bool Model::Render() const {
     const Shader *shader = material->GetShader();
 
     if (!shader) { 
-      LOGERR_WARN("Rendering with null shader");
+      LOG_WARN("Rendering with null shader");
       continue; 
     }
     if (!shader->Valid()) {
-      LOGERR_WARN("Rendering with an invalid shader: %s",
+      LOG_WARN("Rendering with an invalid shader: %s",
                   shader->GetName().c_str());
       continue;
     }

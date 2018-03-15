@@ -90,12 +90,12 @@ int main(int, char **) {
   ShowWindow((HWND)io.ImeWindowHandle, SW_MAXIMIZE);
 #endif
 
-  LOGERR_INFO("OpenGL Vendor: %s", glGetString(GL_VENDOR));
-  LOGERR_INFO("OpenGL Renderer: %s", glGetString(GL_RENDERER));
-  LOGERR_INFO("OpenGL Version: %s", glGetString(GL_VERSION));
-  LOGERR_INFO("OpenGL Shading Language Version: %s",
+  LOG_INFO("OpenGL Vendor: %s", glGetString(GL_VENDOR));
+  LOG_INFO("OpenGL Renderer: %s", glGetString(GL_RENDERER));
+  LOG_INFO("OpenGL Version: %s", glGetString(GL_VERSION));
+  LOG_INFO("OpenGL Shading Language Version: %s",
               glGetString(GL_SHADING_LANGUAGE_VERSION));
-  LOGERR_INFO("OpenGL Extension: %s", glGetString(GL_EXTENSIONS));
+  LOG_INFO("OpenGL Extension: %s", glGetString(GL_EXTENSIONS));
 
   // Load a shader
 	std::string vs = ::picasso::utils::ReadWholeFile(GetExecutableDir() + "/shaders/simple.vert");
@@ -105,16 +105,16 @@ int main(int, char **) {
   Shader *shader = nullptr;
   if (shader_res.Valid()) {
     shader = shader_res.ConsumeOrDie();
-    LOGERR_INFO("Successful shader");
+    LOG_INFO("Successful shader");
   } else {
-    LOGERR_ERROR("Error getting shader: %s\n", shader_res.ErrorMsg().c_str());
+    LOG_ERROR("Error getting shader: %s\n", shader_res.ErrorMsg().c_str());
     return 1;
   }
 
   shader->DebugPrint();
 
-  LOGERR_SEPARATOR;
-  LOGERR_INFO("Creating material");
+  LOG_SEPARATOR;
+  LOG_INFO("Creating material");
   std::string mat_name = "mat0";
   auto material_res = MaterialRegistry::Create(mat_name);
 
@@ -126,9 +126,8 @@ int main(int, char **) {
   const MaterialRegistry::Key mat_key = material_res.ConsumeOrDie();
   Material *material = MaterialRegistry::Get(mat_key);
 
-  LOGERR_INFO("Created material \"%s\"", mat_name.c_str());
-
-  LOGERR_INFO("Setting program to \"%s\"", shader_name.c_str());
+  LOG_INFO("Created material \"%s\"", mat_name.c_str());
+  LOG_INFO("Setting program to \"%s\"", shader_name.c_str());
   material->SetShader(shader);
 
 
@@ -158,9 +157,9 @@ int main(int, char **) {
   model.AddAttributePointer({AttributeKind::COLOR, 3, GL_FLOAT, true, 24, 12});
 
 
-  LOGERR_DEBUG("Attribute pointer count: %zu", model.AttributePointers.size());
+  LOG_DEBUG("Attribute pointer count: %zu", model.AttributePointers.size());
   for (auto&& it : model.AttributePointers) {
-    LOGERR_SEPARATOR;
+    LOG_SEPARATOR;
     it.second.DebugPrint();
   }
 

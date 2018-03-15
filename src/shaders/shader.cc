@@ -159,7 +159,6 @@ void Shader::ObtainAttributes() {
   std::sregex_iterator regend;
   std::sregex_iterator regit(vertex_src_.begin(), vertex_src_.end(), attr_regex);
   for (; regit != regend; regit++) {
-    LOGERR_DEBUG("Found!");
     // We get the match
     std::smatch match = *regit;
     const std::string& attr_name = match[1].str();
@@ -218,42 +217,42 @@ void Shader::Cleanup() {
  * MATERIAL INTERFACE
  **/
 void Shader::LinkMaterial(Material*) {
-  LOGERR_WARN("%s: Not Implemented", __FUNCTION__);
+  LOG_WARN("%s: Not Implemented", __FUNCTION__);
 }
 
 void Shader::UnlinkMaterial(Material*) {
-  LOGERR_WARN("%s: Not Implemented", __FUNCTION__);
+  LOG_WARN("%s: Not Implemented", __FUNCTION__);
 }
 
 
 void Shader::DebugPrint(int indent) const {
-  LOGERR_INDENT_DEBUG(indent, "Shader debug print for \"%s\"", name_.c_str());
+  LOG_INDENT_DEBUG(indent, "Shader debug print for \"%s\"", name_.c_str());
 
   // Vertex Shader
-  LOGERR_INDENT_DEBUG(indent, "Vertex Handle: %d", vertex_handle_);
-  LOGERR_INDENT_DEBUG(indent, "Vertex Source: \n%s", vertex_src_.c_str());
+  LOG_INDENT_DEBUG(indent, "Vertex Handle: %d", vertex_handle_);
+  LOG_INDENT_DEBUG(indent, "Vertex Source: \n%s", vertex_src_.c_str());
 
   // Fragment Shader
-  LOGERR_INDENT_DEBUG(indent, "Fragment Handle: %d", fragment_handle_);
-  LOGERR_INDENT_DEBUG(indent, "Fragment Source: \n%s", fragment_src_.c_str());
+  LOG_INDENT_DEBUG(indent, "Fragment Handle: %d", fragment_handle_);
+  LOG_INDENT_DEBUG(indent, "Fragment Source: \n%s", fragment_src_.c_str());
 
 
   // Attributes
-  LOGERR_INDENT_DEBUG(indent, "Found %zu attributes", Attributes.size());
+  LOG_INDENT_DEBUG(indent, "Found %zu attributes", Attributes.size());
   for (auto&& it : Attributes) {
     it.second.DebugPrint(indent + 4);
   }
 
-  LOGERR_INDENT_DEBUG(indent, "Found %zu attribte mappings", 
+  LOG_INDENT_DEBUG(indent, "Found %zu attribte mappings", 
                       AttributeMapping.size());
   for (auto&& it : AttributeMapping) {
-    LOGERR_INDENT_DEBUG(indent + 4, "%s: %s", 
+    LOG_INDENT_DEBUG(indent + 4, "%s: %s", 
                         AttributeKind::ToString(it.first).c_str(),
                         it.second.c_str());
 
   }
 
-  LOGERR_INDENT_DEBUG(indent, "Found %zu uniforms", Uniforms.size());
+  LOG_INDENT_DEBUG(indent, "Found %zu uniforms", Uniforms.size());
   for (auto&& it : Uniforms) {
     it.second.DebugPrint(indent + 4);
   }

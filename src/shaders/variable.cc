@@ -39,18 +39,18 @@ Variable& Variable::operator=(Variable&& other) noexcept {
 }
 
 void Variable::DebugPrint(int indent) const {
-  LOGERR_INDENT_DEBUG(indent, "Variable debug print for \"%s\"", data_.name_.c_str());
+  LOG_INDENT_DEBUG(indent, "Variable debug print for \"%s\"", data_.name_.c_str());
   if (data_.kind_ == VariableKind::ATTRIBUTE) {
-    LOGERR_INDENT_DEBUG(indent, "Kind: ATTRIBUTE");
+    LOG_INDENT_DEBUG(indent, "Kind: ATTRIBUTE");
   } else if (data_.kind_ == VariableKind::UNIFORM) {
-    LOGERR_INDENT_DEBUG(indent, "Kind: UNIFORM");
+    LOG_INDENT_DEBUG(indent, "Kind: UNIFORM");
   } else {
-    LOGERR_INDENT_DEBUG(indent, "Kind: NONE");
+    LOG_INDENT_DEBUG(indent, "Kind: NONE");
   }
-  LOGERR_INDENT_DEBUG(indent, "Location: %d", data_.location_);
-  LOGERR_INDENT_DEBUG(indent, "Type: %s", data_.type_name_.c_str());
-  LOGERR_INDENT_DEBUG(indent, "Type Size: %zu", data_.type_size_);
-  LOGERR_INDENT_DEBUG(indent, "Size: %d", data_.size_);
+  LOG_INDENT_DEBUG(indent, "Location: %d", data_.location_);
+  LOG_INDENT_DEBUG(indent, "Type: %s", data_.type_name_.c_str());
+  LOG_INDENT_DEBUG(indent, "Type Size: %zu", data_.type_size_);
+  LOG_INDENT_DEBUG(indent, "Size: %d", data_.size_);
 }
 
 }   // namespace shaders
