@@ -217,15 +217,23 @@ void MaterialWindow(UiData *, ImVec2 start_pos, ImVec2 start_size) {
 
 
 void LogWindow(UiData *, ImVec2 start_pos, ImVec2 start_size) {
+  static bool open = true;
+  static size_t log_count = 0;
   ImGui::SetNextWindowPos(start_pos, ImGuiCond_Once);
   ImGui::SetNextWindowSize(start_size, ImGuiCond_Once);
-  static bool open = true;
   ImGui::Begin("Log", &open);
 
   ImGui::BeginChild("scrolling", {0, 0}, false, ImGuiWindowFlags_HorizontalScrollbar);
 
-  for (const std::string log_entry : LogBuffer::Instance().Logs) {
+  bool scroll_bottom = log_count != LogBuffer::Count();
+  log_count = LogBuffer::Count();
+
+  for (const std::string log_entry : LogBuffer::GetLogs()) {
     ImGui::TextUnformatted(log_entry.c_str());
+  }
+
+  if (scroll_bottom) { 
+    ImGui::SetScrollHere(1.0f);
   }
 
   ImGui::EndChild();
@@ -236,7 +244,7 @@ void RunUi(UiData *ui_data) {
   SystemWindow(ui_data,   {0, 0},     {500, 500});
   ShaderWindow(ui_data,   {0, 500},   {500, 500});
   MaterialWindow(ui_data, {0, 1000},  {500, 500});
-  LogWindow(ui_data, {600, 500}, {500, 500});
+  LogWindow(ui_data, {600, 800}, {1200, 300});
 }
 
 

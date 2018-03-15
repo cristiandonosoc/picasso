@@ -42,13 +42,13 @@ class LogBuffer {
 
  public:
   static void Clear();
+  static size_t Count();
   static void Log(int indent, LogLevel, const char *file, int line, 
                   const char *fmt, ...);
   static void LogStderr(int indent, LogLevel, const char *file, int line, 
                         const char *fmt, ...); 
 
- public:
-  static const LogBuffer& Instance() { return PrivateInstance(); }
+  static const LogContainer& GetLogs();
 
  private:
   static LogBuffer& PrivateInstance() {
@@ -67,8 +67,6 @@ class LogBuffer {
   LogContainer::reverse_iterator rbegin() { return container_.rbegin(); }
   LogContainer::reverse_iterator rend() { return container_.rend(); }
  
- public:
-  const LogContainer& Logs = container_;
 
  private:
   LogContainer container_;

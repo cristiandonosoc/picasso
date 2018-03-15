@@ -71,6 +71,13 @@ void LogBuffer::LogStderr(int indent, LogLevel level, const char *file, int line
   fflush(stderr);
 }
 
+size_t LogBuffer::Count() {
+  return PrivateInstance().container_.size();
+}
+
+const LogBuffer::LogContainer& LogBuffer::GetLogs() {
+  return PrivateInstance().container_;
+}
 
 
 
