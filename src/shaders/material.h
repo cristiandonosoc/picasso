@@ -30,7 +30,7 @@ class Shader;   // Forward Declaration
 class Material {
  public:
    DEFINE_PTR_TYPES(Material);
-  
+
  private:
   static ResultOr<UniquePtr> Create(const std::string& name);
 
@@ -38,7 +38,7 @@ class Material {
   Material() {}
 
  public:
-  const std::string& GetName() const { return data_.name_; }
+  const std::string& GetName() const { return data_.name; }
   const Shader *GetShader() const { return data_.shader; }
 
  public:
@@ -61,8 +61,8 @@ class Material {
  private:
   class Data {
    public:
-    std::string name_;
-    Shader *shader;
+    std::string name;
+    Shader *shader = nullptr;
     ValueMap attributes;
     ValueMap uniforms;
    public:

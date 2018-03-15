@@ -84,7 +84,7 @@ int main(int, char **) {
   ImGuiIO& io = ImGui::GetIO();
   // Mainly sets up the HDC and SDL Keyboard/Mouse stuf
   ImGui_ImplSdlGL3_Init(window);
-  
+
   // We maximize the window
   //
 #ifdef _WIN32
@@ -99,7 +99,7 @@ int main(int, char **) {
   LOGERR_INFO("OpenGL Vendor: %s", glGetString(GL_VENDOR));
   LOGERR_INFO("OpenGL Renderer: %s", glGetString(GL_RENDERER));
   LOGERR_INFO("OpenGL Version: %s", glGetString(GL_VERSION));
-  LOGERR_INFO("OpenGL Shading Language Version: %s", 
+  LOGERR_INFO("OpenGL Shading Language Version: %s",
               glGetString(GL_SHADING_LANGUAGE_VERSION));
   LOGERR_INFO("OpenGL Extension: %s", glGetString(GL_EXTENSIONS));
 
@@ -131,7 +131,7 @@ int main(int, char **) {
 
   const MaterialRegistry::Key mat_key = material_res.ConsumeOrDie();
   Material *material = MaterialRegistry::Get(mat_key);
-  
+
   LOGERR_INFO("Created material \"%s\"", mat_name.c_str());
 
   LOGERR_INFO("Setting program to \"%s\"", shader_name.c_str());
@@ -170,9 +170,8 @@ int main(int, char **) {
     it.second.DebugPrint();
   }
 
-  model.SetupBuffers();
-
   model.AddMaterialKey(mat_key);
+  model.SetupBuffers();
 
   // Setup style
   ImGui::StyleColorsDark();
@@ -211,9 +210,9 @@ int main(int, char **) {
       // Rendering
       // Clear the window
       glViewport(0, 0, (int)ImGui::GetIO().DisplaySize.x, (int)ImGui::GetIO().DisplaySize.y);
-      glClearColor(ui_data.clear_color.x, 
-                   ui_data.clear_color.y, 
-                   ui_data.clear_color.z, 
+      glClearColor(ui_data.clear_color.x,
+                   ui_data.clear_color.y,
+                   ui_data.clear_color.z,
                    ui_data.clear_color.w);
       glClear(GL_COLOR_BUFFER_BIT);
 
