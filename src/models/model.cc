@@ -53,11 +53,11 @@ void BindAttributePointer(int location, const AttributePointer& attrib_pointer) 
       // Stride: Space in bytes between two consecutive values of this 
       //         attribute in the array. 
       // A value of 0 is saying that the buffer is densely packed.
-      attrib_pointer.GetGLStride(),    
+      attrib_pointer.GetStride(),    
       // Offset: Space in bytes from the start of the array where the
       //        first value is. 
       // Value starts from the beginning of the array
-      attrib_pointer.GetGLOffset());
+      (void*)(size_t)attrib_pointer.GetOffset());
 }
 
 }   // namespace
@@ -220,16 +220,15 @@ bool Model::SetupAttributeByAttributeKind(Material* material, AttributeKind kind
     return false;
   }
 
-  // We see if we actually have the attribute
+  // We see if we actually have the attribute mapping
   auto it = material->Attributes.find(attrib_name);
   if (it == material->Attributes.end()) {
-    LOGERR_ERROR("Model doesn't have an SV_POSITION attribute specification");
+    LOGERR_ERROR("Model doesn't have an %s attribute specification",
+                 AttributeKind::ToString(kind).c_str());
     return false;
   }
 
-  // We try to set the VERTEX
-  // We get the location
-  auto pos_it = attribute_pointer_map_.find(AttributeKind::VERTEX);
+  auto pos_it = attribute_pointer_map_.find(kind);
   if (pos_it == attribute_pointer_map_.end()) {
     LOGERR_ERROR("Model doesn't have VERTEX attribute specification");
     return false;
@@ -238,6 +237,8 @@ bool Model::SetupAttributeByAttributeKind(Material* material, AttributeKind kind
   const AttributePointer& attrib_pointer = pos_it->second;
 
   // We finally are able to allocate the attribte to the location
+  LOGERR_DEBUG("LOCATION: %d", location);
+  attrib_pointer.DebugPrint();
   BindAttributePointer(location, attrib_pointer);
   glEnableVertexAttribArray(location);
   return true;

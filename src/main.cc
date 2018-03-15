@@ -61,12 +61,6 @@ SDL_Window *SetupSDL() {
 
 }   // namespace
 
-PRINTABLE_ENUM(SuperEnum, VERTEX, FRAGMENT, COMPUTE, GEOMETRY);
-
-
-#include <regex>
-#include <iostream>
-
 int main(int, char **) {
   if (SDL_Init(SDL_INIT_VIDEO|SDL_INIT_TIMER) != 0) {
     LOGERR_FATAL("SDL_Init Error: %s", SDL_GetError());
@@ -160,8 +154,8 @@ int main(int, char **) {
   model.SetIndexBuffer(sizeof(indices), indices);
 
 
-  model.AddAttributePointer({AttributeKind::VERTEX, 3, GL_FLOAT, true, 6, 0});
-  model.AddAttributePointer({AttributeKind::COLOR, 3, GL_FLOAT, true, 6, 3});
+  model.AddAttributePointer({AttributeKind::VERTEX, 3, GL_FLOAT, true, 24, 0});
+  model.AddAttributePointer({AttributeKind::COLOR, 3, GL_FLOAT, true, 24, 12});
 
 
   LOGERR_DEBUG("Attribute pointer count: %zu", model.AttributePointers.size());

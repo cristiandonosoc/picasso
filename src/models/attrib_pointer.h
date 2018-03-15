@@ -45,10 +45,6 @@ class AttributePointer {
   GLsizei GetStride() const { return stride_; }
   GLsizei GetOffset() const { return offset_; }
   GLboolean GetNormalize() const { return normalize_; }
-  GLsizei GetGLStride() const { return stride_ * type_size_; }
-  void *GetGLOffset() const {
-    return (void*)(size_t)(offset_ * type_size_);
-  }
 
  private:
   AttributeKind kind_;
@@ -62,15 +58,13 @@ class AttributePointer {
  public:
   void DebugPrint(int indent = 0) const {
     LOGERR_INDENT_DEBUG(indent, "Debug print of AttributePointer");
-    LOGERR_INDENT_DEBUG(indent, "KIND: %s", GetKind() == AttributeKind::VERTEX ? "VERTEX" : "NON-VERTEX");
+    LOGERR_INDENT_DEBUG(indent, "KIND: %s", AttributeKind::ToString(GetKind()).c_str());
     LOGERR_INDENT_DEBUG(indent, "SIZE: %d", GetSize());
     LOGERR_INDENT_DEBUG(indent, "TYPE %s", GL_TYPES_TO_STRING.GetName(GetType()).ConsumeOrDie().c_str());
     LOGERR_INDENT_DEBUG(indent, "TYPE SIZE: %d", GetTypeSize());
     LOGERR_INDENT_DEBUG(indent, "NORMALIZE: %s",  GetNormalize() ? "true" : "false");
     LOGERR_INDENT_DEBUG(indent, "STRIDE: %d", GetStride());
     LOGERR_INDENT_DEBUG(indent, "OFFSET: %d", GetOffset());
-    LOGERR_INDENT_DEBUG(indent, "GL_STRIDE: %d", GetGLStride());
-    LOGERR_INDENT_DEBUG(indent, "GL_OFFSET: %d", GetOffset() * GetTypeSize());
   }
 };  // class AttributePointer
 
