@@ -1,7 +1,7 @@
 #include "shaders/shader.h"
 
 #include "logging/log.h"
-#include "utils/result.h"
+#include "utils/status_or.h"
 #include "utils/gl.h"
 #include "utils/make_unique.h"
 
@@ -18,11 +18,11 @@ using ::picasso::models::AttributeKind;
 
 namespace {
 
-ResultOr<int> CompileShader(const std::string& shader_name,
+StatusOr<int> CompileShader(const std::string& shader_name,
                   GLenum shader_kind, const std::string& src) {
   int shader_handle = glCreateShader(shader_kind);
   if (!shader_handle) {
-    return ResultOr<int>::Error("Could not create shader \"%s\"\n",
+    return StatusOr<int>::Error("Could not create shader \"%s\"\n",
                                 shader_name.c_str());
   }
 
@@ -36,11 +36,11 @@ ResultOr<int> CompileShader(const std::string& shader_name,
   if (success == GL_FALSE) {
     GLchar log[2048];
     glGetShaderInfoLog(shader_handle, sizeof(log), 0, log);
-    return ResultOr<int>::Error("Error compiling \"%s\": %s\n",
+    return StatusOr<int>::Error("Error compiling \"%s\": %s\n",
                                 shader_name.c_str(), log);
 	}
 
-  return ResultOr<int>::Success(std::move(shader_handle));
+  return shader_handle;
 }
 
 }   // namespace
@@ -48,7 +48,7 @@ ResultOr<int> CompileShader(const std::string& shader_name,
 /**
  * Shader
  **/
-ResultOr<Shader::UniquePtr> Shader::Create(const std::string& name,
+StatusOr<Shader::UniquePtr> Shader::Create(const std::string& name,
                                            const std::string& vertex_src,
                                            const std::string& fragment_src) {
   // If some result is invalid, the Shader destructor will
@@ -58,23 +58,23 @@ ResultOr<Shader::UniquePtr> Shader::Create(const std::string& name,
 
   // Vertex Shader
   auto vertex_res = CompileShader("Vertex", GL_VERTEX_SHADER, vertex_src);
-  if (!vertex_res.Valid()) {
-    return ResultOr<UniquePtr>::Error(vertex_res.ErrorMsg());
+  if (!vertex_res.Ok()) {
+    return { Status::STATUS_ERROR, vertex_res.ErrorMsg() };
   }
   shader->vertex_handle_ = vertex_res.ConsumeOrDie();
 
   // Fragment Shader
   auto fragment_res = CompileShader("Fragment", GL_FRAGMENT_SHADER,
                                     fragment_src);
-  if (!fragment_res.Valid()) {
-    return ResultOr<UniquePtr>::Error(fragment_res.ErrorMsg());
+  if (!fragment_res.Ok()) {
+    return { Status::STATUS_ERROR, vertex_res.ErrorMsg() };
   }
   shader->fragment_handle_ = fragment_res.ConsumeOrDie();
 
   // Shader
   shader->shader_handle_ = glCreateProgram();
   if (!shader->shader_handle_) {
-    return ResultOr<UniquePtr>::Error("Could not get shader handle");
+    return StatusOr<UniquePtr>::Error("Could not get shader handle");
   }
 
   glAttachShader(shader->shader_handle_, shader->vertex_handle_);
@@ -85,7 +85,7 @@ ResultOr<Shader::UniquePtr> Shader::Create(const std::string& name,
   if (is_linked == GL_FALSE) {
     GLchar log[2048];
     glGetShaderInfoLog(shader->shader_handle_, sizeof(log), 0, log);
-    return ResultOr<UniquePtr>::Error("Error linkink shader: %s\n", log);
+    return StatusOr<UniquePtr>::Error("Error linkink shader: %s\n", log);
   }
 
   // We set the sources
@@ -166,7 +166,7 @@ void Shader::ObtainAttributes() {
     
     // We see if its a valid enum option
     auto res = AttributeKind::FromString(attr_type);
-    if (res.Valid()) {
+    if (res.Ok()) {
       AttributeKind kind = res.ConsumeOrDie();
       attribute_map_[kind] = attr_name;
     }

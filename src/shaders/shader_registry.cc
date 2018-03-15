@@ -20,7 +20,7 @@ namespace shaders {
 /**
  * STATIC INTERFACE
  **/
-ResultOr<Shader*> ShaderRegistry::CreateFromFiles(
+StatusOr<Shader*> ShaderRegistry::CreateFromFiles(
     const std::string& name,
     const std::string& vertex_path,
     const std::string& fragment_path) {
@@ -30,7 +30,7 @@ ResultOr<Shader*> ShaderRegistry::CreateFromFiles(
   return Create(name, vs, fs);
 }
 
-ResultOr<Shader*> ShaderRegistry::Create(const std::string& name,
+StatusOr<Shader*> ShaderRegistry::Create(const std::string& name,
                                            const std::string& vs,
                                            const std::string& fs) {
   return Instance().InternalCreate(name, vs, fs);
@@ -43,20 +43,20 @@ Shader* ShaderRegistry::Get(const std::string& name) {
 /**
  * INSTANCE INTERFACE
  **/
-ResultOr<Shader*> ShaderRegistry::InternalCreate(const std::string& name,
+StatusOr<Shader*> ShaderRegistry::InternalCreate(const std::string& name,
                                                    const std::string& vs,
                                                    const std::string& fs) {
   // We check if it exists already
   auto it = program_map_.find(name);
   if (it != program_map_.end()) {
-    return ResultOr<Shader*>::Error("Shader %s already exists",
+    return StatusOr<Shader*>::Error("Shader %s already exists",
                                      name.c_str());
   }
 
   // We attempt to create it
   auto res = Shader::Create(name, vs, fs); 
-  if (!res.Valid()) { 
-    return ResultOr<Shader*>::Error(res.ErrorMsg());
+  if (!res.Ok()) { 
+    return StatusOr<Shader*>::Error(res.ErrorMsg());
   }
 
   // Add it to the registry

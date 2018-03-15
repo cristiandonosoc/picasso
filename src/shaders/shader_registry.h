@@ -13,7 +13,7 @@
 
 #include "shaders/shader.h"
 #include "utils/macros.h"
-#include "utils/result.h"
+#include "utils/status_or.h"
 #include "utils/singleton.h"
 
 #include <map>
@@ -38,10 +38,10 @@ class ShaderRegistry : Singleton<ShaderRegistry> {
 
 
  public:
-  static ResultOr<Shader*> CreateFromFiles(const std::string& name,
+  static StatusOr<Shader*> CreateFromFiles(const std::string& name,
                                              const std::string& vertex_path,
                                              const std::string& fragment_path);
-  static ResultOr<Shader*> Create(const std::string& name, 
+  static StatusOr<Shader*> Create(const std::string& name, 
                                            const std::string& vs,
                                            const std::string& fs);
   static Shader *Get(const std::string& name);
@@ -51,7 +51,7 @@ class ShaderRegistry : Singleton<ShaderRegistry> {
   }
 
  protected:
-  ResultOr<Shader*> InternalCreate(const std::string& name,
+  StatusOr<Shader*> InternalCreate(const std::string& name,
                                     const std::string& vs,
                                     const std::string& fs);
   Shader *InternalGet(const std::string& name) const;

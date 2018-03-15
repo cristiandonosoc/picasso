@@ -13,7 +13,7 @@
 namespace picasso {
 namespace shaders {
 
-ResultOr<MaterialRegistry::Key> MaterialRegistry::Create(const std::string& name) {
+StatusOr<MaterialRegistry::Key> MaterialRegistry::Create(const std::string& name) {
   return Instance().InternalCreate(name);
 }
 
@@ -22,17 +22,17 @@ Material *MaterialRegistry::Get(const std::string& name) {
 }
 
 
-ResultOr<MaterialRegistry::Key> MaterialRegistry::InternalCreate(const std::string& name) {
+StatusOr<MaterialRegistry::Key> MaterialRegistry::InternalCreate(const std::string& name) {
   auto it = material_map_.find(name);
   if (it != material_map_.end()) {
-    return ResultOr<MaterialRegistry::Key>::Error("Material %s already exists",
+    return StatusOr<MaterialRegistry::Key>::Error("Material %s already exists",
                                                   name.c_str());
   }
 
   // Attempt to create 
   auto res = Material::Create(name);
-  if (!res.Valid()) {
-    return ResultOr<MaterialRegistry::Key>::Error(res.ErrorMsg());
+  if (!res.Ok()) {
+    return { Status::STATUS_ERROR, res.ErrorMsg() };
   }
   material_map_[name] = res.ConsumeOrDie();
   return name;

@@ -2,7 +2,7 @@
 #define SRC_SHADERS_shader_H
 
 #include "shaders/variable.h"
-#include "utils/result.h"
+#include "utils/status_or.h"
 #include "utils/macros.h"
 #include "models/attrib_pointer.h"
 
@@ -32,7 +32,7 @@ class Shader {
 
   // FACTORIES
  private:
-  static ResultOr<UniquePtr> Create(const std::string& name, 
+  static StatusOr<UniquePtr> Create(const std::string& name, 
                                     const std::string& vertex_src,
                                     const std::string& fragment_src);
   // CONSTRUCTORS

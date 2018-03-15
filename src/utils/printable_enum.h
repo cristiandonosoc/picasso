@@ -32,7 +32,7 @@
 
 #include "utils/macros.h"
 #include "utils/map_macro.h"
-#include "utils/result.h"
+#include "utils/status_or.h"
 
 // TODO(Cristian): Actually write some unit tests for this
 
@@ -115,18 +115,16 @@
       return mapping.string_map_;                                             \
     }                                                                         \
                                                                               \
-    static ::picasso::utils::ResultOr<InternalEnum>                           \
+    static ::picasso::utils::StatusOr<InternalEnum>                           \
     FromString(const std::string& val) {                                      \
       const Mapping& mapping = MappingInstance();                             \
       auto it = mapping.string_map_.find(std::string(#EnumType) + val);       \
       if (it == mapping.string_map_.end()) {                                  \
-        return ::picasso::utils::ResultOr<InternalEnum>::Error(               \
-            "Cannot find %s", val.c_str());                                   \
+        using STOR = ::picasso::utils::StatusOr<InternalEnum>;                \
+        return STOR::Error("Cannot find %s", val.c_str());                    \
       }                                                                       \
       return it->second;                                                      \
     }                                                                         \
-                                                                              \
-                                                                              \
                                                                               \
    private:                                                                   \
     InternalEnum val_;                                                        \

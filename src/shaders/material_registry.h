@@ -13,7 +13,7 @@
 
 #include "shaders/material.h"
 #include "utils/macros.h"
-#include "utils/result.h"
+#include "utils/status_or.h"
 #include "utils/singleton.h"
 
 #include <map>
@@ -36,7 +36,7 @@ class MaterialRegistry : Singleton<MaterialRegistry> {
   DISABLE_MOVE(MaterialRegistry);
 
  public:
-  static ResultOr<Key> Create(const std::string& name);
+  static StatusOr<Key> Create(const std::string& name);
   static Material *Get(const Key& key);
 
   // IMPORTANT: The pointers are not assured to be valid 
@@ -48,7 +48,7 @@ class MaterialRegistry : Singleton<MaterialRegistry> {
   }
 
  protected:
-  ResultOr<Key> InternalCreate(const std::string& name);
+  StatusOr<Key> InternalCreate(const std::string& name);
   Material *InternalGet(const std::string& name) const;
 
   /* std::map<Key, Material*> InternalGetMaterials() const { */

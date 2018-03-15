@@ -103,7 +103,7 @@ int main(int, char **) {
   std::string shader_name = "test_shader";
   auto shader_res = ShaderRegistry::Create(shader_name, vs, fs);
   Shader *shader = nullptr;
-  if (shader_res.Valid()) {
+  if (shader_res.Ok()) {
     shader = shader_res.ConsumeOrDie();
     LOG_INFO("Successful shader");
   } else {
@@ -118,7 +118,7 @@ int main(int, char **) {
   std::string mat_name = "mat0";
   auto material_res = MaterialRegistry::Create(mat_name);
 
-  if (!material_res.Valid()) {
+  if (!material_res.Ok()) {
     LOGERR_FATAL("Could not create material \"%s\"", mat_name.c_str());
     return 1;
   }

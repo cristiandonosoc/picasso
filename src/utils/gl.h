@@ -1,10 +1,10 @@
 #ifndef SRC_UTILS_GL_H
 #define SRC_UTILS_GL_H
 
-#include "result.h"
-
 #include <GL/gl3w.h>
 #include <map>
+
+#include "utils/status_or.h"
 
 namespace picasso {
 namespace utils {
@@ -38,18 +38,18 @@ class GLTypesToString {
      return instance;
    }
  public:
-   ResultOr<std::string> GetName(GLenum type) const {
+   StatusOr<std::string> GetName(GLenum type) const {
      auto it = mapping_.find(type);
      if (it == mapping_.end()) {
-       return ResultOr<std::string>::Error("Cannot find type %d", type);
+       return StatusOr<std::string>::Error("Cannot find type %d", type);
      }
      return it->second.name;
    }
 
-   ResultOr<size_t> GetSize(GLenum type) const {
+   StatusOr<size_t> GetSize(GLenum type) const {
      auto it = mapping_.find(type);
      if (it == mapping_.end()) {
-       return ResultOr<size_t>::Error("Cannot find type %d", type);
+       return StatusOr<size_t>::Error("Cannot find type %d", type);
      }
      return it->second.size;
    }

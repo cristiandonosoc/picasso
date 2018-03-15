@@ -22,7 +22,7 @@ Variable::Variable(VariableKind kind, const std::string& name, int location,
   data_.size_ = size;
   // We need to get the size of the backend
   auto size_res = GL_TYPES_TO_STRING.GetSize(data_.type_);
-  assert(size_res.Valid());
+  assert(size_res.Ok());
   data_.type_size_ = size_res.ConsumeOrDie();
   data_.type_name_ = GL_TYPES_TO_STRING.GetName(data_.type_).ConsumeOrDie();
 }

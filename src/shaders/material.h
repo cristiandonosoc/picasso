@@ -12,7 +12,7 @@
 #define SRC_SHADERS_MATERIAL_H
 
 #include "utils/macros.h"
-#include "utils/result.h"
+#include "utils/status_or.h"
 #include "shaders/value.h"
 
 #include <map>
@@ -32,7 +32,7 @@ class Material {
    DEFINE_PTR_TYPES(Material);
 
  private:
-  static ResultOr<UniquePtr> Create(const std::string& name);
+  static StatusOr<UniquePtr> Create(const std::string& name);
 
  private:
   Material() {}
