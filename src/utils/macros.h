@@ -17,11 +17,11 @@
 // of ignoring warnings for certain includes
 // (I mean, they did add it in 2018...)
 #ifdef _WIN32
-#define BEGIN_IGNORE_WARNINGS() #pragma warning(push, 0)
-#define END_IGNORE_WARNINGS() #pragme warning(pop)
+#define BEGIN_IGNORE_WARNINGS() __pragma(warning(push, 0))
+#define END_IGNORE_WARNINGS() __pragma(warning(pop))
 #else
-#define BEGIN_IGNORE_WARNINGS()
-#define END_IGNORE_WARNINGS()
+#define BEGIN_IGNORE_WARNINGS() 
+#define END_IGNORE_WARNINGS() 
 #endif
 
 

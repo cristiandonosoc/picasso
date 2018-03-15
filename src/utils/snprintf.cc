@@ -13,7 +13,7 @@ int picasso_snprintf(char *buf, size_t size, const char *fmt, ...) {
 #ifndef _WIN32
   int res = vsnprintf(buf, size, fmt, args);
 #else
-  int res = vsnprintf_s(buf, size, fmt, args);
+  int res = vsnprintf_s(buf, size, size - 1, fmt, args);
 #endif
   va_end(args);
   return res;
