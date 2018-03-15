@@ -104,11 +104,11 @@ void ShaderWindow(UiData *, ImVec2 start_pos, ImVec2 start_size) {
 
         if (shader) {
           const std::string& vertex_src = shader->GetVertexSource();
-          len = min(vertex_src.size(), sizeof(buf));
+          len = std::min(vertex_src.size(), sizeof(buf));
           memcpy(buf, vertex_src.c_str(), len);
         }
 
-        ImGui::InputTextMultiline("##vs", buf, len, {-1, text_height}, 
+        ImGui::InputTextMultiline("##vs", buf, len, {-1, text_height},
                                   ImGuiInputTextFlags_AllowTabInput);
       }
       {
@@ -117,13 +117,13 @@ void ShaderWindow(UiData *, ImVec2 start_pos, ImVec2 start_size) {
 
         if (shader) {
           const std::string& fragment_src = shader->GetFragmentSource();
-          len = min(fragment_src.size(), sizeof(buf));
+          len = std::min(fragment_src.size(), sizeof(buf));
           memcpy(buf, fragment_src.c_str(), len);
         }
 
         ImGui::Text("Fragment Shader");
         ImGui::Separator();
-        ImGui::InputTextMultiline("##fs", buf, len, {-1, -1}, 
+        ImGui::InputTextMultiline("##fs", buf, len, {-1, -1},
                                 ImGuiInputTextFlags_AllowTabInput);
       }
     ImGui::EndChild();
@@ -173,7 +173,7 @@ void MaterialWindow(UiData *, ImVec2 start_pos, ImVec2 start_size) {
     ImGui::Text("Uniforms");
     ImGui::Separator();
 
-    static std::regex color_regex("color", std::regex_constants::ECMAScript | 
+    static std::regex color_regex("color", std::regex_constants::ECMAScript |
                                            std::regex_constants::icase);
 
     for (auto&& it : material->Uniforms) {

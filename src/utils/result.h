@@ -7,6 +7,15 @@
 #include <string>
 #include <type_traits>
 
+// Removing some conflicts with X11 macros
+#ifdef Error
+#undef Error
+#endif
+
+#ifdef Success
+#undef Success
+#endif
+
 namespace picasso {
 namespace utils {
 

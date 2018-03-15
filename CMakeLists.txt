@@ -55,9 +55,9 @@ file(GLOB_RECURSE NO_WARN_AS_ERROR ${EXTERNAL_DIR}/*
 #####################################################
 
 include_directories(${SOURCE_DIR})
-include_directories(SYSTEM ${INCLUDE_DIR} 
+include_directories(SYSTEM ${INCLUDE_DIR}
                            ${IMGUI_DIR}
-                           ${SDL2_INCLUDE_DIR} 
+                           ${SDL2_INCLUDE_DIR}
                            ${BOOST_DIR})
 
 #####################################################
@@ -65,7 +65,10 @@ include_directories(SYSTEM ${INCLUDE_DIR}
 #####################################################
 
 if (UNIX)
-  message(FATAL_ERROR "UNIX not supported yet")
+  message(STATUS "Setting linux C++ flags")
+  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -Wextra -Werror -std=c++11")
+  # Adding linux linker flags
+  set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -ldl")
 else()
   message(STATUS "Setting MSVC flags")
   set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /W4 /WX /EHsc")
