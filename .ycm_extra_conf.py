@@ -53,7 +53,7 @@ flags = [
 '-I', os.path.join(os.getcwd(), 'src'),
 '-isystem', os.path.join(os.getcwd(), 'include'),
 '-isystem', os.path.join(os.getcwd(), 'imgui'),
-'-isystem', os.path.join(os.environ['SDL2'], 'include'),
+'-isystem', os.path.join(os.environ['SDL2']),
 
 ]
 

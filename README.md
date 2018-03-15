@@ -9,7 +9,6 @@ Remember to bring in the submodules (this should bring in imgui)
 
 ```
 git submodule update
-
 ```
 
 For now, I'm trying CMake (cannot say I'm thrilled). Remember to do an out-of-source build

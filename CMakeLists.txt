@@ -66,12 +66,14 @@ include_directories(SYSTEM ${INCLUDE_DIR}
 
 if (UNIX)
   message(STATUS "Setting linux C++ flags")
-  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -Wextra -Werror -std=c++11")
+  # Linux CXX flags
+  set(LINUX_CXX_FLAGS "-Wall -Wextra -Werror -std=c++11")
+  set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} ${LINUX_CXX_FLAGS}")
   # Adding linux linker flags
   set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -ldl")
 else()
   message(STATUS "Setting MSVC flags")
-  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /W4 /WX /EHsc")
+  set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} /W4 /WX /EHsc")
 endif()
 
 #####################################################
