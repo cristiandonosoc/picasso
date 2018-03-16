@@ -232,6 +232,14 @@ void MaterialWindow(UiData *, ImVec2 start_pos, ImVec2 start_size) {
   ImGui::End();
 }
 
+inline void PrintEntry(const std::string& entry, int count) {
+  if (entry.empty()) { return; }
+  if (count > 0) {
+    ImGui::Text("%4d: %s", count, entry.c_str());
+  } else {
+    ImGui::TextUnformatted(entry.c_str());
+  }
+}
 
 void LogWindow(UiData *, ImVec2 start_pos, ImVec2 start_size) {
   static bool open = true;
@@ -245,9 +253,20 @@ void LogWindow(UiData *, ImVec2 start_pos, ImVec2 start_size) {
   bool scroll_bottom = log_count != LogBuffer::Count();
   log_count = LogBuffer::Count();
 
+  std::string current_log_entry;
+  int count = 0;
   for (const std::string log_entry : LogBuffer::GetLogs()) {
-    ImGui::TextUnformatted(log_entry.c_str());
+    if (log_entry != current_log_entry) {
+      PrintEntry(current_log_entry, count);
+      current_log_entry = log_entry;
+      count = 0;
+    } else {
+      if (count < 9999) { count++; }
+    }
   }
+
+  // We need to print the last string
+  PrintEntry(current_log_entry, count);
 
   if (scroll_bottom) {
     ImGui::SetScrollHere(1.0f);
