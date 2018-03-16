@@ -25,7 +25,7 @@ static std::map<LogLevel, const char*> level_map = {
   { LogLevel::LOG_ERROR,  "[ERROR]" },
 };
 
-std::string CreateEntry(int indent, LogLevel level, const char *file, int line,
+std::string CreateEntryMsg(int indent, LogLevel level, const char *file, int line,
                         const char *fmt, va_list arglist) {
   const char *prefix = level_map[level];
   char fmt_buf[128];
@@ -53,31 +53,38 @@ void LogBuffer::Clear() {
   PrivateInstance().container_.clear();
 }
 
-void LogBuffer::Log(int indent, LogLevel level, const char *file, int line, 
-                    const char *fmt, ...) {
+void LogBuffer::AddEntry(LogLevel level, const std::string& msg) {
   using Clock = std::chrono::system_clock;
-  va_list arglist;
-  va_start(arglist, fmt);
-  std::string msg = CreateEntry(indent, level, file, line, fmt, arglist);
-  va_end(arglist);
   Entry entry;
-  entry.msg = std::move(msg);
+  entry.msg = msg;
   entry.level = level;
+
   // Obtain the timing
   auto now = Clock::now();
-  entry.time = Clock::to_time_t(now);
   auto seconds = std::chrono::time_point_cast<std::chrono::seconds>(now);
+
+  entry.time = Clock::to_time_t(now);
   entry.us = (size_t)std::chrono::duration_cast<std::chrono::microseconds>(now - seconds).count();
   PrivateInstance().container_.push_back(std::move(entry));
+}
+
+void LogBuffer::Log(int indent, LogLevel level, const char *file, int line, 
+                    const char *fmt, ...) {
+  va_list arglist;
+  va_start(arglist, fmt);
+  std::string msg = CreateEntryMsg(indent, level, file, line, fmt, arglist);
+  va_end(arglist);
+  PrivateInstance().AddEntry(level, msg);
 }
 
 void LogBuffer::LogStderr(int indent, LogLevel level, const char *file, int line, 
                     const char *fmt, ...) {
   va_list arglist;
   va_start(arglist, fmt);
-  std::string entry = CreateEntry(indent, level, file, line, fmt, arglist);
+  std::string msg = CreateEntryMsg(indent, level, file, line, fmt, arglist);
   va_end(arglist);
-  fprintf(stderr, "%s\n", entry.c_str());
+  PrivateInstance().AddEntry(level, msg);
+  fprintf(stderr, "%s\n", msg.c_str());
   fflush(stderr);
 }
 

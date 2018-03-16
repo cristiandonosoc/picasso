@@ -73,6 +73,9 @@ class LogBuffer {
   DISABLE_COPY(LogBuffer);
   DISABLE_MOVE(LogBuffer);
 
+ private:
+  void AddEntry(LogLevel, const std::string& msg);
+
  public:
   LogContainer::iterator begin() { return container_.begin(); }
   LogContainer::iterator end() { return container_.end(); }

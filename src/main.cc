@@ -109,7 +109,7 @@ int main(int, char **) {
     shader = shader_res.ConsumeOrDie();
     LOG_INFO("Successful shader");
   } else {
-    LOG_ERROR("Error getting shader: %s\n", shader_res.ErrorMsg().c_str());
+    LOGERR_ERROR("Error getting shader: %s\n", shader_res.ErrorMsg().c_str());
     return 1;
   }
 

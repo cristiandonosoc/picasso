@@ -67,7 +67,7 @@ StatusOr<Shader::UniquePtr> Shader::Create(const std::string& name,
   auto fragment_res = CompileShader("Fragment", GL_FRAGMENT_SHADER,
                                     fragment_src);
   if (!fragment_res.Ok()) {
-    return { Status::STATUS_ERROR, vertex_res.ErrorMsg() };
+    return { Status::STATUS_ERROR, fragment_res.ErrorMsg() };
   }
   shader->fragment_handle_ = fragment_res.ConsumeOrDie();
 
