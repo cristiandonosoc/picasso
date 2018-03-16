@@ -13,6 +13,7 @@
 
 #include <string>
 #include <vector>
+#include <ctime>
 
 #include "utils/macros.h"
 #include "utils/printable_enum.h"
@@ -37,8 +38,19 @@ PRINTABLE_ENUM(LogLevel, LOG_FATAL, LOG_ERROR, LOG_WARN,
  * Singleton in charge of keeping the log entries
  */
 class LogBuffer {
+
  public:
-  using LogContainer = std::vector<std::string>;
+  class Entry {
+   public:
+    LogLevel level;
+    std::string msg;
+    time_t time;
+    size_t us;
+  };  // struct LogBuffer::Entry
+
+
+ public:
+  using LogContainer = std::vector<Entry>;
 
  public:
   static void Clear();

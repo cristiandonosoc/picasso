@@ -9,6 +9,7 @@
  ******************************************************************************/
 
 #include <cstdarg>
+#include <chrono>
 
 #include "logging/log_buffer.h"
 
@@ -54,10 +55,19 @@ void LogBuffer::Clear() {
 
 void LogBuffer::Log(int indent, LogLevel level, const char *file, int line, 
                     const char *fmt, ...) {
+  using Clock = std::chrono::system_clock;
   va_list arglist;
   va_start(arglist, fmt);
-  std::string entry = CreateEntry(indent, level, file, line, fmt, arglist);
+  std::string msg = CreateEntry(indent, level, file, line, fmt, arglist);
   va_end(arglist);
+  Entry entry;
+  entry.msg = std::move(msg);
+  entry.level = level;
+  // Obtain the timing
+  auto now = Clock::now();
+  entry.time = Clock::to_time_t(now);
+  auto seconds = std::chrono::time_point_cast<std::chrono::seconds>(now);
+  entry.us = (size_t)std::chrono::duration_cast<std::chrono::microseconds>(now - seconds).count();
   PrivateInstance().container_.push_back(std::move(entry));
 }
 

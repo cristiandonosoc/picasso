@@ -10,6 +10,9 @@
 
 #include "platform.h"
 
+#include <ctime>
+#include <iomanip>
+
 #undef min
 #undef max
 
@@ -232,12 +235,19 @@ void MaterialWindow(UiData *, ImVec2 start_pos, ImVec2 start_size) {
   ImGui::End();
 }
 
-inline void PrintEntry(const std::string& entry, int count) {
-  if (entry.empty()) { return; }
+inline void PrintEntry(const LogBuffer::Entry& entry, int count) {
+  if (entry.msg.empty()) { return; }
+
+  // Obtain the time
+  struct tm result;
+  localtime_s(&result, &entry.time);
+  char buf[128];
+  strftime(buf, sizeof(buf), "%H:%M:%S", &result);
+
   if (count > 0) {
-    ImGui::Text("%4d: %s", count, entry.c_str());
+    ImGui::Text("[%s.%zu]: %s (%d)", buf, entry.us, entry.msg.c_str(), count);
   } else {
-    ImGui::TextUnformatted(entry.c_str());
+    ImGui::Text("[%s.%zu]: %s", buf, entry.us, entry.msg.c_str());
   }
 }
 
@@ -253,23 +263,25 @@ void LogWindow(UiData *, ImVec2 start_pos, ImVec2 start_size) {
   bool scroll_bottom = log_count != LogBuffer::Count();
   log_count = LogBuffer::Count();
 
-  std::string current_log_entry;
+  LogBuffer::Entry current_log_entry;
   int count = 0;
-  for (const std::string log_entry : LogBuffer::GetLogs()) {
-    if (log_entry != current_log_entry) {
+  for (const LogBuffer::Entry& log_entry : LogBuffer::GetLogs()) {
+    if (log_entry.msg != current_log_entry.msg) {
       PrintEntry(current_log_entry, count);
-      current_log_entry = log_entry;
       count = 0;
     } else {
       if (count < 9999) { count++; }
     }
+    current_log_entry = log_entry;
   }
 
   // We need to print the last string
   PrintEntry(current_log_entry, count);
 
-  if (scroll_bottom) {
-    ImGui::SetScrollHere(1.0f);
+  static bool first_pass = true;
+  if (first_pass || (scroll_bottom && count == 0)) {
+    first_pass = false;
+    ImGui::SetScrollHere();
   }
 
   ImGui::EndChild();
