@@ -18,7 +18,7 @@ set(EXTERNAL_DIR ${CMAKE_SOURCE_DIR}/external)
 set(INCLUDE_DIR ${CMAKE_SOURCE_DIR}/include)
 set(BUILD_DIR ${CMAKE_SOURCE_DIR}/bin)
 set(IMGUI_DIR ${CMAKE_SOURCE_DIR}/imgui)
-set(SHADERS_DIR ${CMAKE_SOURCE_DIR}/shaders)
+set(ASSETS_DIR ${CMAKE_SOURCE_DIR}/assets)
 set(BOOST_DIR ${CMAKE_SOURCE_DIR}/boost)
 
 set(WINDOWS_PLATFORM_DIR ${CMAKE_SOURCE_DIR}/platforms/win32)
@@ -124,7 +124,7 @@ target_link_libraries(picasso platform)
 
 add_custom_command(TARGET picasso POST_BUILD
                    COMMAND ${CMAKE_COMMAND} -E copy_directory
-                   ${SHADERS_DIR} $<TARGET_FILE_DIR:picasso>/shaders)
+                   ${ASSETS_DIR} $<TARGET_FILE_DIR:picasso>)
 
 #####################################################
 # OUTPUT
