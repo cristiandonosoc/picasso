@@ -11,6 +11,7 @@
 #ifndef SRC_UTILS_DYNAMIC_ARRAY_H
 #define SRC_UTILS_DYNAMIC_ARRAY_H
 
+#include <cstring>
 #include <memory>
 
 #include "utils/macros.h"
@@ -49,6 +50,13 @@ class DynamicArray {
     count_ = count;
     buffer_.reset(new T[count_]);
     FillArray(count_, array);
+  }
+
+ public:
+  void Zero() {
+    if (count_ > 0) {
+      memset(buffer_.get(), 0, count_);
+    }
   }
 
  public:

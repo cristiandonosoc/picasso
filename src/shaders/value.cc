@@ -9,6 +9,7 @@
  ******************************************************************************/
 
 #include <cassert>
+#include <cstring>
 
 #include "shaders/value.h"
 #include "logging/log.h"
@@ -21,6 +22,7 @@ Value::Value(const Variable *variable) : variable_(variable) {
   if (variable->GetKind() == VariableKind::UNIFORM) {
     // We allocate the amount of data needed for the value
     backend_.Reset(variable->GetTypeSize() * variable->GetSize());
+    backend_.Zero();
   }
 }
 
