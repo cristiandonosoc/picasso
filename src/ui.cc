@@ -77,7 +77,6 @@ void SystemWindow(UiData *ui_data, ImVec2 start_pos, ImVec2 start_size) {
   ImGui::Begin("System", &open);
   ImGui::ColorEdit3("Clear Color", (float*)&ui_data->clear_color);
 
-
   if (ImGui::Button("Open File")) {
     auto res = Platform::FileDialog("");
     if (res.Ok()) {
@@ -235,7 +234,9 @@ void MaterialWindow(UiData *, ImVec2 start_pos, ImVec2 start_size) {
   ImGui::End();
 }
 
-inline void PrintEntry(const LogBuffer::Entry& entry, int count) {
+inline void PrintEntry(const LogBuffer::Entry& entry, int count,
+                       ImVec4& error_color, ImVec4& warn_color) {
+  using ::picasso::logging::LogLevel;
   if (entry.msg.empty()) { return; }
 
   // Obtain the time
@@ -243,6 +244,17 @@ inline void PrintEntry(const LogBuffer::Entry& entry, int count) {
   localtime_s(&result, &entry.time);
   char buf[128];
   strftime(buf, sizeof(buf), "%H:%M:%S", &result);
+
+  if (entry.level == LogLevel::LOG_ERROR || entry.level == LogLevel::LOG_WARN) {
+    ImVec2 pos = ImGui::GetCursorScreenPos();
+    float height = ImGui::GetTextLineHeight();
+    float width = ImGui::GetWindowContentRegionWidth();
+    ImDrawList* draw_list = ImGui::GetWindowDrawList();
+
+    ImVec4& color = entry.level == LogLevel::LOG_ERROR ? error_color : warn_color;
+    draw_list->AddRectFilled(pos, {pos.x + width, pos.y + height}, 
+                             ImGui::ColorConvertFloat4ToU32(color));
+  }
 
   if (count > 0) {
     ImGui::Text("[%s.%zu]: %s (%d)", buf, entry.us, entry.msg.c_str(), count);
@@ -258,6 +270,17 @@ void LogWindow(UiData *, ImVec2 start_pos, ImVec2 start_size) {
   ImGui::SetNextWindowSize(start_size, ImGuiCond_Once);
   ImGui::Begin("Log", &open);
 
+  if (ImGui::Button("Clear")) { LogBuffer::Clear(); }
+
+  static ImVec4 error_color = {0.7f, 0.0f, 0.0f, 1.0f};
+  static ImVec4 warn_color = {0.7f, 0.5f, 0.0f, 1.0f};
+  auto flags = ImGuiColorEditFlags_NoInputs;
+  ImGui::SameLine();
+  ImGui::ColorEdit3("Error", (float*)&error_color, flags);
+  ImGui::SameLine();
+  ImGui::ColorEdit3("Warn", (float*)&warn_color, flags);
+  ImGui::Separator();
+
   ImGui::BeginChild("scrolling", {0, 0}, false, ImGuiWindowFlags_HorizontalScrollbar);
 
   bool scroll_bottom = log_count != LogBuffer::Count();
@@ -267,7 +290,7 @@ void LogWindow(UiData *, ImVec2 start_pos, ImVec2 start_size) {
   int count = 0;
   for (const LogBuffer::Entry& log_entry : LogBuffer::GetLogs()) {
     if (log_entry.msg != current_log_entry.msg) {
-      PrintEntry(current_log_entry, count);
+      PrintEntry(current_log_entry, count, error_color, warn_color);
       count = 0;
     } else {
       if (count < 9999) { count++; }
@@ -276,7 +299,7 @@ void LogWindow(UiData *, ImVec2 start_pos, ImVec2 start_size) {
   }
 
   // We need to print the last string
-  PrintEntry(current_log_entry, count);
+  PrintEntry(current_log_entry, count, error_color, warn_color);
 
   static bool first_pass = true;
   if (first_pass || (scroll_bottom && count == 0)) {
