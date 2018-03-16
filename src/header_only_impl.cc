@@ -15,6 +15,6 @@ BEGIN_IGNORE_WARNINGS();
 
 // DG_MISC
 #define DG_MISC_IMPLEMENTATION
-#include <DG_misc.h>
+#include <external/DG_misc.h>
 
 END_IGNORE_WARNINGS();

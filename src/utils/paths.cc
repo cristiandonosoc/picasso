@@ -12,7 +12,7 @@
 #include "utils/paths.h"
 
 BEGIN_IGNORE_WARNINGS();
-#include <DG_misc.h>
+#include <external/DG_misc.h>
 END_IGNORE_WARNINGS();
 
 
