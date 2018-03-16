@@ -8,6 +8,8 @@
 #include "logging/log.h"
 #include "utils/snprintf.h"
 
+#include "platform.h"
+
 #undef min
 #undef max
 
@@ -19,6 +21,8 @@ using ::picasso::shaders::Variable;
 using ::picasso::shaders::Value;
 using ::picasso::logging::LogBuffer;
 using ::picasso::utils::picasso_snprintf;
+
+using ::picasso::Platform;
 
 #if 0
 void ImGuiExample(const ImVec4& clear_color, bool show_demo_window,
@@ -69,6 +73,17 @@ void SystemWindow(UiData *ui_data, ImVec2 start_pos, ImVec2 start_size) {
   static bool open = true;
   ImGui::Begin("System", &open);
   ImGui::ColorEdit3("Clear Color", (float*)&ui_data->clear_color);
+
+
+  if (ImGui::Button("Open File")) {
+    auto res = Platform::FileDialog("");
+    if (res.Ok()) {
+      LOG_INFO("Found file: %s", res.ConsumeOrDie().c_str());
+    } else {
+      LOG_ERROR("Could not find file");
+    }
+  }
+
 
   ImGui::End();
 }

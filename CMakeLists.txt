@@ -21,6 +21,8 @@ set(IMGUI_DIR ${CMAKE_SOURCE_DIR}/imgui)
 set(SHADERS_DIR ${CMAKE_SOURCE_DIR}/shaders)
 set(BOOST_DIR ${CMAKE_SOURCE_DIR}/boost)
 
+set(WINDOWS_PLATFORM_DIR ${CMAKE_SOURCE_DIR}/platforms/win32)
+
 #####################################################
 # SOURCE GLOBBING
 #####################################################
@@ -35,9 +37,14 @@ file(GLOB_RECURSE EXTERNAL_SRCS ${EXTERNAL_DIR}/*.cpp
                                 ${EXTERNAL_DIR}/*.c
 )
 
+file(GLOB_RECURSE WINDOWS_SRCS ${WINDOWS_PLATFORM_DIR}/*.cc
+                               ${WINDOWS_PLATFORM_DIR}/*.h)
+
 file(GLOB IMGUI_SRCS ${IMGUI_DIR}/*.cpp
                      ${IMGUI_DIR}/*.h
 )
+
+
 
 set(SOURCES ${INTERNAL_SRCS} ${EXTERNAL_SRCS} ${IMGUI_SRCS})
 
@@ -54,6 +61,7 @@ file(GLOB_RECURSE NO_WARN_AS_ERROR ${EXTERNAL_DIR}/*
 # INCLUDES
 #####################################################
 
+include_directories(${CMAKE_SOURCE_DIR})
 include_directories(${SOURCE_DIR})
 include_directories(SYSTEM ${INCLUDE_DIR}
                            ${IMGUI_DIR}
@@ -74,6 +82,7 @@ if (UNIX)
 else()
   message(STATUS "Setting MSVC flags")
   set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} /W4 /WX /EHsc")
+  add_library(platform STATIC ${WINDOWS_SRCS})
 endif()
 
 #####################################################
@@ -107,6 +116,7 @@ endif()
 add_executable(picasso ${SOURCES})
 target_link_libraries(picasso ${SDL2_LIBRARY})
 target_link_libraries(picasso ${OPENGL_LIBRARIES})
+target_link_libraries(picasso platform)
 
 #####################################################
 # SHADER COPY
