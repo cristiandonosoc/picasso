@@ -190,8 +190,9 @@ GLuint Model::SetupMaterialVAO(const MaterialRegistry::Key& key) {
   // that through the material
   Material *material = MaterialRegistry::Get(key);
   if (material) {
-    SetupAttributeByAttributeKind(material, AttributeKind::VERTEX);
-    SetupAttributeByAttributeKind(material, AttributeKind::COLOR);
+    for (auto&& kind_it : AttributeKind::GetEnumMap()) {
+      SetupAttributeByAttributeKind(material, kind_it.first);
+    }
   } else {
     // TODO(Cristian): Log? At least show in the UI...
   }
@@ -236,6 +237,7 @@ bool Model::SetupAttributeByAttributeKind(Material* material, AttributeKind kind
   const AttributePointer& attrib_pointer = pos_it->second;
 
   // We finally are able to allocate the attribte to the location
+  LOG_DEBUG("Found attribute for %s", AttributeKind::ToString(kind).c_str());
   attrib_pointer.DebugPrint();
   BindAttributePointer(location, attrib_pointer);
   glEnableVertexAttribArray(location);
@@ -324,6 +326,7 @@ bool Model::Render() const {
     }
 
     if (indexed_) {
+      glBindTexture(GL_TEXTURE_2D, 1);
       // TODO(Cristian): Actually calculate the sizes
       glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
     }

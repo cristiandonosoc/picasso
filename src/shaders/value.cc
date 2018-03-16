@@ -54,7 +54,7 @@ bool Value::SendValue() const {
         glUniform4f(location, *ptr, *(ptr+1), *(ptr+2), *(ptr+3)); break;
       }
       default: {
-        LOGERR_WARN("Type \"%s\" is not implemented yet!", 
+        LOG_WARN("Type \"%s\" is not implemented yet!", 
                     variable_->GetTypeName().c_str());
         return false;
       }

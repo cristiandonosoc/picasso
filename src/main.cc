@@ -38,6 +38,8 @@ using ::picasso::models::Model;
 
 using ::picasso::utils::paths::GetExecutableDir;
 
+#include <external/stb_image.h>
+
 namespace {
 
 SDL_Window *SetupSDL() {
@@ -130,16 +132,45 @@ int main(int, char **) {
   LOG_INFO("Setting program to \"%s\"", shader_name.c_str());
   material->SetShader(shader);
 
+  // We load a texture
+  int width = 0, height = 0, num_channels = 0; 
+  std::string texture_path = GetExecutableDir() + "textures/container.jpg";
+  uint8_t *data = stbi_load(texture_path.c_str(), &width, &height, &num_channels, 0);
+
+  LOG_DEBUG("TEXTURE READ. POINTER: %p, WIDTH: %d, HEIGHT: %d", data, width, height);
+
+  // We generate the OpenGL texture
+  GLuint texture_id;
+  glGenTextures(1, &texture_id);
+  glBindTexture(GL_TEXTURE_2D, texture_id);
+
+  // We sent the image over
+  glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, data);
+  glGenerateMipmap(GL_TEXTURE_2D);
+
+  // Set the current texture parameters
+  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+
+  // We don't need the texture data anymore
+  stbi_image_free(data);
+
+
+
+
+
 
   // We create some sample points
   // Actual points to be renderer
   // There are 6 floats from each element. So stride is 24
   float vertices[] = {
      // positions         // colors
-     0.5f,  0.5f, 0.0f,   1.0f, 0.0f, 0.0f,   // top right
-     0.5f, -0.5f, 0.0f,   0.0f, 1.0f, 0.0f,   // bottom right
-    -0.5f, -0.5f, 0.0f,   0.0f, 0.0f, 1.0f,   // bottom left
-    -0.5f,  0.5f, 0.0f,   0.5f, 0.7f, 0.2f,   // top left
+     0.5f,  0.5f, 0.0f,   1.0f, 0.0f, 0.0f,  1.0f, 1.0f,  // top right
+     0.5f, -0.5f, 0.0f,   0.0f, 1.0f, 0.0f,  1.0f, 0.0f,  // bottom right
+    -0.5f, -0.5f, 0.0f,   0.0f, 0.0f, 1.0f,  0.0f, 0.0f,  // bottom left
+    -0.5f,  0.5f, 0.0f,   0.5f, 0.7f, 0.2f,  0.0f, 1.0f   // top left
   };
   // Indices that OpenGL will use to generate the primitives
   // This enables us to send much less data
@@ -152,9 +183,10 @@ int main(int, char **) {
   model.SetVertexBuffer(sizeof(vertices), vertices);
   model.SetIndexBuffer(sizeof(indices), indices);
 
-
-  model.AddAttributePointer({AttributeKind::VERTEX, 3, GL_FLOAT, true, 24, 0});
-  model.AddAttributePointer({AttributeKind::COLOR, 3, GL_FLOAT, true, 24, 12});
+  int stride = 8 * sizeof(float);
+  model.AddAttributePointer({AttributeKind::VERTEX, 3, GL_FLOAT, false, stride, 0});
+  model.AddAttributePointer({AttributeKind::COLOR, 3, GL_FLOAT, false, stride, 3 * sizeof(float)});
+  model.AddAttributePointer({AttributeKind::UV, 2, GL_FLOAT, false, stride, 6 * sizeof(float)});
 
 
   LOG_DEBUG("Attribute pointer count: %zu", model.AttributePointers.size());
@@ -209,6 +241,7 @@ int main(int, char **) {
                    ui_data.clear_color.w);
       glClear(GL_COLOR_BUFFER_BIT);
 
+      glBindTexture(GL_TEXTURE_2D, texture_id);
       /* glPolygonMode(GL_FRONT_AND_BACK, GL_LINE); */
       model.Render();
 

@@ -17,4 +17,7 @@ BEGIN_IGNORE_WARNINGS();
 #define DG_MISC_IMPLEMENTATION
 #include <external/DG_misc.h>
 
+#define STB_IMAGE_IMPLEMENTATION
+#include <external/stb_image.h>
+
 END_IGNORE_WARNINGS();
