@@ -42,6 +42,14 @@ class StatusOr {
     : status_(status), error_msg_(error_msg) {
     assert(status != Status::STATUS_OK);
   }
+  StatusOr(Status status, const char *fmt, ...) : status_(status) {
+    va_list arglist;
+    va_start(arglist, fmt);
+    char buffer[1024];
+    vsnprintf(buffer, sizeof(buffer), fmt, arglist);
+    va_end(arglist);
+    error_msg_ = buffer;
+  }
 
  public:
   static StatusOr Error(const std::string& error_msg) {
