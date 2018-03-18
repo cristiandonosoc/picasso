@@ -7,6 +7,7 @@
 #include "shaders/material_registry.h"
 #include "logging/log.h"
 #include "utils/snprintf.h"
+#include "textures/texture_registry.h"
 
 #include "platform.h"
 
@@ -24,6 +25,8 @@ using ::picasso::shaders::Variable;
 using ::picasso::shaders::Value;
 using ::picasso::logging::LogBuffer;
 using ::picasso::utils::picasso_snprintf;
+using ::picasso::textures::Texture;
+using ::picasso::textures::TextureRegistry;
 
 using ::picasso::Platform;
 
@@ -234,6 +237,63 @@ void MaterialWindow(UiData *, ImVec2 start_pos, ImVec2 start_size) {
   ImGui::End();
 }
 
+void TextureWindow(UiData*, ImVec2 start_pos, ImVec2 start_size) {
+  ImGui::SetNextWindowPos(start_pos, ImGuiCond_Once);
+  ImGui::SetNextWindowSize(start_size, ImGuiCond_Once);
+  static bool open = true;
+  ImGui::Begin("Textures", &open);
+
+  ImGui::BeginChild("Left Pane", {150, 0}, true);
+  auto&& texture_map = TextureRegistry::GetTextureMap();
+  static int selected_index = -1;
+  static TextureRegistry::Key selected_key;
+  int i = 0;
+  for (auto&& it = texture_map.begin();
+       it != texture_map.end();
+       it++, i++) {
+    auto&& key = it->first;
+    /* Material* material = it->second; */
+    char label[128];
+    picasso_snprintf(label, sizeof(label), "%s", key.c_str());
+    if (ImGui::Selectable(label, selected_index == i)) {
+      selected_index = i;
+      selected_key = key;
+    }
+  }
+
+  ImGui::EndChild();
+  ImGui::SameLine();
+
+  Texture::SharedPtr texture = nullptr;
+  if (selected_index >= 0) {
+    auto it = texture_map.find(selected_key);
+    texture = it != texture_map.end() ? it->second : nullptr;
+  }
+
+  /* float height = ImGui::GetContentRegionAvail().y; */
+
+  if (texture) {
+    ImGui::BeginChild("Texture", {-1, -1});
+
+    ImGui::PushTextWrapPos(ImGui::GetCursorPosX() + ImGui::GetContentRegionAvailWidth());
+    ImGui::BulletText("Name: %s", texture->GetName().c_str());
+    ImGui::BulletText("Path:");
+    ImGui::Text("%s", texture->GetPath().c_str());
+    ImGui::BulletText("Width: %d", texture->GetWidth());
+    ImGui::BulletText("Height: %d", texture->GetHeight());
+    ImGui::BulletText("Num. Channels: %d", texture->GetNumChannels());
+    ImGui::BulletText("OpenGL id: %u", texture->GetId());
+    ImGui::PopTextWrapPos();
+    ImGui::Separator();
+    ImGui::Image((void*)(size_t)texture->GetId(), {200, 200});
+
+
+    ImGui::EndChild();
+
+  }
+  ImGui::End();
+}
+
 inline void PrintEntry(const LogBuffer::Entry& entry, int count,
                        ImVec4& error_color, ImVec4& warn_color) {
   using ::picasso::logging::LogLevel;
@@ -268,7 +328,17 @@ void LogWindow(UiData *, ImVec2 start_pos, ImVec2 start_size) {
   static size_t log_count = 0;
   ImGui::SetNextWindowPos(start_pos, ImGuiCond_Once);
   ImGui::SetNextWindowSize(start_size, ImGuiCond_Once);
-  ImGui::Begin("Log", &open);
+  ImGui::Begin("Log", &open, ImGuiWindowFlags_MenuBar);
+  
+  static bool docked = true;
+  if (ImGui::BeginMenuBar()) {
+
+    if (ImGui::BeginMenu("Docking")) {
+      ImGui::MenuItem("Docked", NULL, &docked);
+      ImGui::EndMenu();
+    }
+    ImGui::EndMenuBar();
+  }
 
   if (ImGui::Button("Clear")) { LogBuffer::Clear(); }
 
@@ -315,6 +385,7 @@ void RunUi(UiData *ui_data) {
   SystemWindow(ui_data,   {0, 0},     {500, 500});
   ShaderWindow(ui_data,   {0, 500},   {500, 500});
   MaterialWindow(ui_data, {0, 1000},  {500, 500});
+  TextureWindow(ui_data, {500, 500}, {500, 500});
   LogWindow(ui_data, {600, 800}, {1200, 300});
 }
 

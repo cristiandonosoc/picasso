@@ -24,6 +24,7 @@ StatusOr<Texture::UniquePtr> Texture::Create(const std::string& name,
                                              const std::string& path) {
   Texture::UniquePtr texture(new Texture());  // Private constructor
   texture->name_ = name;
+  texture->path_ = path;
   // We try to load the data
   texture->image_data_.reset(stbi_load(path.c_str(), 
                              &texture->width_, &texture->height_,

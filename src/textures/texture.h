@@ -47,6 +47,7 @@ class Texture {
   const uint8_t *GetData() const { return image_data_.get(); }
   int GetWidth() const { return width_; }
   int GetHeight() const { return height_; }
+  int GetNumChannels() const { return num_channels_; }
   uint32_t GetId() const { return id_; }
 
 
