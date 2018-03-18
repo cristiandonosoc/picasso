@@ -55,6 +55,8 @@ bool Value::SendValue() const {
         const GLfloat *ptr = GetValue<GLfloat>();
         glUniform4f(location, *ptr, *(ptr+1), *(ptr+2), *(ptr+3)); break;
       }
+      case GL_SAMPLER_2D:
+        break;
       default: {
         LOG_WARN("Type \"%s\" is not implemented yet!", 
                     variable_->GetTypeName().c_str());

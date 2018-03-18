@@ -49,6 +49,9 @@ StatusOr<Texture::UniquePtr> Texture::Create(const std::string& name,
   glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
   glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 
+  // Unbind
+  glBindTexture(GL_TEXTURE_2D, 0);
+
   return texture;
 }
 
