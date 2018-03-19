@@ -97,9 +97,9 @@ class GLTypesToString {
 		mapping_[GL_DOUBLE_MAT3x4]                              = { "GL_DOUBLE_MAT3x4",     3 * 4 * sizeof(GLdouble) };
 		mapping_[GL_DOUBLE_MAT4x2]                              = { "GL_DOUBLE_MAT4x2",     4 * 2 * sizeof(GLdouble) };
 		mapping_[GL_DOUBLE_MAT4x3]                              = { "GL_DOUBLE_MAT4x3",     4 * 3 * sizeof(GLdouble) };
-		mapping_[GL_SAMPLER_1D]                                 = { "GL_SAMPLER_1D", 0 };
-		mapping_[GL_SAMPLER_2D]                                 = { "GL_SAMPLER_2D", 0 };
-		mapping_[GL_SAMPLER_3D]                                 = { "GL_SAMPLER_3D", 0 };
+		mapping_[GL_SAMPLER_1D]                                 = { "GL_SAMPLER_1D", 1 * sizeof(uint32_t) };
+		mapping_[GL_SAMPLER_2D]                                 = { "GL_SAMPLER_2D", 1 * sizeof(uint32_t) };
+		mapping_[GL_SAMPLER_3D]                                 = { "GL_SAMPLER_3D", 1 * sizeof(uint32_t) };
 		mapping_[GL_SAMPLER_CUBE]                               = { "GL_SAMPLER_CUBE", 0 };
 		mapping_[GL_SAMPLER_1D_SHADOW]                          = { "GL_SAMPLER_1D_SHADOW", 0 };
 		mapping_[GL_SAMPLER_2D_SHADOW]                          = { "GL_SAMPLER_2D_SHADOW", 0 };

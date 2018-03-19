@@ -207,17 +207,25 @@ void MaterialWindow(UiData *, ImVec2 start_pos, ImVec2 start_size) {
     static std::regex color_regex("color", std::regex_constants::ECMAScript |
                                            std::regex_constants::icase);
 
+    int mat_count = 0;
     for (auto&& it : material->Uniforms) {
       Value& value = it.second;
       const Variable *variable = value.GetVariable();
       const std::string& name = variable->GetName();
 
+      ImGui::PushID(mat_count);
       if(ImGui::TreeNode(name.c_str(), "%s", variable->GetName().c_str())) {
         ImGui::BulletText("Location: %d", variable->GetLocation());
         ImGui::BulletText("Type: %s", variable->GetTypeName().c_str());
         ImGui::BulletText("Type Size: %zu", variable->GetTypeSize());
         ImGui::BulletText("Size: %zu", variable->GetSize());
         ImGui::TreePop();
+      }
+
+      float *ptr = value.GetValue<GLfloat>();
+      ImGui::Text("PTR: %p, VAL: %f", ptr, *ptr);
+      if (variable->GetType() == GL_FLOAT) {
+        ImGui::SliderFloat("Value", ptr, 0.0f, 1.0f);
       }
 
       if (std::regex_search(name, color_regex)) {
@@ -227,6 +235,8 @@ void MaterialWindow(UiData *, ImVec2 start_pos, ImVec2 start_size) {
           ImGui::ColorEdit3("", value.GetValue<float>());
         }
       }
+      ImGui::PopID();
+      mat_count++;
       ImGui::Separator();
     }
 

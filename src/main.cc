@@ -119,6 +119,20 @@ int main(int, char **) {
 
   shader->DebugPrint();
 
+  // We load a texture
+  auto texture_key = TextureRegistry::Create("test_texture", 
+                                             GetExecutableDir() + "textures/container.jpg").ConsumeOrDie();
+  auto texture = TextureRegistry::Get(texture_key).lock();
+  LOG_DEBUG("TEXTURE READ. POINTER: %p, WIDTH: %d, HEIGHT: %d",  texture->GetData(), texture->GetWidth(), texture->GetHeight());
+
+  auto res = TextureRegistry::Create("happy",
+                                     GetExecutableDir() + "textures/awesomeface.png");
+  if (!res.Ok()) {
+    LOGERR_FATAL("Could not load texture: %s", res.ErrorMsg().c_str());
+    return 1;
+  }
+  auto tex2 = TextureRegistry::Get(res.ConsumeOrDie()).lock();
+
   LOG_SEPARATOR;
   LOG_INFO("Creating material");
   std::string mat_name = "mat0";
@@ -136,15 +150,9 @@ int main(int, char **) {
   LOG_INFO("Setting program to \"%s\"", shader_name.c_str());
   material->SetShader(shader);
 
-  // We load a texture
-  auto texture_key = TextureRegistry::Create("test_texture", 
-                                             GetExecutableDir() + "textures/container.jpg").ConsumeOrDie();
-  auto texture = TextureRegistry::Get(texture_key);
-  {
-    auto shared_texture = texture.lock();
-    LOG_DEBUG("TEXTURE READ. POINTER: %p, WIDTH: %d, HEIGHT: %d", 
-      shared_texture->GetData(), shared_texture->GetWidth(), shared_texture->GetHeight());
-  }
+
+  material->SetValue<uint32_t>("tex0", texture->GetId());
+  material->SetValue<uint32_t>("tex1", tex2->GetId());
 
 
   // We create some sample points

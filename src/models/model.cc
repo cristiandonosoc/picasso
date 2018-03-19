@@ -212,11 +212,19 @@ GLuint Model::SetupMaterialVAO(const MaterialRegistry::Key& key) {
 }
 
 bool Model::SetupAttributeByAttributeKind(Material* material, AttributeKind kind)  {
+  auto pos_it = attribute_pointer_map_.find(kind);
+  if (pos_it == attribute_pointer_map_.end()) {
+    LOG_ERROR("Model doesn't have \"%s\" attribute pointer",
+              AttributeKind::ToString(kind).c_str());
+    return false;
+  }
+  const AttributePointer& attrib_pointer = pos_it->second;
+
   // We get the name we should be looking for
   std::string attrib_name = AttributeKindToAttributeName[kind];
   if (attrib_name.empty()) {
     LOG_ERROR("There is no attribute name map for the kind: \"%s\"",
-                 AttributeKind::ToString(kind).c_str());
+              AttributeKind::ToString(kind).c_str());
     return false;
   }
 
@@ -224,17 +232,11 @@ bool Model::SetupAttributeByAttributeKind(Material* material, AttributeKind kind
   auto it = material->Attributes.find(attrib_name);
   if (it == material->Attributes.end()) {
     LOG_ERROR("Model doesn't have an %s attribute specification",
-                 AttributeKind::ToString(kind).c_str());
+              AttributeKind::ToString(kind).c_str());
     return false;
   }
 
-  auto pos_it = attribute_pointer_map_.find(kind);
-  if (pos_it == attribute_pointer_map_.end()) {
-    LOG_ERROR("Model doesn't have VERTEX attribute specification");
-    return false;
-  }
   GLuint location = it->second.GetVariable()->GetLocation();
-  const AttributePointer& attrib_pointer = pos_it->second;
 
   // We finally are able to allocate the attribte to the location
   LOG_DEBUG("Found attribute for %s", AttributeKind::ToString(kind).c_str());
@@ -321,12 +323,12 @@ bool Model::Render() const {
     }
 
     // We bind the uniforms
+    int texture_unit_count = 0;
     for (auto&& u_it : material->Uniforms) {
-      u_it.second.SendValue();
+      u_it.second.SendValue(&texture_unit_count);
     }
 
     if (indexed_) {
-      glBindTexture(GL_TEXTURE_2D, 1);
       // TODO(Cristian): Actually calculate the sizes
       glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
     }
