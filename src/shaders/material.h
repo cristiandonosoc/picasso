@@ -42,6 +42,13 @@ class Material {
   const Shader *GetShader() const { return data_.shader; }
 
  public:
+  template <typename T>
+  Status SetValue(const std::string& uniform, const T&);
+  template <typename T>
+  Status SetValues(const std::string& uniform, size_t count, const T*);
+
+
+ public:
   ValueMap& Uniforms = data_.uniforms;
   ValueMap& Attributes = data_.attributes;
 
@@ -72,6 +79,29 @@ class Material {
  public:
   friend class MaterialRegistry;
 };
+
+template <typename T>
+Status Material::SetValue(const std::string& uniform, const T& val) {
+  auto it = data_.uniforms.find(uniform);
+  if (it == data_.uniforms.end()) {
+    return Status::STATUS_ERROR;
+  }
+  auto&& value = it->second;
+  value.SetValue<T>(val);
+  return Status::STATUS_OK;
+}
+
+template <typename T>
+Status Material::SetValues(const std::string& uniform, size_t count, const T* val) {
+  auto it = data_.uniforms.find(uniform);
+  if (it == data_.uniforms.end()) {
+    LOG_ERROR("Could not find uniform \"%s\"", uniform.c_str());
+    return Status::STATUS_ERROR;
+  }
+  auto&& value = it->second;
+  value.SetValues<T>(count, val);
+  return Status::STATUS_OK;
+}
 
 }   // namepsace shaders
 }   // namespace picasso
