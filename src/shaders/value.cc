@@ -21,12 +21,17 @@ Value::Value(const Variable *variable) : variable_(variable) {
   assert(variable);
   if (variable->GetKind() == VariableKind::UNIFORM) {
     // We allocate the amount of data needed for the value
+    if (variable->GetTypeSize() == 0) {
+      LOGERR_FATAL("Attempting to allocate a variable (%s) with type size 0.\n"
+                   "This is most probably that the size if not set in utils/gl.h",
+                   variable->GetName().c_str());
+    }
     backend_.Reset(variable->GetTypeSize() * variable->GetSize());
     backend_.Zero();
   }
 }
 
-bool Value::SendValue() const {
+bool Value::SendValue(int *texture_unit_count) const {
   if (!variable_) {
     LOGERR_WARN("Calling SendValue on a Value without Variable");
     return false;
@@ -43,6 +48,11 @@ bool Value::SendValue() const {
 
   if (size == 1) {
     switch (type) {
+      case GL_FLOAT: {
+        const GLfloat *ptr = GetValue<GLfloat>();
+        glUniform1f(location, *ptr);
+        break;
+      }
       case GL_FLOAT_VEC2: {
         const GLfloat *ptr = GetValue<GLfloat>();
         glUniform2f(location, *ptr, *(ptr+1)); break;
@@ -55,8 +65,15 @@ bool Value::SendValue() const {
         const GLfloat *ptr = GetValue<GLfloat>();
         glUniform4f(location, *ptr, *(ptr+1), *(ptr+2), *(ptr+3)); break;
       }
-      case GL_SAMPLER_2D:
+      case GL_SAMPLER_2D: {
+        const GLuint *texture_id = GetValue<uint32_t>();
+        glActiveTexture(GL_TEXTURE0 + *texture_unit_count);
+        glBindTexture(GL_TEXTURE_2D, *texture_id);
+        glUniform1i(location, *texture_unit_count);
+        (*texture_unit_count)++;
+        // We set the location
         break;
+      }
       default: {
         LOG_WARN("Type \"%s\" is not implemented yet!", 
                     variable_->GetTypeName().c_str());

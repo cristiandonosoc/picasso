@@ -23,8 +23,6 @@ using ::picasso::utils::DynamicArray;
 namespace picasso {
 namespace shaders {
 
-
-
 class Value {
  public:
   Value() = default;
@@ -47,7 +45,7 @@ class Value {
 
  public:
   // Send the value to the GPU
-  bool SendValue() const;
+  bool SendValue(int* texture_unit_count) const;
 
  private:
   const Variable *variable_;  // Holds a reference to its variable
@@ -77,7 +75,5 @@ void Value::SetValues(size_t count, const T* values) {
 
 }   // namespace shaders
 }   // namespace picasso
-
-
 
 #endif  // SRC_SHADERS_VALUE_H
