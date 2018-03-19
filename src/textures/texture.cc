@@ -26,6 +26,7 @@ StatusOr<Texture::UniquePtr> Texture::Create(const std::string& name,
   texture->name_ = name;
   texture->path_ = path;
   // We try to load the data
+  stbi_set_flip_vertically_on_load(true);
   texture->image_data_.reset(stbi_load(path.c_str(), 
                              &texture->width_, &texture->height_,
                              &texture->num_channels_,
@@ -39,9 +40,16 @@ StatusOr<Texture::UniquePtr> Texture::Create(const std::string& name,
   // We generate the OpenGL texture data
   glGenTextures(1, &texture->id_);
   glBindTexture(GL_TEXTURE_2D, texture->id_);
+
   // We send the image over
-  glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, texture->width_, texture->height_,
-               0, GL_RGB, GL_UNSIGNED_BYTE, texture->image_data_.get());
+  glTexImage2D(GL_TEXTURE_2D, 
+               0, 
+               texture->num_channels_ == 3 ? GL_RGB : GL_RGBA, 
+               texture->width_, texture->height_,
+               0, 
+               texture->num_channels_ == 3 ? GL_RGB : GL_RGBA, 
+               GL_UNSIGNED_BYTE, 
+               texture->image_data_.get());
   glGenerateMipmap(GL_TEXTURE_2D);
 
   // Set the current texture parameters
