@@ -44,6 +44,10 @@ using ::picasso::utils::paths::GetExecutableDir;
 
 #include <external/stb_image.h>
 
+BEGIN_IGNORE_WARNINGS();
+#include <glm/vec2.hpp>
+END_IGNORE_WARNINGS();
+
 namespace {
 
 SDL_Window *SetupSDL() {
@@ -196,6 +200,9 @@ int main(int, char **) {
 
   picasso::UiData ui_data;
   ui_data.clear_color = { 0.137f, 0.152f, 0.637f, 1.00f };
+
+  glm::vec2 vec(2.0f, 3.0f);
+  LOG_DEBUG("Printing vector -> X: %f, Y: %f", vec.x, vec.y);
 
   // Main loop
   bool done = false;

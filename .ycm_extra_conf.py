@@ -51,12 +51,12 @@ flags = [
 # For a C project, you would set this to 'c' instead of 'c++'.
 '-x', 'c++',
 '-I', os.path.join(os.getcwd(), 'src'),
+'-isystem', os.path.join(os.getcwd()),
 '-isystem', os.path.join(os.getcwd(), 'include'),
 '-isystem', os.path.join(os.getcwd(), 'imgui'),
-'-isystem', os.path.join(os.getcwd()),
+'-isystem', os.path.join(os.getcwd(), 'glm'),
 '-isystem', os.path.join(os.environ['SDL2']),
 '-isystem', os.path.join(os.environ['SDL2'], 'include'),
-
 ]
 
 

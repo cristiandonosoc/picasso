@@ -20,6 +20,7 @@ set(BUILD_DIR ${CMAKE_SOURCE_DIR}/bin)
 set(IMGUI_DIR ${CMAKE_SOURCE_DIR}/imgui)
 set(ASSETS_DIR ${CMAKE_SOURCE_DIR}/assets)
 set(BOOST_DIR ${CMAKE_SOURCE_DIR}/boost)
+set(GLM_DIR ${CMAKE_SOURCE_DIR}/glm)
 
 set(WINDOWS_PLATFORM_DIR ${CMAKE_SOURCE_DIR}/platforms/win32)
 
@@ -66,7 +67,8 @@ include_directories(${SOURCE_DIR})
 include_directories(SYSTEM ${INCLUDE_DIR}
                            ${IMGUI_DIR}
                            ${SDL2_INCLUDE_DIR}
-                           ${BOOST_DIR})
+                           ${BOOST_DIR}
+                           ${GLM_DIR})
 
 #####################################################
 # COMPILER FLAGS
