@@ -45,7 +45,9 @@ using ::picasso::utils::paths::GetExecutableDir;
 #include <external/stb_image.h>
 
 BEGIN_IGNORE_WARNINGS();
-#include <glm/vec2.hpp>
+#include <glm/glm.hpp>
+#include <glm/gtc/matrix_transform.hpp>
+#include <glm/gtc/type_ptr.hpp>
 END_IGNORE_WARNINGS();
 
 namespace {
@@ -225,6 +227,7 @@ int main(int, char **) {
 			}
 
       ImGui_ImplSdlGL3_NewFrame(window);
+      
 
       /* picasso::ImGuiExample(clear_color, show_demo_window, show_another_window); */
       picasso::RunUi(&ui_data);
@@ -241,6 +244,7 @@ int main(int, char **) {
                    ui_data.clear_color.w);
       glClear(GL_COLOR_BUFFER_BIT);
 
+  
       /* glPolygonMode(GL_FRONT_AND_BACK, GL_LINE); */
       model.Render();
 

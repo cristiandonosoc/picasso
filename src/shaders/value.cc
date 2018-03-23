@@ -65,6 +65,10 @@ bool Value::SendValue(int *texture_unit_count) const {
         const GLfloat *ptr = GetValue<GLfloat>();
         glUniform4f(location, *ptr, *(ptr+1), *(ptr+2), *(ptr+3)); break;
       }
+      case GL_FLOAT_MAT4: {
+        /* const GLfloat *ptr = GetValue<GLfloat>(); */
+        /* glUniformMatrix4fv(location, 1, false, ptr); */
+      }
       case GL_SAMPLER_2D: {
         const GLuint *texture_id = GetValue<uint32_t>();
         glActiveTexture(GL_TEXTURE0 + *texture_unit_count);

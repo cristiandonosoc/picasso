@@ -8,11 +8,22 @@
  * @description: TODO(Cristian): Add description
  ******************************************************************************/
 
+
+#include <SDL.h>
 #include <algorithm>
 
 #include "logging/log.h"
 #include "models/model.h"
 #include "shaders/shader.h"
+#include "utils/macros.h"
+
+BEGIN_IGNORE_WARNINGS();
+#include <glm/glm.hpp>
+#include <glm/gtc/matrix_transform.hpp>
+#include <glm/gtc/type_ptr.hpp>
+END_IGNORE_WARNINGS();
+
+
 
 namespace picasso {
 namespace models {
@@ -326,7 +337,17 @@ bool Model::Render() const {
     int texture_unit_count = 0;
     for (auto&& u_it : material->Uniforms) {
       u_it.second.SendValue(&texture_unit_count);
+
+      if (u_it.first == "transform") {
+        glm::mat4 trans(1.0f);
+        trans = glm::rotate(trans, (float)SDL_GetTicks() / 1000, glm::vec3(0, 0, 1));
+        int location = u_it.second.GetVariable()->GetLocation();
+        LOG_DEBUG("LOCATION: %d", location);
+        glUniformMatrix4fv(location, 1, GL_FALSE, glm::value_ptr(trans));
+      }
     }
+
+
 
     if (indexed_) {
       // TODO(Cristian): Actually calculate the sizes
