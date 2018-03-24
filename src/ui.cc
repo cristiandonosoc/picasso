@@ -173,12 +173,12 @@ void MaterialWindow(UiData *, ImVec2 start_pos, ImVec2 start_size) {
   ImGui::BeginChild("Left Pane", {150, 0}, true);
   auto&& materials = shaders::MaterialRegistry::GetMaterials();
   static int selected_material = -1;
-  static shaders::MaterialRegistry::Key selected_key;
+  static shaders::MaterialKey selected_key;
   int i = 0;
   for (auto&& it = materials.begin();
        it != materials.end();
        it++, i++) {
-    shaders::MaterialRegistry::Key key = it->first;
+    shaders::MaterialKey key = it->first;
     /* Material* material = it->second; */
     char label[128];
     picasso_snprintf(label, sizeof(label), "%s", key.c_str());
@@ -256,7 +256,7 @@ void TextureWindow(UiData*, ImVec2 start_pos, ImVec2 start_size) {
   ImGui::BeginChild("Left Pane", {150, 0}, true);
   auto&& texture_map = TextureRegistry::GetTextureMap();
   static int selected_index = -1;
-  static TextureRegistry::Key selected_key;
+  static ::picasso::shaders::MaterialKey selected_key;
   int i = 0;
   for (auto&& it = texture_map.begin();
        it != texture_map.end();

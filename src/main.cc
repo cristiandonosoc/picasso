@@ -149,7 +149,7 @@ int main(int, char **) {
     return 1;
   }
 
-  const MaterialRegistry::Key mat_key = material_res.ConsumeOrDie();
+  const ::picasso::shaders::MaterialKey mat_key = material_res.ConsumeOrDie();
   Material *material = MaterialRegistry::Get(mat_key);
 
   LOG_INFO("Created material \"%s\"", mat_name.c_str());

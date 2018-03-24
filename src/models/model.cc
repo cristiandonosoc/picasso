@@ -156,7 +156,7 @@ bool Model::SetupBuffers() {
   //    This is a mapping to a particular location, so we need a shader to which
   //    to know the locations to.
   //    This means that this is a per material object.
-  for (const MaterialRegistry::Key& key : material_keys_) {
+  for (const MaterialKey& key : material_keys_) {
     GLuint vao = SetupMaterialVAO(key);
     // We store it in the map
     material_vao_map_[key] = vao;
@@ -166,7 +166,7 @@ bool Model::SetupBuffers() {
   return true;
 }
 
-GLuint Model::SetupMaterialVAO(const MaterialRegistry::Key& key) {
+GLuint Model::SetupMaterialVAO(const MaterialKey& key) {
   // 3.1 Generate the VAO buffer
   GLuint vao = 0;
   glGenVertexArrays(1, &vao); 
@@ -257,7 +257,7 @@ bool Model::SetupAttributeByAttributeKind(Material* material, AttributeKind kind
   return true;
 }
 
-bool Model::AddMaterialKey(const MaterialRegistry::Key& key) {
+bool Model::AddMaterialKey(const MaterialKey& key) {
   // TODO(Cristian): Send error message
   auto it = find(material_keys_.begin(), material_keys_.end(), key);
   if (it != material_keys_.end()) {
@@ -267,7 +267,7 @@ bool Model::AddMaterialKey(const MaterialRegistry::Key& key) {
   return true;
 }
 
-bool Model::RemoveMaterialKey(const MaterialRegistry::Key& key) {
+bool Model::RemoveMaterialKey(const MaterialKey& key) {
   auto it = find(material_keys_.begin(), material_keys_.end(), key);
   if (it == material_keys_.end()) {
     return false;   // Cannot find it
@@ -310,7 +310,7 @@ bool Model::Render() const {
     return false;
   }
 
-  for (const MaterialRegistry::Key& key : MaterialKeys) {
+  for (const MaterialKey& key : MaterialKeys) {
     Material *material = MaterialRegistry::Get(key);
     const Shader *shader = material->GetShader();
 

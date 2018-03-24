@@ -25,11 +25,12 @@ namespace models {
 
 using ::picasso::shaders::Material;
 using ::picasso::shaders::MaterialRegistry;
+using ::picasso::shaders::MaterialKey;
 using ::picasso::utils::DynamicArray;
 
 class Model {
  public:
-  using MaterialKeysContainer = std::vector<MaterialRegistry::Key>;
+  using MaterialKeysContainer = std::vector<MaterialKey>;
   using AttributePointerMap = std::map<AttributeKind, AttributePointer>;
 
  public:
@@ -44,7 +45,7 @@ class Model {
   bool SetupBuffers();
 
  private:
-  GLuint SetupMaterialVAO(const MaterialRegistry::Key&);
+  GLuint SetupMaterialVAO(const MaterialKey&);
   bool SetupAttributeByAttributeKind(Material*, AttributeKind);
 
  public:
@@ -56,8 +57,8 @@ class Model {
  public:
   const MaterialKeysContainer& MaterialKeys = material_keys_;
   // TODO(Cristian): Use Status
-  bool AddMaterialKey(const MaterialRegistry::Key&);
-  bool RemoveMaterialKey(const MaterialRegistry::Key&);
+  bool AddMaterialKey(const MaterialKey&);
+  bool RemoveMaterialKey(const MaterialKey&);
 
  public:
   bool Render() const;
@@ -66,8 +67,8 @@ class Model {
   Transform transform_;
 
   AttributePointerMap attribute_pointer_map_;
-  std::vector<MaterialRegistry::Key> material_keys_;
-  std::map<MaterialRegistry::Key, GLuint> material_vao_map_;
+  std::vector<MaterialKey> material_keys_;
+  std::map<MaterialKey, GLuint> material_vao_map_;
 
   DynamicArray<GLfloat> vertex_buffer_;
   GLuint vbo_ = 0;

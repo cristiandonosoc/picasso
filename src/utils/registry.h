@@ -25,6 +25,7 @@ class Registry : Singleton<Registry<ParentClass, Key, Value>> {
   Registry() = default;
   DISABLE_COPY(Registry);
   DISABLE_MOVE(Registry);
+
  
  public:
   static Registry& Instance() {
@@ -32,8 +33,11 @@ class Registry : Singleton<Registry<ParentClass, Key, Value>> {
     return instance;
   }
 
- protected:
+ private:
   std::map<Key, Value> map_;
+
+ public:
+  using RegistryMapType = decltype(map_);
 
  public:
   friend class Singleton<Registry<ParentClass, Key, Value>>;

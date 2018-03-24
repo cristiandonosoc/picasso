@@ -13,20 +13,12 @@
 namespace picasso {
 namespace shaders {
 
-StatusOr<MaterialRegistry::Key> MaterialRegistry::Create(const std::string& name) {
-  return Instance().InternalCreate(name);
-}
-
-Material *MaterialRegistry::Get(const std::string& name) {
-  return Instance().InternalGet(name);
-}
-
-
-StatusOr<MaterialRegistry::Key> MaterialRegistry::InternalCreate(const std::string& name) {
-  auto it = material_map_.find(name);
-  if (it != material_map_.end()) {
-    return StatusOr<MaterialRegistry::Key>::Error("Material %s already exists",
-                                                  name.c_str());
+StatusOr<MaterialKey> MaterialRegistry::Create(const std::string& name) {
+  auto& map = Instance().map_;
+  auto it = map.find(name);
+  if (it != map.end()) {
+    return StatusOr<MaterialKey>::Error("Material %s already exists",
+                                        name.c_str());
   }
 
   // Attempt to create 
@@ -34,18 +26,22 @@ StatusOr<MaterialRegistry::Key> MaterialRegistry::InternalCreate(const std::stri
   if (!res.Ok()) {
     return { Status::STATUS_ERROR, res.ErrorMsg() };
   }
-  material_map_[name] = res.ConsumeOrDie();
+  map[name] = res.ConsumeOrDie();
   return name;
 }
 
-Material *MaterialRegistry::InternalGet(const std::string& name) const {
-  auto it = material_map_.find(name);
-  if (it == material_map_.end()) {
+Material *MaterialRegistry::Get(const std::string& name) {
+  auto& map = Instance().map_;
+  auto it = map.find(name);
+  if (it == map.end()) {
     return nullptr;
   }
   return it->second.get();
 }
 
+const MaterialRegistry::RegistryMapType& MaterialRegistry::GetMaterials() {
+  return Instance().map_;
+}
+
 }   // namespace shaders
 }   // namespace picasso
-
