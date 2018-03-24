@@ -33,22 +33,11 @@ StatusOr<Shader*> ShaderRegistry::CreateFromFiles(
 StatusOr<Shader*> ShaderRegistry::Create(const std::string& name,
                                            const std::string& vs,
                                            const std::string& fs) {
-  return Instance().InternalCreate(name, vs, fs);
-}
+  auto& map = Instance().map_;
 
-Shader* ShaderRegistry::Get(const std::string& name) {
-  return Instance().InternalGet(name);
-}
-
-/**
- * INSTANCE INTERFACE
- **/
-StatusOr<Shader*> ShaderRegistry::InternalCreate(const std::string& name,
-                                                   const std::string& vs,
-                                                   const std::string& fs) {
   // We check if it exists already
-  auto it = program_map_.find(name);
-  if (it != program_map_.end()) {
+  auto it = map.find(name);
+  if (it != map.end()) {
     return StatusOr<Shader*>::Error("Shader %s already exists",
                                      name.c_str());
   }
@@ -60,17 +49,30 @@ StatusOr<Shader*> ShaderRegistry::InternalCreate(const std::string& name,
   }
 
   // Add it to the registry
-  return (program_map_[name] = res.ConsumeOrDie()).get();
+  return (map[name] = res.ConsumeOrDie()).get();
 }
 
-Shader *ShaderRegistry::InternalGet(const std::string& name) const {
-  auto it = program_map_.find(name);
-  if (it == program_map_.end()) {
+Shader* ShaderRegistry::Get(const std::string& name) {
+  auto& map = Instance().map_;
+  auto it = map.find(name);
+  if (it == map.end()) {
     return nullptr;
   }
   return it->second.get();
+
 }
 
+
+std::vector<Shader*> ShaderRegistry::GetShaders() {
+  std::vector<Shader*> programs;
+  auto& map = Instance().map_;
+  programs.reserve(map.size());
+  for (auto&& it : map) {
+    programs.push_back(it.second.get());
+  }
+
+  return programs;
+}
 
 }   // namespace shaders
 }   // namespace picasso
