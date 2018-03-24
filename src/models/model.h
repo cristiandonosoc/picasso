@@ -18,10 +18,10 @@
 #include "models/attrib_pointer.h"
 #include "shaders/material_registry.h"
 #include "utils/dynamic_array.h"
+#include "models/transform.h"
 
 namespace picasso {
 namespace models {
-
 
 using ::picasso::shaders::Material;
 using ::picasso::shaders::MaterialRegistry;
@@ -63,6 +63,8 @@ class Model {
   bool Render() const;
 
  private:
+  Transform transform_;
+
   AttributePointerMap attribute_pointer_map_;
   std::vector<MaterialRegistry::Key> material_keys_;
   std::map<MaterialRegistry::Key, GLuint> material_vao_map_;

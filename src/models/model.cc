@@ -338,8 +338,7 @@ bool Model::Render() const {
 
     // We set the matrix
     location = material->Uniforms.find("M_MODEL")->second.GetVariable()->GetLocation();
-    trans = glm::mat4(1.0f);  // uniform
-    glUniformMatrix4fv(location, 1, GL_FALSE, glm::value_ptr(trans));
+    glUniformMatrix4fv(location, 1, GL_FALSE, glm::value_ptr(transform_.GetModelMatrix()));
 
     location = material->Uniforms.find("M_VIEW")->second.GetVariable()->GetLocation();
     trans = glm::mat4(1.0f);  // uniform
