@@ -7,10 +7,17 @@ in vec2 SV_UV;
 out vec2 frag_uv;
 out vec3 frag_color;
 
-uniform mat4 transform;
+uniform mat4 M_MODEL;
+uniform mat4 M_VIEW;
+uniform mat4 M_PROJ;
+
+mat4 CalculateMVP() {
+  return M_PROJ * M_VIEW * M_MODEL;
+}
 
 void main() {
-  gl_Position = transform * vec4(SV_POSITION, 1); 
+  mat4 mvp = CalculateMVP();
+  gl_Position = mvp * vec4(SV_POSITION, 1); 
   frag_color = SV_COLOR;
   frag_uv = SV_UV;
 }

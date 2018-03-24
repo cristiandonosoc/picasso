@@ -17,9 +17,7 @@ void main() {
 
   vec4 texval0 = texture(tex0, frag_uv);
   vec4 texval1 = texture(tex1, frag_uv);
-
-  float mix_val = texval1.a * dim;
-
+  float mix_val = texval0.a * dim;
   out_color = mix(texval0.rgba, texval1.rgba, mix_val);
 
   // out_color = mix(texture(tex0, frag_uv), texture(tex1, frag_uv), dim);

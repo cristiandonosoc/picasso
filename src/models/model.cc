@@ -333,20 +333,28 @@ bool Model::Render() const {
       glBindVertexArray(it->second);
     }
 
+    int location = -1;
+    glm::mat4 trans;
+
+    // We set the matrix
+    location = material->Uniforms.find("M_MODEL")->second.GetVariable()->GetLocation();
+    trans = glm::mat4(1.0f);  // uniform
+    glUniformMatrix4fv(location, 1, GL_FALSE, glm::value_ptr(trans));
+
+    location = material->Uniforms.find("M_VIEW")->second.GetVariable()->GetLocation();
+    trans = glm::mat4(1.0f);  // uniform
+    glUniformMatrix4fv(location, 1, GL_FALSE, glm::value_ptr(trans));
+
+    location = material->Uniforms.find("M_PROJ")->second.GetVariable()->GetLocation();
+    trans = glm::mat4(1.0f);  // uniform
+    glUniformMatrix4fv(location, 1, GL_FALSE, glm::value_ptr(trans));
+
+
     // We bind the uniforms
     int texture_unit_count = 0;
     for (auto&& u_it : material->Uniforms) {
       u_it.second.SendValue(&texture_unit_count);
-
-      if (u_it.first == "transform") {
-        glm::mat4 trans(1.0f);
-        trans = glm::rotate(trans, (float)SDL_GetTicks() / 1000, glm::vec3(0, 0, 1));
-        int location = u_it.second.GetVariable()->GetLocation();
-        LOG_DEBUG("LOCATION: %d", location);
-        glUniformMatrix4fv(location, 1, GL_FALSE, glm::value_ptr(trans));
-      }
     }
-
 
 
     if (indexed_) {
