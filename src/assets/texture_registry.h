@@ -2,28 +2,27 @@
  * @file: texture_registry.h
  * @author: Cristián Donoso C.
  * @email: cristiandonosoc@gmail.com
- * @date: 2018-03-17
+ * @date: 2018-03-25
  * @license: 2018 Cristián Donoso C. - All Rights Reserved.
  *
  * @description: TODO(Cristian): Add description
  ******************************************************************************/
 
-#ifndef SRC_TEXTURES_TEXTURE_REGISTRY_H
-#define SRC_TEXTURES_TEXTURE_REGISTRY_H
+#ifndef SRC_ASSETS_TEXTURE_REGISTRY_H
+#define SRC_ASSETS_TEXTURE_REGISTRY_H
 
 #include <map>
 
-#include "textures/texture.h"
+#include "assets/texture.h"
 #include "utils/singleton.h"
 #include "utils/macros.h"
 #include "utils/status_or.h"
 
-namespace picasso {
-namespace textures {
-
 using ::picasso::utils::Singleton;
 using ::picasso::utils::StatusOr;
 
+namespace picasso {
+namespace assets {
 
 class TextureRegistry : Singleton<TextureRegistry> {
  public:
@@ -49,7 +48,7 @@ class TextureRegistry : Singleton<TextureRegistry> {
   friend class ::picasso::utils::Singleton<TextureRegistry>;
 };  // class TextureRegistry
 
-}   // namespace textures
+}   // namespace assets
 }   // namespace picasso
 
-#endif  // SRC_TEXTURES_TEXTURE_REGISTRY_H
+#endif  // SRC_ASSETS_TEXTURE_REGISTRY_H

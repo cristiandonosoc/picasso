@@ -1,16 +1,15 @@
-
 /******************************************************************************
  * @file: mesh.h
  * @author: Cristián Donoso C.
  * @email: cristiandonosoc@gmail.com
- * @date: 2018-03-11
+ * @date: 2018-03-25
  * @license: 2018 Cristián Donoso C. - All Rights Reserved.
  *
  * @description: TODO(Cristian): Add description
  ******************************************************************************/
 
-#ifndef SRC_MODELS_MESH_H
-#define SRC_MODELS_MESH_H
+#ifndef SRC_ASSETS_MESH_H
+#define SRC_ASSETS_MESH_H
 
 #include <map>
 #include <string>
@@ -21,8 +20,12 @@
 #include "utils/dynamic_array.h"
 #include "models/transform.h"
 
+using ::picasso::models::Transform;
+using ::picasso::models::AttributeKind;
+using ::picasso::models::AttributePointer;
+
 namespace picasso {
-namespace models {
+namespace assets {
 
 using ::picasso::shaders::Material;
 using ::picasso::shaders::MaterialRegistry;
@@ -84,7 +87,7 @@ class Mesh {
   bool setup_ = false;
 };  // class Mesh
 
-}   // namespace models
+}   // namespace assets
 }   // namespace picasso
 
-#endif  // SRC_MODELS_MESH_H
+#endif  // SRC_ASSETS_MESH_H

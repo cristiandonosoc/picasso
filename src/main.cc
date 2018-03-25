@@ -7,11 +7,11 @@
 #include <imgui_impl_sdl_gl3.h>
 
 #include "models/attrib_pointer.h"
-#include "models/mesh.h"
+#include "assets/mesh.h"
 #include "shaders/shader_registry.h"
 #include "shaders/material_registry.h"
 
-#include "textures/texture_registry.h"
+#include "assets/texture_registry.h"
 
 #include "ui.h"
 #include "utils/file.h"
@@ -25,7 +25,9 @@
 #include "Windows.h"
 #endif
 
-using namespace ::picasso::utils;
+using ::picasso::assets::Mesh;
+using ::picasso::assets::TextureRegistry;
+
 
 using ::picasso::shaders::Shader;
 using ::picasso::shaders::ShaderRegistry;
@@ -36,11 +38,11 @@ using ::picasso::shaders::MaterialRegistry;
 
 using ::picasso::models::AttributeKind;
 using ::picasso::models::AttributePointer;
-using ::picasso::models::Mesh;
 
-using ::picasso::textures::TextureRegistry;
 
 using ::picasso::utils::paths::GetExecutableDir;
+
+using namespace ::picasso::utils;
 
 #include <external/stb_image.h>
 

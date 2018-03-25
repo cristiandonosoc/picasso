@@ -12,8 +12,8 @@
 #include <SDL.h>
 #include <algorithm>
 
+#include "assets/mesh.h"
 #include "logging/log.h"
-#include "models/mesh.h"
 #include "shaders/shader.h"
 #include "utils/macros.h"
 
@@ -23,10 +23,8 @@ BEGIN_IGNORE_WARNINGS();
 #include <glm/gtc/type_ptr.hpp>
 END_IGNORE_WARNINGS();
 
-
-
 namespace picasso {
-namespace models {
+namespace assets {
 
 // TODO(Cristian): Move to a better place
 //                 And make it configurable through the UI or INI file
@@ -369,5 +367,5 @@ bool Mesh::Render() const {
   return true;
 }
 
-}   // namespace models
+}   // namespace assets 
 }   // namespace picasso

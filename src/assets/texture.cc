@@ -10,15 +10,15 @@
 
 #include <GL/gl3w.h>
 
-#include "textures/texture.h"
+#include "assets/texture.h"
 #include "utils/make_unique.h"
-
-
-namespace picasso {
-namespace textures {
 
 using ::picasso::utils::Status;
 using ::picasso::utils::MakeUnique;
+
+namespace picasso {
+namespace assets {
+
 
 StatusOr<Texture::UniquePtr> Texture::Create(const std::string& name,
                                              const std::string& path) {
@@ -64,6 +64,5 @@ StatusOr<Texture::UniquePtr> Texture::Create(const std::string& name,
   return texture;
 }
 
-
-}   // namesapce textures
+}   // namesapce assets
 }   // namespace picasso

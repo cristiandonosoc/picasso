@@ -7,7 +7,7 @@
 #include "shaders/material_registry.h"
 #include "logging/log.h"
 #include "utils/snprintf.h"
-#include "textures/texture_registry.h"
+#include "assets/texture_registry.h"
 
 #include "platform.h"
 
@@ -25,8 +25,8 @@ using ::picasso::shaders::Variable;
 using ::picasso::shaders::Value;
 using ::picasso::logging::LogBuffer;
 using ::picasso::utils::picasso_snprintf;
-using ::picasso::textures::Texture;
-using ::picasso::textures::TextureRegistry;
+using ::picasso::assets::Texture;
+using ::picasso::assets::TextureRegistry;
 
 using ::picasso::Platform;
 

@@ -8,12 +8,12 @@
  * @description: TODO(Cristian): Add description
  ******************************************************************************/
 
-#include "textures/texture_registry.h"
-
-namespace picasso {
-namespace textures {
+#include "assets/texture_registry.h"
 
 using ::picasso::utils::Status;
+
+namespace picasso {
+namespace assets {
 
 StatusOr<TextureRegistry::Key> TextureRegistry::Create(const std::string& name, 
                                                        const std::string& path) {
@@ -53,5 +53,5 @@ const TextureRegistry::TextureMap& TextureRegistry::GetTextureMap() {
   return Instance().texture_map_;
 }
 
-}   // namespace textures
+}   // namespace assets
 }   // namespace picasso
