@@ -13,7 +13,7 @@
 #include <algorithm>
 
 #include "logging/log.h"
-#include "models/model.h"
+#include "models/mesh.h"
 #include "shaders/shader.h"
 #include "utils/macros.h"
 
@@ -39,11 +39,11 @@ static std::map<AttributeKind, std::string> AttributeKindToAttributeName = {
 using ::picasso::shaders::Shader;
 using ::picasso::shaders::Material;
 
-void Model::SetVertexBuffer(size_t count, GLfloat *vertices) {
+void Mesh::SetVertexBuffer(size_t count, GLfloat *vertices) {
   vertex_buffer_.Reset(count, vertices);
 }
 
-void Model::SetIndexBuffer(size_t count, GLuint *indices) {
+void Mesh::SetIndexBuffer(size_t count, GLuint *indices) {
   index_buffer_.Reset(count, indices);
 }
 
@@ -72,14 +72,14 @@ void BindAttributePointer(int location, const AttributePointer& attrib_pointer) 
 
 }   // namespace
 
-bool Model::SetupBuffers() {
+bool Mesh::SetupBuffers() {
   if (setup_) {
-    LOG_WARN("Model already setup!");
+    LOG_WARN("Mesh already setup!");
     return false;
   }
 
   if (vertex_buffer_.Count() == 0) {
-    LOG_WARN("Model without Vertex Buffer set up");
+    LOG_WARN("Mesh without Vertex Buffer set up");
     return false;
   }
 
@@ -166,7 +166,7 @@ bool Model::SetupBuffers() {
   return true;
 }
 
-GLuint Model::SetupMaterialVAO(const MaterialKey& key) {
+GLuint Mesh::SetupMaterialVAO(const MaterialKey& key) {
   // 3.1 Generate the VAO buffer
   GLuint vao = 0;
   glGenVertexArrays(1, &vao); 
@@ -222,10 +222,10 @@ GLuint Model::SetupMaterialVAO(const MaterialKey& key) {
   return vao;
 }
 
-bool Model::SetupAttributeByAttributeKind(Material* material, AttributeKind kind)  {
+bool Mesh::SetupAttributeByAttributeKind(Material* material, AttributeKind kind)  {
   auto pos_it = attribute_pointer_map_.find(kind);
   if (pos_it == attribute_pointer_map_.end()) {
-    LOG_ERROR("Model doesn't have \"%s\" attribute pointer",
+    LOG_ERROR("Mesh doesn't have \"%s\" attribute pointer",
               AttributeKind::ToString(kind).c_str());
     return false;
   }
@@ -242,7 +242,7 @@ bool Model::SetupAttributeByAttributeKind(Material* material, AttributeKind kind
   // We see if we actually have the attribute mapping
   auto it = material->Attributes.find(attrib_name);
   if (it == material->Attributes.end()) {
-    LOG_ERROR("Model doesn't have an %s attribute specification",
+    LOG_ERROR("Mesh doesn't have an %s attribute specification",
               AttributeKind::ToString(kind).c_str());
     return false;
   }
@@ -257,7 +257,7 @@ bool Model::SetupAttributeByAttributeKind(Material* material, AttributeKind kind
   return true;
 }
 
-bool Model::AddMaterialKey(const MaterialKey& key) {
+bool Mesh::AddMaterialKey(const MaterialKey& key) {
   // TODO(Cristian): Send error message
   auto it = find(material_keys_.begin(), material_keys_.end(), key);
   if (it != material_keys_.end()) {
@@ -267,7 +267,7 @@ bool Model::AddMaterialKey(const MaterialKey& key) {
   return true;
 }
 
-bool Model::RemoveMaterialKey(const MaterialKey& key) {
+bool Mesh::RemoveMaterialKey(const MaterialKey& key) {
   auto it = find(material_keys_.begin(), material_keys_.end(), key);
   if (it == material_keys_.end()) {
     return false;   // Cannot find it
@@ -277,7 +277,7 @@ bool Model::RemoveMaterialKey(const MaterialKey& key) {
 }
 
 // TODO(Cristian): Use Status
-bool Model::AddAttributePointer(const AttributePointer& attrib_pointer) {
+bool Mesh::AddAttributePointer(const AttributePointer& attrib_pointer) {
   auto it = attribute_pointer_map_.find(attrib_pointer.GetKind());
   if (it != attribute_pointer_map_.end()) {
     return false;
@@ -288,7 +288,7 @@ bool Model::AddAttributePointer(const AttributePointer& attrib_pointer) {
 }
 
 // TODO(Cristian): Use Status
-bool Model::RemoveAttributePointer(const AttributePointer& attrib_pointer) {
+bool Mesh::RemoveAttributePointer(const AttributePointer& attrib_pointer) {
   auto it = attribute_pointer_map_.find(attrib_pointer.GetKind());
   if (it == attribute_pointer_map_.end()) {
     return false;
@@ -297,7 +297,7 @@ bool Model::RemoveAttributePointer(const AttributePointer& attrib_pointer) {
   return true;
 }
 
-bool Model::Render() const {
+bool Mesh::Render() const {
   if (!setup_) {
     // TODO(Cristian): Send error message
     LOG_WARN("Calling render on an not ready model");

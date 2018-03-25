@@ -1,6 +1,6 @@
 
 /******************************************************************************
- * @file: model.h
+ * @file: mesh.h
  * @author: Cristián Donoso C.
  * @email: cristiandonosoc@gmail.com
  * @date: 2018-03-11
@@ -9,12 +9,13 @@
  * @description: TODO(Cristian): Add description
  ******************************************************************************/
 
-#ifndef SRC_MODELS_MODEL_H
-#define SRC_MODELS_MODEL_H
+#ifndef SRC_MODELS_MESH_H
+#define SRC_MODELS_MESH_H
 
 #include <map>
 #include <string>
 
+#include "utils/macros.h"
 #include "models/attrib_pointer.h"
 #include "shaders/material_registry.h"
 #include "utils/dynamic_array.h"
@@ -28,13 +29,16 @@ using ::picasso::shaders::MaterialRegistry;
 using ::picasso::shaders::MaterialKey;
 using ::picasso::utils::DynamicArray;
 
-class Model {
+class Mesh {
+ public:
+  DEFINE_PTR_TYPES(Mesh);
+
  public:
   using MaterialKeysContainer = std::vector<MaterialKey>;
   using AttributePointerMap = std::map<AttributeKind, AttributePointer>;
 
  public:
-  Model() = default;
+  Mesh() = default;
 
  public:
   bool Valid() const { return setup_; }
@@ -78,9 +82,9 @@ class Model {
 
   bool indexed_ = false;
   bool setup_ = false;
-};  // class Model
+};  // class Mesh
 
 }   // namespace models
 }   // namespace picasso
 
-#endif  // SRC_MODELS_MODEL_H
+#endif  // SRC_MODELS_MESH_H

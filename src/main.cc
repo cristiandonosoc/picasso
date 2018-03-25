@@ -7,7 +7,7 @@
 #include <imgui_impl_sdl_gl3.h>
 
 #include "models/attrib_pointer.h"
-#include "models/model.h"
+#include "models/mesh.h"
 #include "shaders/shader_registry.h"
 #include "shaders/material_registry.h"
 
@@ -36,7 +36,7 @@ using ::picasso::shaders::MaterialRegistry;
 
 using ::picasso::models::AttributeKind;
 using ::picasso::models::AttributePointer;
-using ::picasso::models::Model;
+using ::picasso::models::Mesh;
 
 using ::picasso::textures::TextureRegistry;
 
@@ -178,7 +178,7 @@ int main(int, char **) {
     1, 2, 3    // second triangle
   };
 
-  Model model;
+  Mesh model;
   model.SetVertexBuffer(sizeof(vertices), vertices);
   model.SetIndexBuffer(sizeof(indices), indices);
 
