@@ -28,7 +28,6 @@ namespace picasso {
 namespace assets {
 
 using ::picasso::shaders::Material;
-using ::picasso::shaders::MaterialRegistry;
 using ::picasso::shaders::MaterialKey;
 using ::picasso::utils::DynamicArray;
 
@@ -68,7 +67,7 @@ class Mesh {
   bool RemoveMaterialKey(const MaterialKey&);
 
  public:
-  bool Render() const;
+  bool Render(Material*) const;
 
  private:
   Transform transform_;

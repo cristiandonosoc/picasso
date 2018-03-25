@@ -1,17 +1,17 @@
 /******************************************************************************
- * @file: program_registry.h
+ * @file: shader_registry.h
  * @author: Cristián Donoso C.
  * @email: cristiandonosoc@gmail.com
- * @date: 2018-03-05
+ * @date: 2018-03-25
  * @license: 2018 Cristián Donoso C. - All Rights Reserved.
  *
  * @description: TODO(Cristian): Add description
  ******************************************************************************/
 
-#ifndef SRC_SHADERS_PROGRAM_REGISTRY_H
-#define SRC_SHADERS_PROGRAM_REGISTRY_H
+#ifndef SRC_ASSETS_SHADER_REGISTRY_H
+#define SRC_ASSETS_SHADER_REGISTRY_H
 
-#include "shaders/shader.h"
+#include "assets/shader.h"
 #include "utils/macros.h"
 #include "utils/status_or.h"
 #include "utils/registry.h"
@@ -21,13 +21,10 @@
 #include <string>
 #include <vector>
 
+using ::picasso::utils::StatusOr;
+
 namespace picasso {
-
-using namespace utils;
-
-namespace shaders {
-
-using ShaderMap = std::map<std::string, Shader::UniquePtr>;
+namespace assets {
 
 class ShaderRegistry : Registry<ShaderRegistry, std::string, Shader::UniquePtr> {
 
@@ -42,11 +39,14 @@ class ShaderRegistry : Registry<ShaderRegistry, std::string, Shader::UniquePtr> 
 
   static std::vector<Shader*> GetShaders();
 
+ private:
+  static StatusOr<Shader::UniquePtr> InternalCreate(const std::string& name,
+                                                    const std::string& vs,
+                                                    const std::string& fs);
+
 };
 
-}   // namespace shaders
+}   // namespace assets
 }   // namespace picasso
 
-
-
-#endif  // SRC_SHADERS_PROGRAM_REGISTRY_H
+#endif  // SRC_ASSETS_SHADER_REGISTRY_H

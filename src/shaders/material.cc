@@ -8,8 +8,8 @@
  * @description: TODO(Cristian): Add description
  ******************************************************************************/
 
+#include "assets/shader.h"
 #include "shaders/material.h"
-#include "shaders/shader.h"
 
 namespace picasso {
 namespace shaders {
@@ -49,16 +49,9 @@ void Material::UnsetShader() {
 
 void Material::LinkShader(Shader *shader) {
   if (shader) {
-    shader->LinkMaterial(this);
-
-    // Copy over attributes
-    for (auto&& it : shader->Attributes) {
-      data_.attributes[it.first] = Value(&it.second);
-    }
-
     // Copy over uniforms
     for (auto&& it : shader->Uniforms) {
-      data_.uniforms[it.first] = Value(&it.second);
+      data_.uniforms[it.first] = UniformValue(&it.second);
     }
   }
   data_.shader = shader;
@@ -66,7 +59,6 @@ void Material::LinkShader(Shader *shader) {
 
 void Material::UnlinkShader() {
   if (data_.shader) {
-    data_.shader->UnlinkMaterial(this);
     data_.attributes.clear();
     data_.uniforms.clear();
   }

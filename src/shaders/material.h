@@ -13,19 +13,21 @@
 
 #include "utils/macros.h"
 #include "utils/status_or.h"
-#include "shaders/value.h"
+#include "shaders/uniform_value.h"
 
 #include <map>
 
 namespace picasso {
+namespace assets {
+class Shader;   // Forward Declaration
+}   // namespace assets
 
 using namespace utils;
 
 namespace shaders {
 
-using ValueMap = std::map<std::string, Value>;
-
-class Shader;   // Forward Declaration
+using ValueMap = std::map<std::string, UniformValue>;
+using Shader = ::picasso::assets::Shader;
 
 class Material {
  public:

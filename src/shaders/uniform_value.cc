@@ -1,52 +1,43 @@
 /******************************************************************************
- * @file: value.cc
+ * @file: uniform_value.cc
  * @author: Cristián Donoso C.
  * @email: cristiandonosoc@gmail.com
- * @date: 2018-03-10
+ * @date: 2018-03-25
  * @license: 2018 Cristián Donoso C. - All Rights Reserved.
  *
  * @description: TODO(Cristian): Add description
  ******************************************************************************/
 
-#include <cassert>
-#include <cstring>
-
-#include "shaders/value.h"
+#include "shaders/uniform_value.h"
 #include "logging/log.h"
 
 namespace picasso {
 namespace shaders {
 
-Value::Value(const Variable *variable) : variable_(variable) {
-  assert(variable);
-  if (variable->GetKind() == VariableKind::UNIFORM) {
-    // We allocate the amount of data needed for the value
-    if (variable->GetTypeSize() == 0) {
-      LOGERR_FATAL("Attempting to allocate a variable (%s) with type size 0.\n"
-                   "This is most probably that the size if not set in utils/gl.h",
-                   variable->GetName().c_str());
-    }
-    backend_.Reset(variable->GetTypeSize() * variable->GetSize());
-    backend_.Zero();
+UniformValue::UniformValue(const Shader::Uniform *uniform) : uniform_(uniform) {
+  assert(uniform);
+  // We allocate the amount of data needed for the value
+  if (uniform->type_size == 0) {
+    LOGERR_FATAL("Attempting to allocate a variable (%s) with type size 0.\n"
+                 "This is most probably that the size if not set in utils/gl.h",
+                 uniform->name.c_str());
   }
+  backend_.Reset(uniform->count * uniform->type_size);
+  // We zero that memory
+  backend_.Zero();
 }
 
-bool Value::SendValue(int *texture_unit_count) const {
-  if (!variable_) {
+bool UniformValue::SendValue(int *texture_unit_count) const {
+  if (!uniform_) {
     LOGERR_WARN("Calling SendValue on a Value without Variable");
     return false;
   }
 
-  if (variable_->GetKind() != VariableKind::UNIFORM) {
-    LOGERR_WARN("Calling SendValue on a non uniform Value");
-    return false;
-  }
+  GLenum type = uniform_->type;
+  GLint location = uniform_->location;
+  GLsizei count = uniform_->count;
 
-  GLenum type = variable_->GetType();
-  GLint location = variable_->GetLocation();
-  GLsizei size = variable_->GetSize();
-
-  if (size == 1) {
+  if (count == 1) {
     switch (type) {
       case GL_FLOAT: {
         const GLfloat *ptr = GetValue<GLfloat>();
@@ -79,8 +70,7 @@ bool Value::SendValue(int *texture_unit_count) const {
         break;
       }
       default: {
-        LOG_WARN("Type \"%s\" is not implemented yet!", 
-                    variable_->GetTypeName().c_str());
+        LOG_WARN("Type \"%s\" is not implemented yet!", uniform_->type_name.c_str());
         return false;
       }
     }
@@ -93,5 +83,5 @@ bool Value::SendValue(int *texture_unit_count) const {
   return true;
 }
 
-}   // namespace shaders 
+}   // namespace shaders
 }   // namespace picasso

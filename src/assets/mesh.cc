@@ -12,9 +12,9 @@
 #include <SDL.h>
 #include <algorithm>
 
+#include "assets/shader.h"
 #include "assets/mesh.h"
 #include "logging/log.h"
-#include "shaders/shader.h"
 #include "utils/macros.h"
 
 BEGIN_IGNORE_WARNINGS();
@@ -34,7 +34,7 @@ static std::map<AttributeKind, std::string> AttributeKindToAttributeName = {
   { AttributeKind::UV, "SV_UV" }
 };
 
-using ::picasso::shaders::Shader;
+using ::picasso::assets::Shader;
 using ::picasso::shaders::Material;
 
 void Mesh::SetVertexBuffer(size_t count, GLfloat *vertices) {
@@ -154,16 +154,17 @@ bool Mesh::SetupBuffers() {
   //    This is a mapping to a particular location, so we need a shader to which
   //    to know the locations to.
   //    This means that this is a per material object.
-  for (const MaterialKey& key : material_keys_) {
-    GLuint vao = SetupMaterialVAO(key);
-    // We store it in the map
-    material_vao_map_[key] = vao;
-  }
+  /* for (const MaterialKey& key : material_keys_) { */
+  /*   GLuint vao = SetupMaterialVAO(key); */
+  /*   // We store it in the map */
+  /*   material_vao_map_[key] = vao; */
+  /* } */
   
   setup_ = true;
   return true;
 }
 
+#if 0
 GLuint Mesh::SetupMaterialVAO(const MaterialKey& key) {
   // 3.1 Generate the VAO buffer
   GLuint vao = 0;
@@ -254,6 +255,7 @@ bool Mesh::SetupAttributeByAttributeKind(Material* material, AttributeKind kind)
   glEnableVertexAttribArray(location);
   return true;
 }
+#endif
 
 bool Mesh::AddMaterialKey(const MaterialKey& key) {
   // TODO(Cristian): Send error message
@@ -295,7 +297,7 @@ bool Mesh::RemoveAttributePointer(const AttributePointer& attrib_pointer) {
   return true;
 }
 
-bool Mesh::Render() const {
+bool Mesh::Render(Material* material) const {
   if (!setup_) {
     // TODO(Cristian): Send error message
     LOG_WARN("Calling render on an not ready model");
@@ -308,58 +310,79 @@ bool Mesh::Render() const {
     return false;
   }
 
-  for (const MaterialKey& key : MaterialKeys) {
-    Material *material = MaterialRegistry::Get(key);
-    const Shader *shader = material->GetShader();
+  const Shader *shader = material->GetShader();
 
-    if (!shader) { 
-      LOG_WARN("Rendering with null shader");
-      continue; 
-    }
-    if (!shader->Valid()) {
-      LOG_WARN("Rendering with an invalid shader: %s",
-                  shader->GetName().c_str());
-      continue;
-    }
-
-    // We setup the program
-    glUseProgram(shader->GetShaderHandle());
-
-    // We bind our set VAO
-    auto it = material_vao_map_.find(key);
-    if (it != material_vao_map_.end()) {
-      glBindVertexArray(it->second);
-    }
-
-    int location = -1;
-    glm::mat4 trans;
-
-    // We set the matrix
-    location = material->Uniforms.find("M_MODEL")->second.GetVariable()->GetLocation();
-    glUniformMatrix4fv(location, 1, GL_FALSE, glm::value_ptr(transform_.GetModelMatrix()));
-
-    location = material->Uniforms.find("M_VIEW")->second.GetVariable()->GetLocation();
-    trans = glm::mat4(1.0f);  // uniform
-    glUniformMatrix4fv(location, 1, GL_FALSE, glm::value_ptr(trans));
-
-    location = material->Uniforms.find("M_PROJ")->second.GetVariable()->GetLocation();
-    trans = glm::mat4(1.0f);  // uniform
-    glUniformMatrix4fv(location, 1, GL_FALSE, glm::value_ptr(trans));
-
-
-    // We bind the uniforms
-    int texture_unit_count = 0;
-    for (auto&& u_it : material->Uniforms) {
-      u_it.second.SendValue(&texture_unit_count);
-    }
-
-
-    if (indexed_) {
-      // TODO(Cristian): Actually calculate the sizes
-      glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
-    }
-
+  if (!shader) { 
+    LOG_WARN("Rendering with null shader");
+    return false;
   }
+  if (!shader->Valid()) {
+    LOG_WARN("Rendering with an invalid shader: %s",
+                shader->GetName().c_str());
+    return false;
+  }
+
+  // We setup the program
+  glUseProgram(shader->GetShaderHandle());
+
+  /* // We bind our set VAO */
+  /* auto it = material_vao_map_.find(key); */
+  /* if (it != material_vao_map_.end()) { */
+  /*   glBindVertexArray(it->second); */
+  /* } */
+
+
+  int location = -1;
+
+  // Set the VBO and EBO of this mesh
+  glBindBuffer(GL_ARRAY_BUFFER, vbo_);
+  if (indexed_) {
+    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ebo_);
+  }
+
+  // We set the attributes
+  location = shader->Attributes.find("SV_POSITION")->second.location;
+  auto it = attribute_pointer_map_.find(AttributeKind::VERTEX);
+  if (it == attribute_pointer_map_.end()) {
+    LOG_ERROR("No AttributeKind::VERTEX for this model");
+    return false;
+  }
+  BindAttributePointer(location, it->second);
+
+  location = shader->Attributes.find("SV_UV")->second.location;
+  it = attribute_pointer_map_.find(AttributeKind::UV);
+  if (it == attribute_pointer_map_.end()) {
+    LOG_ERROR("No vertex AttributeKind::UV for this model");
+    return false;
+  }
+  BindAttributePointer(location, it->second);
+
+  // We set the transformation uniforms
+  glm::mat4 trans;
+  location = material->Uniforms.find("M_MODEL")->second.GetUniform()->location;
+  glUniformMatrix4fv(location, 1, GL_FALSE, glm::value_ptr(transform_.GetModelMatrix()));
+
+  location = material->Uniforms.find("M_VIEW")->second.GetUniform()->location;
+  trans = glm::mat4(1.0f);  // uniform
+  glUniformMatrix4fv(location, 1, GL_FALSE, glm::value_ptr(trans));
+
+  location = material->Uniforms.find("M_PROJ")->second.GetUniform()->location;
+  trans = glm::mat4(1.0f);  // uniform
+  glUniformMatrix4fv(location, 1, GL_FALSE, glm::value_ptr(trans));
+
+
+  // We bind the uniforms
+  int texture_unit_count = 0;
+  for (auto&& u_it : material->Uniforms) {
+    u_it.second.SendValue(&texture_unit_count);
+  }
+
+
+  if (indexed_) {
+    // TODO(Cristian): Actually calculate the sizes
+    glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
+  }
+
 
   // Unbind
   glUseProgram(0);

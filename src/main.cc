@@ -8,7 +8,7 @@
 
 #include "models/attrib_pointer.h"
 #include "assets/mesh.h"
-#include "shaders/shader_registry.h"
+#include "assets/shader_registry.h"
 #include "shaders/material_registry.h"
 
 #include "assets/texture_registry.h"
@@ -29,9 +29,8 @@ using ::picasso::assets::Mesh;
 using ::picasso::assets::TextureRegistry;
 
 
-using ::picasso::shaders::Shader;
-using ::picasso::shaders::ShaderRegistry;
-using ::picasso::shaders::Variable;
+using ::picasso::assets::Shader;
+using ::picasso::assets::ShaderRegistry;
 
 using ::picasso::shaders::Material;
 using ::picasso::shaders::MaterialRegistry;
@@ -248,7 +247,7 @@ int main(int, char **) {
 
   
       /* glPolygonMode(GL_FRONT_AND_BACK, GL_LINE); */
-      model.Render();
+      model.Render(material);
 
       ImGui::Render();
       ImGui_ImplSdlGL3_RenderDrawData(ImGui::GetDrawData());

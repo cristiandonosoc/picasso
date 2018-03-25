@@ -3,7 +3,7 @@
 #include <regex>
 
 #include "ui.h"
-#include "shaders/shader_registry.h"
+#include "assets/shader_registry.h"
 #include "shaders/material_registry.h"
 #include "logging/log.h"
 #include "utils/snprintf.h"
@@ -21,12 +21,12 @@ namespace picasso {
 
 using ::picasso::shaders::Shader;
 using ::picasso::shaders::Material;
-using ::picasso::shaders::Variable;
-using ::picasso::shaders::Value;
+using ::picasso::shaders::UniformValue;
 using ::picasso::logging::LogBuffer;
 using ::picasso::utils::picasso_snprintf;
 using ::picasso::assets::Texture;
 using ::picasso::assets::TextureRegistry;
+using ::picasso::assets::ShaderRegistry;
 
 using ::picasso::Platform;
 
@@ -100,7 +100,7 @@ void ShaderWindow(UiData *, ImVec2 start_pos, ImVec2 start_size) {
   ImGui::Begin("Shaders", &open);
 
   ImGui::BeginChild("Left Pane", {150, 0}, true);
-  auto&& shaders = shaders::ShaderRegistry::GetShaders();
+  auto&& shaders = ShaderRegistry::GetShaders();
   static int selected_shader = -1;
   int i = 0;
   for (auto&& it = shaders.begin();
@@ -209,27 +209,28 @@ void MaterialWindow(UiData *, ImVec2 start_pos, ImVec2 start_size) {
 
     int mat_count = 0;
     for (auto&& it : material->Uniforms) {
-      Value& value = it.second;
-      const Variable *variable = value.GetVariable();
-      const std::string& name = variable->GetName();
+      UniformValue& value = it.second;
+      const Shader::Uniform *uniform = value.GetUniform();
 
       ImGui::PushID(mat_count);
-      if(ImGui::TreeNode(name.c_str(), "%s", variable->GetName().c_str())) {
-        ImGui::BulletText("Location: %d", variable->GetLocation());
-        ImGui::BulletText("Type: %s", variable->GetTypeName().c_str());
-        ImGui::BulletText("Type Size: %zu", variable->GetTypeSize());
-        ImGui::BulletText("Size: %zu", variable->GetSize());
+      const std::string& name = uniform->name;
+      if(ImGui::TreeNode(name.c_str(), "%s", name.c_str())) {
+        ImGui::BulletText("Location: %d", uniform->location);
+        ImGui::BulletText("Type: %s", uniform->type_name.c_str());
+        ImGui::BulletText("Type Size: %d", uniform->type_size);
+        ImGui::BulletText("Size: %d", uniform->count);
         ImGui::TreePop();
       }
 
       float *ptr = value.GetValue<GLfloat>();
       ImGui::Text("PTR: %p, VAL: %f", ptr, *ptr);
-      if (variable->GetType() == GL_FLOAT) {
+      if (uniform->type == GL_FLOAT) {
         ImGui::SliderFloat("Value", ptr, 0.0f, 1.0f);
       }
 
+      // TODO(Cristian): Do actual mapping from the shaders
       if (std::regex_search(name, color_regex)) {
-        if (variable->GetTypeSize() == 4) {
+        if (uniform->type_size == 4) {
           ImGui::ColorEdit4("", value.GetValue<float>());
         } else {
           ImGui::ColorEdit3("", value.GetValue<float>());
