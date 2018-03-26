@@ -14,7 +14,7 @@
 namespace picasso {
 namespace shaders {
 
-UniformValue::UniformValue(const Shader::Uniform *uniform) : uniform_(uniform) {
+UniformValue::UniformValue(const Uniform *uniform) : uniform_(uniform) {
   assert(uniform);
   // We allocate the amount of data needed for the value
   if (uniform->type_size == 0) {

@@ -8,10 +8,10 @@
  * @description: TODO(Cristian): Add description
  ******************************************************************************/
 
-#ifndef SRC_ASSETS_SHADER_REGISTRY_H
-#define SRC_ASSETS_SHADER_REGISTRY_H
+#ifndef SRC_ASSETS_SHADERS_SHADER_REGISTRY_H
+#define SRC_ASSETS_SHADERS_SHADER_REGISTRY_H
 
-#include "assets/shader.h"
+#include "assets/shaders/shader.h"
 #include "utils/macros.h"
 #include "utils/status_or.h"
 #include "utils/registry.h"
@@ -21,10 +21,12 @@
 #include <string>
 #include <vector>
 
-using ::picasso::utils::StatusOr;
 
 namespace picasso {
 namespace assets {
+namespace shaders {
+
+using ::picasso::utils::StatusOr;
 
 class ShaderRegistry : Registry<ShaderRegistry, std::string, Shader::UniquePtr> {
 
@@ -46,7 +48,8 @@ class ShaderRegistry : Registry<ShaderRegistry, std::string, Shader::UniquePtr> 
 
 };
 
+}   // namespace shaders
 }   // namespace assets
 }   // namespace picasso
 
-#endif  // SRC_ASSETS_SHADER_REGISTRY_H
+#endif  // SRC_ASSETS_SHADERS_SHADER_REGISTRY_H

@@ -1,4 +1,4 @@
-#include "assets/shader.h"
+#include "assets/shaders/shader.h"
 
 #include "logging/log.h"
 #include "utils/status_or.h"
@@ -12,6 +12,7 @@
 
 namespace picasso {
 namespace assets {
+namespace shaders {
 
 using ::picasso::utils::GL_TYPES_TO_STRING;
 
@@ -102,7 +103,10 @@ void Shader::Cleanup() {
 
 namespace {
 
-void DebugPrintAttribute(const Shader::Attribute& attribute, int indent) {
+using ::picasso::assets::shaders::Attribute;
+using ::picasso::assets::shaders::Uniform;
+
+void DebugPrintAttribute(const Attribute& attribute, int indent) {
   LOG_INDENT_DEBUG(indent, "ATTRIBUTE debug print for \"%s\"", attribute.name.c_str());
   LOG_INDENT_DEBUG(indent, "Location: %d", attribute.location);
   LOG_INDENT_DEBUG(indent, "Type: %s", attribute.type_name.c_str());
@@ -110,7 +114,7 @@ void DebugPrintAttribute(const Shader::Attribute& attribute, int indent) {
   LOG_INDENT_DEBUG(indent, "Count: %d", attribute.count);
 }
 
-void DebugPrintUniform(const Shader::Uniform& uniform, int indent) {
+void DebugPrintUniform(const Uniform& uniform, int indent) {
   LOG_INDENT_DEBUG(indent, "UNIFORM debug print for \"%s\"", uniform.name.c_str());
   LOG_INDENT_DEBUG(indent, "Location: %d", uniform.location);
   LOG_INDENT_DEBUG(indent, "Type: %s", uniform.type_name.c_str());
@@ -154,6 +158,6 @@ void Shader::DebugPrint(int indent) const {
   }
 }
 
-
+}   // namespace shaders
 }   // namespace assets
 }   // namespace picasso

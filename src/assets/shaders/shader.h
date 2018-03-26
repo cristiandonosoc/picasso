@@ -8,8 +8,8 @@
  * @description: TODO(Cristian): Add description
  ******************************************************************************/
 
-#ifndef SRC_ASSETS_SHADER_H
-#define SRC_ASSETS_SHADER_H
+#ifndef SRC_ASSETS_SHADERS_SHADER_H
+#define SRC_ASSETS_SHADERS_SHADER_H
 
 #include <map>
 #include <memory>
@@ -21,32 +21,17 @@
 #include "utils/macros.h"
 #include "models/attrib_pointer.h"
 
+#include "assets/shaders/attribute.h"
+#include "assets/shaders/uniform.h"
 
 using namespace ::picasso::utils;
 using ::picasso::models::AttributeKind;
 
 namespace picasso {
 namespace assets {
-
 namespace shaders {
 
-class ShaderVariable {
- public:
-  std::string name;
-  std::string type_name;
-  int location;
-  GLenum type;
-  int count;
-  int type_size;
-};  // class ShaderVariable
-
-};  // namespace shaders
-
 class Shader {
- public:
-  using Attribute = ::picasso::assets::shaders::ShaderVariable;
-  using Uniform = ::picasso::assets::shaders::ShaderVariable;
-
  public:
   using AttributeMap = std::map<std::string, Attribute>;
   using UniformMap = std::map<std::string, Uniform>;
@@ -130,7 +115,8 @@ class Shader {
   friend class ShaderRegistry;
 };
 
+}   // namespace shaders
 }   // namespace assets
 }   // namespace picasso
 
-#endif  // SRC_ASSETS_SHADER_H
+#endif  // SRC_ASSETS_SHADERS_SHADER_H

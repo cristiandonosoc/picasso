@@ -8,11 +8,12 @@
  * @description: TODO(Cristian): Add description
  ******************************************************************************/
 
-#include "assets/shader_registry.h"
+#include "assets/shaders/shader_registry.h"
 #include "utils/file.h"
 
 namespace picasso {
 namespace assets {
+namespace shaders {
 
 using ::picasso::utils::Status;
 
@@ -154,6 +155,6 @@ StatusOr<Shader::UniquePtr> ShaderRegistry::InternalCreate(const std::string& na
 }
 
 
-
 }   // namespace shaders
+}   // namespace assets
 }   // namespace picasso

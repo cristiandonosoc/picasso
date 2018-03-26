@@ -8,7 +8,7 @@
  * @description: TODO(Cristian): Add description
  ******************************************************************************/
 
-#include "assets/shader.h"
+#include "assets/shaders/shader.h"
 #include "shaders/material.h"
 
 namespace picasso {

@@ -12,7 +12,7 @@
 #include <SDL.h>
 #include <algorithm>
 
-#include "assets/shader.h"
+#include "assets/shaders/shader.h"
 #include "assets/mesh.h"
 #include "logging/log.h"
 #include "utils/macros.h"
@@ -34,7 +34,7 @@ static std::map<AttributeKind, std::string> AttributeKindToAttributeName = {
   { AttributeKind::UV, "SV_UV" }
 };
 
-using ::picasso::assets::Shader;
+using ::picasso::assets::shaders::Shader;
 using ::picasso::shaders::Material;
 
 void Mesh::SetVertexBuffer(size_t array_size, GLfloat *vertices) {

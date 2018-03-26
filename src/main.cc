@@ -8,7 +8,7 @@
 
 #include "models/attrib_pointer.h"
 #include "assets/mesh.h"
-#include "assets/shader_registry.h"
+#include "assets/shaders/shader_registry.h"
 #include "shaders/material_registry.h"
 
 #include "assets/texture_registry.h"
@@ -29,8 +29,8 @@ using ::picasso::assets::Mesh;
 using ::picasso::assets::TextureRegistry;
 
 
-using ::picasso::assets::Shader;
-using ::picasso::assets::ShaderRegistry;
+using ::picasso::assets::shaders::Shader;
+using ::picasso::assets::shaders::ShaderRegistry;
 
 using ::picasso::shaders::Material;
 using ::picasso::shaders::MaterialRegistry;

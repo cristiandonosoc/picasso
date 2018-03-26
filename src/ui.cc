@@ -3,7 +3,7 @@
 #include <regex>
 
 #include "ui.h"
-#include "assets/shader_registry.h"
+#include "assets/shaders/shader_registry.h"
 #include "shaders/material_registry.h"
 #include "logging/log.h"
 #include "utils/snprintf.h"
@@ -19,14 +19,17 @@
 
 namespace picasso {
 
-using ::picasso::shaders::Shader;
+using ::picasso::assets::shaders::ShaderRegistry;
+using ::picasso::assets::shaders::Shader;
+using ::picasso::assets::shaders::Attribute;
+using ::picasso::assets::shaders::Uniform;
+
 using ::picasso::shaders::Material;
 using ::picasso::shaders::UniformValue;
 using ::picasso::logging::LogBuffer;
 using ::picasso::utils::picasso_snprintf;
 using ::picasso::assets::Texture;
 using ::picasso::assets::TextureRegistry;
-using ::picasso::assets::ShaderRegistry;
 
 using ::picasso::Platform;
 
@@ -210,7 +213,7 @@ void MaterialWindow(UiData *, ImVec2 start_pos, ImVec2 start_size) {
     int mat_count = 0;
     for (auto&& it : material->Uniforms) {
       UniformValue& value = it.second;
-      const Shader::Uniform *uniform = value.GetUniform();
+      const Uniform *uniform = value.GetUniform();
 
       ImGui::PushID(mat_count);
       const std::string& name = uniform->name;

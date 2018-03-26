@@ -14,23 +14,24 @@
 #include <cstdint>
 #include <memory>
 
-#include "assets/shader.h"
+#include "assets/shaders/shader.h"
 #include "utils/dynamic_array.h"
 
 
 namespace picasso {
 namespace shaders {
 
-using ::picasso::assets::Shader;
+using ::picasso::assets::shaders::Shader;
+using ::picasso::assets::shaders::Uniform;
 using ::picasso::utils::DynamicArray;
 
 class UniformValue {
  public:
   UniformValue() = default;
-  UniformValue(const Shader::Uniform *uniform);
+  UniformValue(const Uniform *uniform);
 
  public:
-  const Shader::Uniform* GetUniform() const { return uniform_; }
+  const Uniform* GetUniform() const { return uniform_; }
 
  public:
   // TODO(Cristian): Move to explicit interface
@@ -51,7 +52,7 @@ class UniformValue {
   bool SendValue(int* texture_unit_count) const;
 
  private:
-  const Shader::Uniform *uniform_;  // Holds a reference to its variable
+  const Uniform *uniform_;  // Holds a reference to its variable
   // Buffer to hold in the memory
   DynamicArray<uint8_t> backend_;
 };  // class UniformValue
