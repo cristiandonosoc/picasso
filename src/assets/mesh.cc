@@ -37,17 +37,18 @@ static std::map<AttributeKind, std::string> AttributeKindToAttributeName = {
 using ::picasso::assets::Shader;
 using ::picasso::shaders::Material;
 
-void Mesh::SetVertexBuffer(size_t count, GLfloat *vertices) {
-  vertex_buffer_.Reset(count, vertices);
+void Mesh::SetVertexBuffer(size_t array_size, GLfloat *vertices) {
+  vertex_buffer_.Reset(array_size / sizeof(GLfloat), vertices);
 }
 
-void Mesh::SetIndexBuffer(size_t count, GLuint *indices) {
-  index_buffer_.Reset(count, indices);
+void Mesh::SetIndexBuffer(size_t array_size, GLuint *indices) {
+  index_buffer_.Reset(array_size / sizeof(GLuint), indices);
 }
 
 namespace {
 
 void BindAttributePointer(int location, const AttributePointer& attrib_pointer) {
+  glEnableVertexAttribArray(location);
   glVertexAttribPointer(
       location,  // Attribute location int he shader
       // Size: How many types are per attrib "element".
@@ -82,6 +83,20 @@ bool Mesh::SetupBuffers() {
   }
 
   // We add the vertices to the GPU
+  //
+  // 0. VAO
+  //    OpenGL has buffer with vertices in it, but has no idea how to interpret them
+  //    (which ones are colors, which ones positions, uv, etc.).
+  //    For that we need to tell which attribute holds which information where.
+  //    That configuration can (and should) be stored in an object that can then
+  //    be binded to the current buffer so that OpenGL knows how to interpret it.
+  //    These objects are called VERTEX ATTRIBUTE OBJECTS
+  //
+  //    This is a mapping to a particular location, so we need a shader to which
+  //    to know the locations to.
+  //    This means that this is a per material object.
+  glGenVertexArrays(1, &vao_);
+  glBindVertexArray(vao_);
   
   // 1. VBO
   //    VBO stands for Vertex Buffer Object. 
@@ -144,22 +159,11 @@ bool Mesh::SetupBuffers() {
     indexed_ =  true;
   }
 
-  // 3. OpenGL has buffer with vertices in it, but has no idea how to interpret them
-  //    (which ones are colors, which ones positions, uv, etc.).
-  //    For that we need to tell which attribute holds which information where.
-  //    That configuration can (and should) be stored in an object that can then
-  //    be binded to the current buffer so that OpenGL knows how to interpret it.
-  //    These objects are called VERTEX ATTRIBUTE OBJECTS
-  //
-  //    This is a mapping to a particular location, so we need a shader to which
-  //    to know the locations to.
-  //    This means that this is a per material object.
-  /* for (const MaterialKey& key : material_keys_) { */
-  /*   GLuint vao = SetupMaterialVAO(key); */
-  /*   // We store it in the map */
-  /*   material_vao_map_[key] = vao; */
-  /* } */
-  
+  // We unset the state
+  glBindVertexArray(0);
+  glBindBuffer(GL_ARRAY_BUFFER, 0);
+  glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
+
   setup_ = true;
   return true;
 }
@@ -331,50 +335,49 @@ bool Mesh::Render(Material* material) const {
   /*   glBindVertexArray(it->second); */
   /* } */
 
-
-  int location = -1;
-
-  // Set the VBO and EBO of this mesh
+  // We set the VAO (which will set the VBO and EBO)
+  glBindVertexArray(vao_);
   glBindBuffer(GL_ARRAY_BUFFER, vbo_);
-  if (indexed_) {
-    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ebo_);
+  glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ebo_);
+
+  // TODO(Cristian): Do this Attribute pointer binding when the model is set a particular 
+  //                 material + mesh, instead of per-frame
+  int location = -1;
+  auto at_it = shader->Attributes.find("SV_POSITION");
+  if (at_it != shader->Attributes.end()) {
+    location = at_it->second.location;
+    BindAttributePointer(location, attribute_pointer_map_.find(AttributeKind::VERTEX)->second);
   }
 
-  // We set the attributes
-  location = shader->Attributes.find("SV_POSITION")->second.location;
-  auto it = attribute_pointer_map_.find(AttributeKind::VERTEX);
-  if (it == attribute_pointer_map_.end()) {
-    LOG_ERROR("No AttributeKind::VERTEX for this model");
-    return false;
+  at_it = shader->Attributes.find("SV_UV");
+  if (at_it != shader->Attributes.end()) {
+    location = at_it->second.location;
+    BindAttributePointer(location, attribute_pointer_map_.find(AttributeKind::UV)->second);
   }
-  BindAttributePointer(location, it->second);
-
-  location = shader->Attributes.find("SV_UV")->second.location;
-  it = attribute_pointer_map_.find(AttributeKind::UV);
-  if (it == attribute_pointer_map_.end()) {
-    LOG_ERROR("No vertex AttributeKind::UV for this model");
-    return false;
-  }
-  BindAttributePointer(location, it->second);
 
   // We set the transformation uniforms
-  glm::mat4 trans;
-  location = material->Uniforms.find("M_MODEL")->second.GetUniform()->location;
-  glUniformMatrix4fv(location, 1, GL_FALSE, glm::value_ptr(transform_.GetModelMatrix()));
+  auto u_it = material->Uniforms.find("M_MODEL");
+  if (u_it != material->Uniforms.end()) {
+    location = u_it->second.GetUniform()->location;
+    glUniformMatrix4fv(location, 1, GL_FALSE, glm::value_ptr(transform_.GetModelMatrix()));
+  }
 
-  location = material->Uniforms.find("M_VIEW")->second.GetUniform()->location;
-  trans = glm::mat4(1.0f);  // uniform
-  glUniformMatrix4fv(location, 1, GL_FALSE, glm::value_ptr(trans));
+  u_it = material->Uniforms.find("M_VIEW");
+  if (u_it != material->Uniforms.end()) {
+    location = u_it->second.GetUniform()->location;
+    glUniformMatrix4fv(location, 1, GL_FALSE, glm::value_ptr(glm::mat4(1.0f)));
+  }
 
-  location = material->Uniforms.find("M_PROJ")->second.GetUniform()->location;
-  trans = glm::mat4(1.0f);  // uniform
-  glUniformMatrix4fv(location, 1, GL_FALSE, glm::value_ptr(trans));
-
+  u_it = material->Uniforms.find("M_PROJ");
+  if (u_it != material->Uniforms.end()) {
+    location = u_it->second.GetUniform()->location;
+    glUniformMatrix4fv(location, 1, GL_FALSE, glm::value_ptr(glm::mat4(1.0f)));
+  }
 
   // We bind the uniforms
   int texture_unit_count = 0;
-  for (auto&& u_it : material->Uniforms) {
-    u_it.second.SendValue(&texture_unit_count);
+  for (auto&& uniform_it : material->Uniforms) {
+    uniform_it.second.SendValue(&texture_unit_count);
   }
 
 

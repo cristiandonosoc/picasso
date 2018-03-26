@@ -59,6 +59,7 @@ bool UniformValue::SendValue(int *texture_unit_count) const {
       case GL_FLOAT_MAT4: {
         /* const GLfloat *ptr = GetValue<GLfloat>(); */
         /* glUniformMatrix4fv(location, 1, false, ptr); */
+		break;
       }
       case GL_SAMPLER_2D: {
         const GLuint *texture_id = GetValue<uint32_t>();

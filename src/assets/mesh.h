@@ -78,6 +78,7 @@ class Mesh {
 
   DynamicArray<GLfloat> vertex_buffer_;
   GLuint vbo_ = 0;
+  GLuint vao_ = 0;
 
   DynamicArray<GLuint> index_buffer_;
   GLuint ebo_ = 0;
