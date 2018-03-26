@@ -21,6 +21,10 @@ namespace utils {
 
 template <typename ParentClass, typename Key, typename Value>
 class Registry : Singleton<Registry<ParentClass, Key, Value>> {
+ public:
+  using KeyType = Key;
+  using ValueType = Value;
+
  protected:
   Registry() = default;
   DISABLE_COPY(Registry);
@@ -34,7 +38,7 @@ class Registry : Singleton<Registry<ParentClass, Key, Value>> {
   }
 
  private:
-  std::map<Key, Value> map_;
+  std::map<KeyType, ValueType> map_;
 
  public:
   using RegistryMapType = decltype(map_);

@@ -21,6 +21,8 @@
 #include "utils/printable_enum.h"
 #include "utils/paths.h"
 
+#include "mappers/shader_material_mapper.h"
+
 #ifdef _WIN32
 #include "Windows.h"
 #endif
@@ -38,8 +40,9 @@ using ::picasso::shaders::MaterialRegistry;
 using ::picasso::models::AttributeKind;
 using ::picasso::models::AttributePointer;
 
-
 using ::picasso::utils::paths::GetExecutableDir;
+
+using ::picasso::mappers::ShaderMaterialMapper;
 
 using namespace ::picasso::utils;
 
@@ -206,6 +209,9 @@ int main(int, char **) {
 
   glm::vec2 vec(2.0f, 3.0f);
   LOG_DEBUG("Printing vector -> X: %f, Y: %f", vec.x, vec.y);
+
+  ShaderMaterialMapper::AddMapping("from", "to");
+  ShaderMaterialMapper::RemoveMapping("from", "to");
 
   // Main loop
   bool done = false;

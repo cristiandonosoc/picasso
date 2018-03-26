@@ -28,7 +28,7 @@ namespace shaders {
 
 using ::picasso::utils::StatusOr;
 
-class ShaderRegistry : Registry<ShaderRegistry, std::string, Shader::UniquePtr> {
+class ShaderRegistry : public Registry<ShaderRegistry, std::string, Shader::UniquePtr> {
 
  public:
   static StatusOr<Shader*> CreateFromFiles(const std::string& name,

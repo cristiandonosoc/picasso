@@ -28,7 +28,7 @@ namespace shaders {
 // TODO(Cristian): Use a templated Key-Type
 using MaterialKey = std::string;
 
-class MaterialRegistry : Registry<MaterialRegistry, MaterialKey, Material::UniquePtr> {
+class MaterialRegistry : public Registry<MaterialRegistry, MaterialKey, Material::UniquePtr> {
  public:
   static StatusOr<MaterialKey> Create(const std::string& name);
   static Material *Get(const MaterialKey& key);
