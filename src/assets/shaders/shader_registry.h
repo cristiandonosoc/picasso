@@ -13,7 +13,7 @@
 
 #include "assets/shaders/shader.h"
 #include "utils/macros.h"
-#include "utils/status_or.h"
+#include "utils/status.h"
 #include "utils/registry.h"
 
 #include <map>
@@ -27,6 +27,7 @@ namespace assets {
 namespace shaders {
 
 using ::picasso::utils::StatusOr;
+using ::picasso::utils::Registry;
 
 class ShaderRegistry : public Registry<ShaderRegistry, std::string, Shader::UniquePtr> {
 

@@ -123,7 +123,7 @@ int main(int, char **) {
     shader = shader_res.ConsumeOrDie();
     LOG_INFO("Successful shader");
   } else {
-    LOGERR_ERROR("Error getting shader: %s\n", shader_res.ErrorMsg().c_str());
+    LOGERR_ERROR("Error getting shader: %s\n", shader_res.GetErrorMsg().c_str());
     return 1;
   }
 
@@ -138,7 +138,7 @@ int main(int, char **) {
   auto res = TextureRegistry::Create("happy",
                                      GetExecutableDir() + "textures/awesomeface.png");
   if (!res.Ok()) {
-    LOGERR_FATAL("Could not load texture: %s", res.ErrorMsg().c_str());
+    LOGERR_FATAL("Could not load texture: %s", res.GetErrorMsg().c_str());
     return 1;
   }
   auto tex2 = TextureRegistry::Get(res.ConsumeOrDie()).lock();

@@ -32,7 +32,7 @@ StatusOr<TextureRegistry::Key> TextureRegistry::InternalCreate(const std::string
   // We attempt to create the texture
   auto res = Texture::Create(name, path);
   if (!res.Ok()) {
-    return { res.GetStatus(), res.ErrorMsg() };
+    return { res.GetStatus(), res.GetErrorMsg() };
   }
 
   // Now that we have a valid loaded texture, we can add it 

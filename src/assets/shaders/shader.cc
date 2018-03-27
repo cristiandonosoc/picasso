@@ -1,7 +1,6 @@
 #include "assets/shaders/shader.h"
 
 #include "logging/log.h"
-#include "utils/status_or.h"
 #include "utils/gl.h"
 #include "utils/make_unique.h"
 

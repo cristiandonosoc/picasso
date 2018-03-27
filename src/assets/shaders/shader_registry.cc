@@ -16,6 +16,7 @@ namespace assets {
 namespace shaders {
 
 using ::picasso::utils::Status;
+using ::picasso::utils::ReadWholeFile;
 
 namespace {
 
@@ -23,8 +24,8 @@ StatusOr<int> CompileShader(const std::string& shader_name,
                   GLenum shader_kind, const std::string& src) {
   int shader_handle = glCreateShader(shader_kind);
   if (!shader_handle) {
-    return StatusOr<int>::Error("Could not create shader \"%s\"\n",
-                                shader_name.c_str());
+    return { Status::STATUS_ERROR, "Could not create shader \"%s\"",
+                                   shader_name.c_str() };
   }
 
   // We compile the shader
@@ -37,8 +38,8 @@ StatusOr<int> CompileShader(const std::string& shader_name,
   if (success == GL_FALSE) {
     GLchar log[2048];
     glGetShaderInfoLog(shader_handle, sizeof(log), 0, log);
-    return StatusOr<int>::Error("Error compiling \"%s\": %s\n",
-                                shader_name.c_str(), log);
+    return { Status::STATUS_ERROR, "Error compiling \"%s\": %s\n",
+                                   shader_name.c_str(), log };
 	}
 
   return shader_handle;
@@ -67,14 +68,13 @@ StatusOr<Shader*> ShaderRegistry::Create(const std::string& name,
   // We check if it exists already
   auto it = map.find(name);
   if (it != map.end()) {
-    return StatusOr<Shader*>::Error("Shader %s already exists",
-                                     name.c_str());
+    return { Status::STATUS_ERROR, "Shader %s already exists", name.c_str() };
   }
 
   // We attempt to create it
   auto res = InternalCreate(name, vs, fs); 
   if (!res.Ok()) { 
-    return StatusOr<Shader*>::Error(res.ErrorMsg());
+    return res;
   }
 
   // Add it to the registry
@@ -114,7 +114,7 @@ StatusOr<Shader::UniquePtr> ShaderRegistry::InternalCreate(const std::string& na
   // Vertex Shader
   auto vertex_res = CompileShader("Vertex", GL_VERTEX_SHADER, vertex_src);
   if (!vertex_res.Ok()) {
-    return { Status::STATUS_ERROR, vertex_res.ErrorMsg() };
+    return vertex_res;
   }
   shader->vertex_handle_ = vertex_res.ConsumeOrDie();
 
@@ -122,7 +122,7 @@ StatusOr<Shader::UniquePtr> ShaderRegistry::InternalCreate(const std::string& na
   auto fragment_res = CompileShader("Fragment", GL_FRAGMENT_SHADER,
                                     fragment_src);
   if (!fragment_res.Ok()) {
-    return { Status::STATUS_ERROR, fragment_res.ErrorMsg() };
+    return fragment_res;
   }
   shader->fragment_handle_ = fragment_res.ConsumeOrDie();
 
@@ -153,7 +153,6 @@ StatusOr<Shader::UniquePtr> ShaderRegistry::InternalCreate(const std::string& na
   shader->valid_ = true;
   return shader;
 }
-
 
 }   // namespace shaders
 }   // namespace assets

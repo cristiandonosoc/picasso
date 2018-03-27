@@ -17,19 +17,18 @@
 #include <GL/gl3w.h>
 
 /* #include "shaders/variable.h" */
-#include "utils/status_or.h"
 #include "utils/macros.h"
 #include "models/attrib_pointer.h"
 
 #include "assets/shaders/attribute.h"
 #include "assets/shaders/uniform.h"
 
-using namespace ::picasso::utils;
-using ::picasso::models::AttributeKind;
 
 namespace picasso {
 namespace assets {
 namespace shaders {
+
+using ::picasso::models::AttributeKind;
 
 class Shader {
  public:

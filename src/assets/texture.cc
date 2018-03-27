@@ -13,12 +13,11 @@
 #include "assets/texture.h"
 #include "utils/make_unique.h"
 
-using ::picasso::utils::Status;
-using ::picasso::utils::MakeUnique;
-
 namespace picasso {
 namespace assets {
 
+using ::picasso::utils::Status;
+using ::picasso::utils::MakeUnique;
 
 StatusOr<Texture::UniquePtr> Texture::Create(const std::string& name,
                                              const std::string& path) {

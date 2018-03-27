@@ -25,7 +25,7 @@ StatusOr<MaterialRegistry::KeyType> MaterialRegistry::Create(const std::string& 
   // Attempt to create 
   auto res = InternalCreate(name);
   if (!res.Ok()) {
-    return { Status::STATUS_ERROR, res.ErrorMsg() };
+    return res;
   }
   map[name] = res.ConsumeOrDie();
   return name;

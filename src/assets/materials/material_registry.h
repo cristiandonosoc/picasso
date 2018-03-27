@@ -13,7 +13,7 @@
 
 #include "assets/materials/material.h"
 #include "utils/macros.h"
-#include "utils/status_or.h"
+#include "utils/status.h"
 #include "utils/registry.h"
 
 #include <map>
@@ -24,6 +24,7 @@ namespace assets {
 namespace materials {
 
 using ::picasso::utils::StatusOr;
+using ::picasso::utils::Registry;
 
 class MaterialRegistry : public Registry<MaterialRegistry, std::string, Material::UniquePtr> {
  public:

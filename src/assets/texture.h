@@ -15,7 +15,7 @@
 #include <external/stb_image.h>
 
 #include "utils/macros.h"
-#include "utils/status_or.h"
+#include "utils/status.h"
 
 using ::picasso::utils::StatusOr;
 

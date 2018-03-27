@@ -14,7 +14,7 @@
 
 #include <string>
 
-#include "utils/status_or.h"
+#include "utils/status.h"
 
 namespace picasso {
 

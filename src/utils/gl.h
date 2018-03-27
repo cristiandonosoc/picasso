@@ -4,10 +4,12 @@
 #include <GL/gl3w.h>
 #include <map>
 
-#include "utils/status_or.h"
+#include "utils/status.h"
 
 namespace picasso {
 namespace utils {
+
+using ::picasso::utils::Status;
 
 
 /**
@@ -41,7 +43,7 @@ class GLTypesToString {
    StatusOr<std::string> GetName(GLenum type) const {
      auto it = mapping_.find(type);
      if (it == mapping_.end()) {
-       return StatusOr<std::string>::Error("Cannot find type %d", type);
+       return { Status::STATUS_ERROR, "Cannot find type \"%d\"", type };
      }
      return it->second.name;
    }
@@ -49,7 +51,7 @@ class GLTypesToString {
    StatusOr<size_t> GetSize(GLenum type) const {
      auto it = mapping_.find(type);
      if (it == mapping_.end()) {
-       return StatusOr<size_t>::Error("Cannot find type %d", type);
+       return { Status::STATUS_ERROR, "Cannot find type \"%d\"", type };
      }
      return it->second.size;
    }

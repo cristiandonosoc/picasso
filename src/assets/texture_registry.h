@@ -16,13 +16,13 @@
 #include "assets/texture.h"
 #include "utils/singleton.h"
 #include "utils/macros.h"
-#include "utils/status_or.h"
-
-using ::picasso::utils::Singleton;
-using ::picasso::utils::StatusOr;
+#include "utils/status.h"
 
 namespace picasso {
 namespace assets {
+
+using ::picasso::utils::Singleton;
+using ::picasso::utils::StatusOr;
 
 class TextureRegistry : Singleton<TextureRegistry> {
  public:
