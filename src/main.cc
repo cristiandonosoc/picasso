@@ -9,7 +9,7 @@
 #include "models/attrib_pointer.h"
 #include "assets/mesh.h"
 #include "assets/shaders/shader_registry.h"
-#include "shaders/material_registry.h"
+#include "assets/materials/material_registry.h"
 
 #include "assets/texture_registry.h"
 
@@ -34,8 +34,8 @@ using ::picasso::assets::TextureRegistry;
 using ::picasso::assets::shaders::Shader;
 using ::picasso::assets::shaders::ShaderRegistry;
 
-using ::picasso::shaders::Material;
-using ::picasso::shaders::MaterialRegistry;
+using ::picasso::assets::materials::Material;
+using ::picasso::assets::materials::MaterialRegistry;
 
 using ::picasso::models::AttributeKind;
 using ::picasso::models::AttributePointer;
@@ -153,7 +153,7 @@ int main(int, char **) {
     return 1;
   }
 
-  const ::picasso::shaders::MaterialKey mat_key = material_res.ConsumeOrDie();
+  const MaterialRegistry::KeyType mat_key = material_res.ConsumeOrDie();
   Material *material = MaterialRegistry::Get(mat_key);
 
   LOG_INFO("Created material \"%s\"", mat_name.c_str());

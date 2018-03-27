@@ -1,15 +1,16 @@
+
 /******************************************************************************
  * @file: uniform_value.h
  * @author: Cristián Donoso C.
  * @email: cristiandonosoc@gmail.com
- * @date: 2018-03-25
+ * @date: 2018-03-26
  * @license: 2018 Cristián Donoso C. - All Rights Reserved.
  *
  * @description: TODO(Cristian): Add description
  ******************************************************************************/
 
-#ifndef SRC_SHADERS_UNIFORM_VALUE_H
-#define SRC_SHADERS_UNIFORM_VALUE_H
+#ifndef SRC_ASSETS_MATERIALS_UNIFORM_VALUE_H
+#define SRC_ASSETS_MATERIALS_UNIFORM_VALUE_H
 
 #include <cstdint>
 #include <memory>
@@ -17,9 +18,9 @@
 #include "assets/shaders/shader.h"
 #include "utils/dynamic_array.h"
 
-
 namespace picasso {
-namespace shaders {
+namespace assets {
+namespace materials {
 
 using ::picasso::assets::shaders::Shader;
 using ::picasso::assets::shaders::Uniform;
@@ -78,8 +79,8 @@ void UniformValue::SetValues(size_t count, const T* values) {
   }
 }
 
-}   // namespace shaders
+}   // namespace materials
+}   // namespace assets
 }   // namespace picasso
 
-
-#endif  // SRC_SHADERS_UNIFORM_VALUE_H
+#endif  // SRC_ASSETS_MATERIALS_UNIFORM_VALUE_H

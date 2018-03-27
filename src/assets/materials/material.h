@@ -1,26 +1,30 @@
+
 /******************************************************************************
  * @file: material.h
  * @author: Cristián Donoso C.
  * @email: cristiandonosoc@gmail.com
- * @date: 2018-03-05
+ * @date: 2018-03-26
  * @license: 2018 Cristián Donoso C. - All Rights Reserved.
  *
  * @description: TODO(Cristian): Add description
  ******************************************************************************/
 
-#ifndef SRC_SHADERS_MATERIAL_H
-#define SRC_SHADERS_MATERIAL_H
+#ifndef SRC_ASSETS_MATERIALS_MATERIAL_H
+#define SRC_ASSETS_MATERIALS_MATERIAL_H
 
 #include "utils/macros.h"
 #include "utils/status_or.h"
-#include "shaders/uniform_value.h"
 
 #include "assets/shaders/shader.h"
+#include "assets/materials/uniform_value.h"
 
 #include <map>
 
 namespace picasso {
-namespace shaders {
+namespace assets {
+namespace materials {
+
+using ::picasso::assets::materials::UniformValue;
 
 using ValueMap = std::map<std::string, UniformValue>;
 using Shader = ::picasso::assets::shaders::Shader;
@@ -101,7 +105,8 @@ Status Material::SetValues(const std::string& uniform, size_t count, const T* va
   return Status::STATUS_OK;
 }
 
-}   // namepsace shaders
+}   // namespace materials
+}   // namepsace assets
 }   // namespace picasso
 
-#endif  // SRC_SHADERS_MATERIAL_H
+#endif  // SRC_ASSETS_MATERIALS_MATERIAL_H

@@ -8,11 +8,12 @@
  * @description: TODO(Cristian): Add description
  ******************************************************************************/
 
-#include "shaders/uniform_value.h"
+#include "assets/materials/uniform_value.h"
 #include "logging/log.h"
 
 namespace picasso {
-namespace shaders {
+namespace assets {
+namespace materials {
 
 UniformValue::UniformValue(const Uniform *uniform) : uniform_(uniform) {
   assert(uniform);
@@ -84,5 +85,6 @@ bool UniformValue::SendValue(int *texture_unit_count) const {
   return true;
 }
 
-}   // namespace shaders
+}   // namespace materials
+}   // namespace assets
 }   // namespace picasso

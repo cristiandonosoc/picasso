@@ -11,7 +11,7 @@
 #ifndef SRC_SHADERS_MATERIAL_REGISTRY_H
 #define SRC_SHADERS_MATERIAL_REGISTRY_H
 
-#include "shaders/material.h"
+#include "assets/materials/material.h"
 #include "utils/macros.h"
 #include "utils/status_or.h"
 #include "utils/registry.h"
@@ -20,10 +20,10 @@
 #include <vector>
 
 namespace picasso {
+namespace assets {
+namespace materials {
 
-using namespace utils; 
-
-namespace shaders {
+using ::picasso::utils::StatusOr;
 
 // TODO(Cristian): Use a templated Key-Type
 using MaterialKey = std::string;
@@ -40,7 +40,8 @@ class MaterialRegistry : public Registry<MaterialRegistry, MaterialKey, Material
   static const RegistryMapType& GetMaterials();
 };
 
-}   // namespace shaders
+}   // namespace materials
+}   // namespace assets
 }   // namespace picasso
 
 #endif  // SRC_SHADERS_MATERIAL_REGISTRY_H

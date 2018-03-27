@@ -8,11 +8,12 @@
  * @description: TODO(Cristian): Add description
  ******************************************************************************/
 
+#include "assets/materials/material.h"
 #include "assets/shaders/shader.h"
-#include "shaders/material.h"
 
 namespace picasso {
-namespace shaders {
+namespace assets {
+namespace materials {
 
 /**
  * CONSTRUCTORS
@@ -65,5 +66,6 @@ void Material::UnlinkShader() {
   data_.shader = nullptr;
 }
 
-}   // namespace shaders
+}   // namespace materials 
+}   // namespace assets
 }   // namespace picasso

@@ -16,7 +16,7 @@
 
 #include "utils/macros.h"
 #include "models/attrib_pointer.h"
-#include "shaders/material_registry.h"
+#include "assets/materials/material_registry.h"
 #include "utils/dynamic_array.h"
 #include "models/transform.h"
 
@@ -27,8 +27,8 @@ using ::picasso::models::AttributePointer;
 namespace picasso {
 namespace assets {
 
-using ::picasso::shaders::Material;
-using ::picasso::shaders::MaterialKey;
+using ::picasso::assets::materials::Material;
+using ::picasso::assets::materials::MaterialKey;
 using ::picasso::utils::DynamicArray;
 
 class Mesh {

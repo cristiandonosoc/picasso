@@ -35,7 +35,7 @@ static std::map<AttributeKind, std::string> AttributeKindToAttributeName = {
 };
 
 using ::picasso::assets::shaders::Shader;
-using ::picasso::shaders::Material;
+using ::picasso::assets::materials::Material;
 
 void Mesh::SetVertexBuffer(size_t array_size, GLfloat *vertices) {
   vertex_buffer_.Reset(array_size / sizeof(GLfloat), vertices);

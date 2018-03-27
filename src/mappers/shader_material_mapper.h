@@ -13,7 +13,7 @@
 
 #include "mappers/mapper.h"
 #include "assets/shaders/shader_registry.h"
-#include "shaders/material_registry.h"
+#include "assets/materials/material_registry.h"
 
 #include "logging/log.h"
 
@@ -21,7 +21,7 @@ namespace picasso {
 namespace mappers {
 
 using ::picasso::assets::shaders::ShaderRegistry;
-using ::picasso::shaders::MaterialRegistry;
+using ::picasso::assets::materials::MaterialRegistry;
 
 class ShaderMaterialMapper : public Mapper<ShaderMaterialMapper, ShaderRegistry, MaterialRegistry> {
  public:

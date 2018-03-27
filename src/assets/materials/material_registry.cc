@@ -8,10 +8,11 @@
  * @description: TODO(Cristian): Add description
  ******************************************************************************/
 
-#include "shaders/material_registry.h"
+#include "assets/materials/material_registry.h"
 
 namespace picasso {
-namespace shaders {
+namespace assets {
+namespace materials {
 
 StatusOr<MaterialKey> MaterialRegistry::Create(const std::string& name) {
   auto& map = Instance().map_;
@@ -43,5 +44,6 @@ const MaterialRegistry::RegistryMapType& MaterialRegistry::GetMaterials() {
   return Instance().map_;
 }
 
-}   // namespace shaders
+}   // namespace materials
+}   // namespace assets
 }   // namespace picasso

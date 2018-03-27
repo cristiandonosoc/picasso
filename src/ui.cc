@@ -4,7 +4,7 @@
 
 #include "ui.h"
 #include "assets/shaders/shader_registry.h"
-#include "shaders/material_registry.h"
+#include "assets/materials/material_registry.h"
 #include "logging/log.h"
 #include "utils/snprintf.h"
 #include "assets/texture_registry.h"
@@ -24,8 +24,9 @@ using ::picasso::assets::shaders::Shader;
 using ::picasso::assets::shaders::Attribute;
 using ::picasso::assets::shaders::Uniform;
 
-using ::picasso::shaders::Material;
-using ::picasso::shaders::UniformValue;
+using ::picasso::assets::materials::Material;
+using ::picasso::assets::materials::MaterialRegistry;
+using ::picasso::assets::materials::UniformValue;
 using ::picasso::logging::LogBuffer;
 using ::picasso::utils::picasso_snprintf;
 using ::picasso::assets::Texture;
@@ -174,14 +175,14 @@ void MaterialWindow(UiData *, ImVec2 start_pos, ImVec2 start_size) {
   ImGui::Begin("Materials", &open);
 
   ImGui::BeginChild("Left Pane", {150, 0}, true);
-  auto&& materials = shaders::MaterialRegistry::GetMaterials();
+  auto&& materials = MaterialRegistry::GetMaterials();
   static int selected_material = -1;
-  static shaders::MaterialKey selected_key;
+  static MaterialRegistry::KeyType selected_key;
   int i = 0;
   for (auto&& it = materials.begin();
        it != materials.end();
        it++, i++) {
-    shaders::MaterialKey key = it->first;
+    MaterialRegistry::KeyType key = it->first;
     /* Material* material = it->second; */
     char label[128];
     picasso_snprintf(label, sizeof(label), "%s", key.c_str());
@@ -260,7 +261,7 @@ void TextureWindow(UiData*, ImVec2 start_pos, ImVec2 start_size) {
   ImGui::BeginChild("Left Pane", {150, 0}, true);
   auto&& texture_map = TextureRegistry::GetTextureMap();
   static int selected_index = -1;
-  static ::picasso::shaders::MaterialKey selected_key;
+  static MaterialRegistry::KeyType selected_key;
   int i = 0;
   for (auto&& it = texture_map.begin();
        it != texture_map.end();
