@@ -20,6 +20,16 @@
 namespace picasso {
 namespace utils {
 
+#define PROCESS_FMT_VAR_ARGS(var_name, size)            \
+  va_list arglist;                                      \
+  va_start(arglist, fmt);                               \
+  char buffer[1024];                                    \
+  vsnprintf(buffer, sizeof(buffer), fmt, arglist);      \
+  va_end(arglist);
+
+#define FILENO_STATUS(status, fmt, ...) \
+  { __FILE__, __LINE__, status, fmt, __VA_ARGS__ }
+
 class Status {
  public:
   enum StatusEnum {
@@ -34,11 +44,20 @@ class Status {
   Status(StatusEnum status, const std::string& error_msg = "") 
     : status_(status), error_msg_(error_msg) {}
   Status(StatusEnum status, const char *fmt, ...) : status_(status) {
-    va_list arglist;
-    va_start(arglist, fmt);
-    char buffer[1024];
-    vsnprintf(buffer, sizeof(buffer), fmt, arglist);
-    va_end(arglist);
+    PROCESS_FMT_VAR_ARGS(buffer, 1024);
+    error_msg_ = buffer;
+  }
+
+  // FILE:NUMBER INTERFACE
+ public:
+  Status(const std::string& file, int line, 
+         StatusEnum status, const std::string& error_msg = "") 
+    : status_(status), error_msg_(error_msg), 
+      file_(file), line_(line) {}
+  Status(const std::string& file, int line, 
+         StatusEnum status, const char *fmt, ...)
+    : status_(status), file_(file), line_(line) {
+    PROCESS_FMT_VAR_ARGS(buffer, 1024);
     error_msg_ = buffer;
   }
 
@@ -50,10 +69,15 @@ class Status {
   bool Ok() const { return status_ == StatusEnum::STATUS_OK; }
   StatusEnum GetStatus() const { return status_; }
   const std::string& GetErrorMsg() const { return error_msg_; }
+  bool HasFileLineInfo() const { return !file_.empty(); }
+  const std::string& GetFile() const { return file_; }
+  int GetLine() const { return line_; }
 
  protected:
   StatusEnum status_ = StatusEnum::STATUS_OK;
   std::string error_msg_;
+  std::string file_;
+  int line_ = 0;
 };  // class Status
 
 template <typename T>
@@ -61,6 +85,9 @@ class StatusOr : public Status {
  public:
   static_assert(!std::is_same<T, StatusEnum>::value,
                 "Cannot create StatusOr<StatusEnum>. Just return Status instead");
+ public:
+  DISABLE_COPY(StatusOr);
+  DEFAULT_MOVE(StatusOr);
     
  public:
   // TODO(Cristian): Do we want a copy constructor
@@ -72,25 +99,29 @@ class StatusOr : public Status {
     assert(status != StatusEnum::STATUS_OK);
   }
 
- public:
-  DISABLE_COPY(StatusOr);
-  DEFAULT_MOVE(StatusOr);
+  StatusOr(StatusEnum status, const char *fmt, ...) : Status(status) {
+    assert(status != StatusEnum::STATUS_OK);
+    PROCESS_FMT_VAR_ARGS(buffer, 1024);
+    error_msg_ = buffer;
+  }
 
-  // Piping another status
+  // FILE:NUMBER INTERFACE
+ public:
+  StatusOr(const std::string& file, int line, 
+         StatusEnum status, const std::string& error_msg = "") 
+    : Status(file, line, status, error_msg) {}
+  StatusOr(const std::string& file, int line, 
+         StatusEnum status, const char *fmt, ...)
+    : Status(file, line, status) {
+    PROCESS_FMT_VAR_ARGS(buffer, 1024);
+    error_msg_ = buffer;
+  }
+
+  // PIPING ANOTHER STATUS
  public:
   template <typename U>
   StatusOr(const StatusOr<U>& other_status) 
     : Status(other_status.GetStatus(), other_status.GetErrorMsg()) {}
-
-  StatusOr(StatusEnum status, const char *fmt, ...) : Status(status) {
-    assert(status != StatusEnum::STATUS_OK);
-    va_list arglist;
-    va_start(arglist, fmt);
-    char buffer[1024];
-    vsnprintf(buffer, sizeof(buffer), fmt, arglist);
-    va_end(arglist);
-    error_msg_ = buffer;
-  }
 
  public:
   T&& ConsumeOrDie() {

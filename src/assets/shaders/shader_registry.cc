@@ -85,8 +85,8 @@ StatusOr<Shader*> ShaderRegistry::Get(const std::string& name) {
   auto& map = Instance().map_;
   auto it = map.find(name);
   if (it == map.end()) {
-    return { Status::STATUS_ERROR, "ShaderRegistry: cannot find key \"%s\"",
-             name.c_str() };
+    return FILENO_STATUS(Status::STATUS_ERROR, "ShaderRegistry: cannot find key \"%s\"",
+                         name.c_str());
   }
   return it->second.get();
 }

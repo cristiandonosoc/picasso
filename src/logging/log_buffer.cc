@@ -107,7 +107,22 @@ LogLevel StatusToLevel(const Status& status) {
 
 void LogBuffer::LogStatus(int indent, const Status& status, const char *file, int line) {
   LogLevel level = StatusToLevel(status);
-  Log(indent, level, file, line, "%s", status.GetErrorMsg().c_str());
+  if (status.HasFileLineInfo()) {
+    Log(indent, level, status.GetFile().c_str(), status.GetLine(), "%s",
+        status.GetErrorMsg().c_str());
+  } else {
+    Log(indent, level, file, line, "%s", status.GetErrorMsg().c_str());
+  }
+}
+
+void LogBuffer::LogStderrStatus(int indent, const Status& status, const char *file, int line) {
+  LogLevel level = StatusToLevel(status);
+  if (status.HasFileLineInfo()) {
+    LogStderr(indent, level, status.GetFile().c_str(), status.GetLine(), "%s",
+        status.GetErrorMsg().c_str());
+  } else {
+    LogStderr(indent, level, file, line, "%s", status.GetErrorMsg().c_str());
+  }
 }
 
 size_t LogBuffer::Count() {
@@ -117,8 +132,6 @@ size_t LogBuffer::Count() {
 const LogBuffer::LogContainer& LogBuffer::GetLogs() {
   return PrivateInstance().container_;
 }
-
-
 
 }   // namespace logging
 }   // namespace picasso

@@ -64,9 +64,14 @@ class LogBuffer {
   static void LogStderr(int indent, LogLevel, const char *file, int line, 
                         const char *fmt, ...); 
   static void LogStatus(int indent, const Status&, const char *file, int line);
+  static void LogStderrStatus(int indent, const Status&, const char *file, int line);
   template<typename T>
   static void LogStatusOr(int indent, const StatusOr<T>& s, const char *file, int line) {
     LogStatus(indent, s.DowncastToStatus(), file, line);
+  }
+  template<typename T>
+  static void LogStderrStatusOr(int indent, const StatusOr<T>& s, const char *file, int line) {
+    LogStderrStatus(indent, s.DowncastToStatus(), file, line);
   }
 
   static const LogContainer& GetLogs();
