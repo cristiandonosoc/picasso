@@ -38,7 +38,7 @@ class ShaderRegistry : public Registry<ShaderRegistry, std::string, Shader::Uniq
   static StatusOr<Shader*> Create(const std::string& name, 
                                   const std::string& vs,
                                   const std::string& fs);
-  static Shader *Get(const std::string& name);
+  static StatusOr<Shader*> Get(const std::string& name);
 
   static std::vector<Shader*> GetShaders();
 

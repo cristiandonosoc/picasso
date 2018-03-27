@@ -81,16 +81,15 @@ StatusOr<Shader*> ShaderRegistry::Create(const std::string& name,
   return (map[name] = res.ConsumeOrDie()).get();
 }
 
-Shader* ShaderRegistry::Get(const std::string& name) {
+StatusOr<Shader*> ShaderRegistry::Get(const std::string& name) {
   auto& map = Instance().map_;
   auto it = map.find(name);
   if (it == map.end()) {
-    return nullptr;
+    return { Status::STATUS_ERROR, "ShaderRegistry: cannot find key \"%s\"",
+             name.c_str() };
   }
   return it->second.get();
-
 }
-
 
 std::vector<Shader*> ShaderRegistry::GetShaders() {
   std::vector<Shader*> programs;

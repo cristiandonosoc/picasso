@@ -25,10 +25,18 @@ using ::picasso::assets::materials::MaterialRegistry;
 
 class ShaderMaterialMapper : public Mapper<ShaderMaterialMapper, ShaderRegistry, MaterialRegistry> {
  public:
-  static constexpr const char *TypeName = "ShaderMaterialMapper";
+  static const std::string& TypeName() {
+    static std::string type_name_("ShaderMaterialMapper");
+    return type_name_;
+  }
 
  public:
-  static Status AddCallback(const FromKeyType&, const ToKeyType&) {
+  static Status AddCallback(const FromKeyType& from_key, const ToKeyType&) {
+    auto from_res = ShaderRegistry::Get(from_key);
+    if (!from_res.Ok()) {
+      return from_res;
+    }
+
     LOG_DEBUG("Called AddCallback: %s", __FUNCTION__);
     return Status::STATUS_OK;
   }
