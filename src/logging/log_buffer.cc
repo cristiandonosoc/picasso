@@ -88,6 +88,28 @@ void LogBuffer::LogStderr(int indent, LogLevel level, const char *file, int line
   fflush(stderr);
 }
 
+namespace {
+
+
+LogLevel StatusToLevel(const Status& status) {
+  switch (status.GetStatus()) {
+    case Status::STATUS_OK:
+      return LogLevel::LOG_INFO;
+    case Status::STATUS_WARNING:
+      return LogLevel::LOG_WARN;
+    case Status::STATUS_ERROR:
+    default:
+      return LogLevel::LOG_ERROR;
+  }
+}
+
+}   // namespace
+
+void LogBuffer::LogStatus(int indent, const Status& status, const char *file, int line) {
+  LogLevel level = StatusToLevel(status);
+  Log(indent, level, file, line, "%s", status.GetErrorMsg().c_str());
+}
+
 size_t LogBuffer::Count() {
   return PrivateInstance().container_.size();
 }

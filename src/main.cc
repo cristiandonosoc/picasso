@@ -212,8 +212,10 @@ int main(int, char **) {
   glm::vec2 vec(2.0f, 3.0f);
   LOG_DEBUG("Printing vector -> X: %f, Y: %f", vec.x, vec.y);
 
-  ShaderMaterialMapper::AddMapping("from", "to");
-  ShaderMaterialMapper::RemoveMapping("from", "to");
+  Status status = ShaderMaterialMapper::AddMapping("from", "to");
+  LOG_STATUS(status);
+  status = ShaderMaterialMapper::RemoveMapping("from", "to");
+  LOG_STATUS(status);
 
   // Main loop
   bool done = false;

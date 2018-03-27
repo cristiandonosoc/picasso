@@ -98,6 +98,11 @@ class StatusOr : public Status {
     return std::move(val_);
   }
 
+ public:
+  Status DowncastToStatus() {
+    return Status(status_, error_msg_);
+  }
+
  private:
   T val_;
 };  // class StatusOr

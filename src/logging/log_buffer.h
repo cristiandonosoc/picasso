@@ -17,9 +17,13 @@
 
 #include "utils/macros.h"
 #include "utils/printable_enum.h"
+#include "utils/status.h"
 
 namespace picasso {
 namespace logging {
+
+using ::picasso::utils::Status;
+using ::picasso::utils::StatusOr;
 
 PRINTABLE_ENUM(LogLevel, LOG_FATAL, LOG_ERROR, LOG_WARN,
                          LOG_INFO, LOG_DEBUG);
@@ -59,6 +63,11 @@ class LogBuffer {
                   const char *fmt, ...);
   static void LogStderr(int indent, LogLevel, const char *file, int line, 
                         const char *fmt, ...); 
+  static void LogStatus(int indent, const Status&, const char *file, int line);
+  template<typename T>
+  static void LogStatusOr(int indent, const StatusOr<T>& s, const char *file, int line) {
+    LogStatus(indent, s.DowncastToStatus(), file, line);
+  }
 
   static const LogContainer& GetLogs();
 
@@ -87,8 +96,6 @@ class LogBuffer {
   LogContainer container_;
 
 };  // class LogBuffer
-
-
 
 }   // namespace logging
 }   // namespace picasso
