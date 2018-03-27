@@ -261,25 +261,6 @@ bool Mesh::SetupAttributeByAttributeKind(Material* material, AttributeKind kind)
 }
 #endif
 
-bool Mesh::AddMaterialKey(const MaterialKey& key) {
-  // TODO(Cristian): Send error message
-  auto it = find(material_keys_.begin(), material_keys_.end(), key);
-  if (it != material_keys_.end()) {
-    return false; // Already got it
-  }
-  material_keys_.push_back(key);
-  return true;
-}
-
-bool Mesh::RemoveMaterialKey(const MaterialKey& key) {
-  auto it = find(material_keys_.begin(), material_keys_.end(), key);
-  if (it == material_keys_.end()) {
-    return false;   // Cannot find it
-  }
-  material_keys_.erase(it);
-  return true;
-}
-
 // TODO(Cristian): Use Status
 bool Mesh::AddAttributePointer(const AttributePointer& attrib_pointer) {
   auto it = attribute_pointer_map_.find(attrib_pointer.GetKind());
@@ -308,14 +289,8 @@ bool Mesh::Render(Material* material) const {
     return false;
   }
 
-  if (MaterialKeys.empty()) {
-    // TODO(Cristian): Send error message
-    LOG_WARN("Calling render on a model without materials");
-    return false;
-  }
-
+  // Get the shader from the material
   const Shader *shader = material->GetShader();
-
   if (!shader) { 
     LOG_WARN("Rendering with null shader");
     return false;

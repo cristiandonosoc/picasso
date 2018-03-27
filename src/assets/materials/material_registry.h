@@ -25,19 +25,19 @@ namespace materials {
 
 using ::picasso::utils::StatusOr;
 
-// TODO(Cristian): Use a templated Key-Type
-using MaterialKey = std::string;
-
-class MaterialRegistry : public Registry<MaterialRegistry, MaterialKey, Material::UniquePtr> {
+class MaterialRegistry : public Registry<MaterialRegistry, std::string, Material::UniquePtr> {
  public:
-  static StatusOr<MaterialKey> Create(const std::string& name);
-  static Material *Get(const MaterialKey& key);
+  static StatusOr<KeyType> Create(const std::string& name);
+  static Material *Get(const KeyType& key);
 
   // IMPORTANT: The pointers are not assured to be valid 
   //            through time, so they should be *always*
   //            be obtained through here
   // TODO(Cristian): Use shared pointer to represent this relationship
   static const RegistryMapType& GetMaterials();
+
+ private:
+  static StatusOr<Material::UniquePtr> InternalCreate(const std::string& name);
 };
 
 }   // namespace materials

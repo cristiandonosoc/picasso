@@ -12,32 +12,32 @@
 #ifndef SRC_ASSETS_MATERIALS_MATERIAL_H
 #define SRC_ASSETS_MATERIALS_MATERIAL_H
 
-#include "utils/macros.h"
-#include "utils/status_or.h"
+
+#include <map>
 
 #include "assets/shaders/shader.h"
 #include "assets/materials/uniform_value.h"
-
-#include <map>
+#include "utils/macros.h"
+#include "utils/status_or.h"
 
 namespace picasso {
 namespace assets {
 namespace materials {
 
 using ::picasso::assets::materials::UniformValue;
-
-using ValueMap = std::map<std::string, UniformValue>;
-using Shader = ::picasso::assets::shaders::Shader;
+using ::picasso::assets::shaders::Shader;
 
 class Material {
+ public:
+  using ValueMap = std::map<std::string, UniformValue>;
+
  public:
    DEFINE_PTR_TYPES(Material);
 
  private:
-  static StatusOr<UniquePtr> Create(const std::string& name);
-
- private:
   Material() {}
+  DISABLE_COPY(Material);
+  DISABLE_MOVE(Material);
 
  public:
   const std::string& GetName() const { return data_.name; }
@@ -49,7 +49,6 @@ class Material {
   template <typename T>
   Status SetValues(const std::string& uniform, size_t count, const T*);
 
-
  public:
   ValueMap& Uniforms = data_.uniforms;
   ValueMap& Attributes = data_.attributes;
@@ -57,15 +56,6 @@ class Material {
  public:
   void SetShader(Shader *);
   void UnsetShader();
-
- private:
-  void LinkShader(Shader *);
-  void UnlinkShader();
-
- public:
-  DISABLE_COPY(Material);
-  Material(Material&&) noexcept;
-  Material& operator=(Material&&) noexcept;
 
  private:
   class Data {

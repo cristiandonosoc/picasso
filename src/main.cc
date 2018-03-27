@@ -147,7 +147,6 @@ int main(int, char **) {
   LOG_INFO("Creating material");
   std::string mat_name = "mat0";
   auto material_res = MaterialRegistry::Create(mat_name);
-
   if (!material_res.Ok()) {
     LOGERR_FATAL("Could not create material \"%s\"", mat_name.c_str());
     return 1;
@@ -198,7 +197,6 @@ int main(int, char **) {
     it.second.DebugPrint();
   }
 
-  model.AddMaterialKey(mat_key);
   model.SetupBuffers();
 
   // Setup style

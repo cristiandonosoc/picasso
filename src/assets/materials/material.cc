@@ -16,54 +16,23 @@ namespace assets {
 namespace materials {
 
 /**
- * CONSTRUCTORS
- **/
-StatusOr<Material::UniquePtr> Material::Create(const std::string& name) {
-  UniquePtr material(new Material());   // Private Constructor
-  material->data_.name = name;
-  return material;
-}
-
-Material::Material(Material&& other) noexcept {
-  *this = std::move(other);
-}
-
-Material& Material::operator=(Material&& other) noexcept {
-  if (this != &other) {
-    data_ = std::move(other.data_);
-  }
-  return *this;
-}
-
-/**
  * SHADER INTERFACE
  **/
 void Material::SetShader(Shader *shader) {
-  if (data_.shader == shader) { return; }
-  UnlinkShader();
-  LinkShader(shader);
+  assert(data_.shader == nullptr);
+  data_.shader = shader;
+  // Create the UniformValues
+  for (auto&& it : shader->Uniforms) {
+    data_.uniforms[it.first] = UniformValue(&it.second);
+  }
+  LOG_WARN("%s: Not completely implemented", __FUNCTION__);
 }
 
 void Material::UnsetShader() {
-  UnlinkShader();
-}
-
-void Material::LinkShader(Shader *shader) {
-  if (shader) {
-    // Copy over uniforms
-    for (auto&& it : shader->Uniforms) {
-      data_.uniforms[it.first] = UniformValue(&it.second);
-    }
-  }
-  data_.shader = shader;
-}
-
-void Material::UnlinkShader() {
-  if (data_.shader) {
-    data_.attributes.clear();
-    data_.uniforms.clear();
-  }
   data_.shader = nullptr;
+  data_.uniforms.clear();
+  data_.attributes.clear();
+  LOG_WARN("%s: Not completely implemented", __FUNCTION__);
 }
 
 }   // namespace materials 

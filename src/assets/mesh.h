@@ -28,16 +28,16 @@ namespace picasso {
 namespace assets {
 
 using ::picasso::assets::materials::Material;
-using ::picasso::assets::materials::MaterialKey;
+using ::picasso::assets::materials::MaterialRegistry;
 using ::picasso::utils::DynamicArray;
 
 class Mesh {
  public:
-  DEFINE_PTR_TYPES(Mesh);
+  using AttributePointerMap = std::map<AttributeKind, AttributePointer>;
 
  public:
-  using MaterialKeysContainer = std::vector<MaterialKey>;
-  using AttributePointerMap = std::map<AttributeKind, AttributePointer>;
+  DEFINE_PTR_TYPES(Mesh);
+
 
  public:
   Mesh() = default;
@@ -51,7 +51,7 @@ class Mesh {
   bool SetupBuffers();
 
  private:
-  GLuint SetupMaterialVAO(const MaterialKey&);
+  GLuint SetupMaterialVAO(const MaterialRegistry::KeyType&);
   bool SetupAttributeByAttributeKind(Material*, AttributeKind);
 
  public:
@@ -61,20 +61,12 @@ class Mesh {
   bool RemoveAttributePointer(const AttributePointer&);
 
  public:
-  const MaterialKeysContainer& MaterialKeys = material_keys_;
-  // TODO(Cristian): Use Status
-  bool AddMaterialKey(const MaterialKey&);
-  bool RemoveMaterialKey(const MaterialKey&);
-
- public:
   bool Render(Material*) const;
 
  private:
   Transform transform_;
 
   AttributePointerMap attribute_pointer_map_;
-  std::vector<MaterialKey> material_keys_;
-  std::map<MaterialKey, GLuint> material_vao_map_;
 
   DynamicArray<GLfloat> vertex_buffer_;
   GLuint vbo_ = 0;
