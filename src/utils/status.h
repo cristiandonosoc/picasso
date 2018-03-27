@@ -26,6 +26,7 @@ class Status {
     STATUS_NONE,
     STATUS_OK,
     STATUS_ERROR,
+    STATUS_WARNING,
     STATUS_CONSUMED
   };  // enum StatusEnum
 

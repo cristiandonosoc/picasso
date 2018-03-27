@@ -18,21 +18,28 @@ namespace materials {
 /**
  * SHADER INTERFACE
  **/
-void Material::SetShader(Shader *shader) {
-  assert(shader_ == nullptr);
+Status Material::SetShader(Shader *shader) {
+  if (shader_ != nullptr) {
+    return { Status::STATUS_ERROR, 
+             "Material \"%s\": already has a shader (\"%s\") associated with it",
+             name_.c_str(), shader->GetName().c_str() };
+  }
   shader_ = shader;
   // Create the UniformValues
   for (auto&& it : shader->Uniforms) {
     uniforms_[it.first] = UniformValue(&it.second);
   }
-  LOG_WARN("%s: Not completely implemented", __FUNCTION__);
+  return Status::STATUS_OK;
 }
 
-void Material::UnsetShader() {
+Status Material::UnsetShader() {
+  if (shader_ == nullptr) {
+    LOG_WARN("Material \"%s\": de-registering from a unset material.");
+  }
   shader_ = nullptr;
   uniforms_.clear();
   attributes_.clear();
-  LOG_WARN("%s: Not completely implemented", __FUNCTION__);
+  return Status::STATUS_OK;
 }
 
 }   // namespace materials 

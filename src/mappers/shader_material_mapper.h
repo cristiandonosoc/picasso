@@ -25,14 +25,17 @@ using ::picasso::assets::materials::MaterialRegistry;
 
 class ShaderMaterialMapper : public Mapper<ShaderMaterialMapper, ShaderRegistry, MaterialRegistry> {
  public:
-  static bool AddCallback(const FromKeyType&, const ToKeyType&) {
+  static constexpr const char *TypeName = "ShaderMaterialMapper";
+
+ public:
+  static Status AddCallback(const FromKeyType&, const ToKeyType&) {
     LOG_DEBUG("Called AddCallback: %s", __FUNCTION__);
-    return true;
+    return Status::STATUS_OK;
   }
 
-  static bool RemoveCallback(const FromKeyType&, const ToKeyType&) {
+  static Status RemoveCallback(const FromKeyType&, const ToKeyType&) {
     LOG_DEBUG("Called RemoveCallback: %s", __FUNCTION__);
-    return true;
+    return Status::STATUS_OK;
   }
 
 

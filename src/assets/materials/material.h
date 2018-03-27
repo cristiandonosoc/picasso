@@ -55,8 +55,8 @@ class Material {
   ValueMap& Attributes = attributes_;
 
  public:
-  void SetShader(Shader *);
-  void UnsetShader();
+  Status SetShader(Shader *);
+  Status UnsetShader();
 
  private:
   std::string name_;

@@ -157,9 +157,13 @@ int main(int, char **) {
 
   LOG_INFO("Created material \"%s\"", mat_name.c_str());
   LOG_INFO("Setting program to \"%s\"", shader_name.c_str());
-  material->SetShader(shader);
-
-
+  auto bind_res = material->SetShader(shader);
+  if(!bind_res.Ok()) {
+    LOGERR_FATAL("Could not bind shader \"%s\" to material \"%s\": %s",
+                 shader->GetName().c_str(), material->GetName().c_str(),
+                 bind_res.GetErrorMsg().c_str());
+    return 1;
+  }
   material->SetValue<uint32_t>("tex0", texture->GetId());
   material->SetValue<uint32_t>("tex1", tex2->GetId());
 
