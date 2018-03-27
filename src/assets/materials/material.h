@@ -40,8 +40,8 @@ class Material {
   DISABLE_MOVE(Material);
 
  public:
-  const std::string& GetName() const { return data_.name; }
-  const Shader *GetShader() const { return data_.shader; }
+  const std::string& GetName() const { return name_; }
+  const Shader *GetShader() const { return shader_; }
 
  public:
   template <typename T>
@@ -50,23 +50,18 @@ class Material {
   Status SetValues(const std::string& uniform, size_t count, const T*);
 
  public:
-  ValueMap& Uniforms = data_.uniforms;
-  ValueMap& Attributes = data_.attributes;
+  ValueMap& Uniforms = uniforms_;
+  ValueMap& Attributes = attributes_;
 
  public:
   void SetShader(Shader *);
   void UnsetShader();
 
  private:
-  class Data {
-   public:
-    std::string name;
-    Shader *shader = nullptr;
-    ValueMap attributes;
-    ValueMap uniforms;
-   public:
-    friend class Material;
-  } data_;
+  std::string name_;
+  Shader *shader_ = nullptr;
+  ValueMap attributes_;
+  ValueMap uniforms_;
 
  public:
   friend class MaterialRegistry;
@@ -74,8 +69,8 @@ class Material {
 
 template <typename T>
 Status Material::SetValue(const std::string& uniform, const T& val) {
-  auto it = data_.uniforms.find(uniform);
-  if (it == data_.uniforms.end()) {
+  auto it = Uniforms.find(uniform);
+  if (it == uniforms_.end()) {
     return Status::STATUS_ERROR;
   }
   auto&& value = it->second;
@@ -85,8 +80,8 @@ Status Material::SetValue(const std::string& uniform, const T& val) {
 
 template <typename T>
 Status Material::SetValues(const std::string& uniform, size_t count, const T* val) {
-  auto it = data_.uniforms.find(uniform);
-  if (it == data_.uniforms.end()) {
+  auto it = Uniforms.find(uniform);
+  if (it == Uniforms.end()) {
     LOG_ERROR("Could not find uniform \"%s\"", uniform.c_str());
     return Status::STATUS_ERROR;
   }

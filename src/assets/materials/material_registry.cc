@@ -46,7 +46,7 @@ const MaterialRegistry::RegistryMapType& MaterialRegistry::GetMaterials() {
 
 StatusOr<Material::UniquePtr> MaterialRegistry::InternalCreate(const std::string& name) {
   Material::UniquePtr material(new Material());   // Private Constructor
-  material->data_.name = name;
+  material->name_ = name;
   return material;
 }
 

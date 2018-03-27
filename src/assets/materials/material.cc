@@ -19,19 +19,19 @@ namespace materials {
  * SHADER INTERFACE
  **/
 void Material::SetShader(Shader *shader) {
-  assert(data_.shader == nullptr);
-  data_.shader = shader;
+  assert(shader_ == nullptr);
+  shader_ = shader;
   // Create the UniformValues
   for (auto&& it : shader->Uniforms) {
-    data_.uniforms[it.first] = UniformValue(&it.second);
+    uniforms_[it.first] = UniformValue(&it.second);
   }
   LOG_WARN("%s: Not completely implemented", __FUNCTION__);
 }
 
 void Material::UnsetShader() {
-  data_.shader = nullptr;
-  data_.uniforms.clear();
-  data_.attributes.clear();
+  shader_ = nullptr;
+  uniforms_.clear();
+  attributes_.clear();
   LOG_WARN("%s: Not completely implemented", __FUNCTION__);
 }
 
