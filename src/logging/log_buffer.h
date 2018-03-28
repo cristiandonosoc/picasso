@@ -49,8 +49,10 @@ class LogBuffer {
  public:
   static void Clear();
   static size_t Count();
+  PRINTF_FORMAT_ATTRIBUTE(5, 6)
   static void Log(int indent, LogLevel, const char *file, int line, 
                   const char *fmt, ...);
+  PRINTF_FORMAT_ATTRIBUTE(5, 6)
   static void LogStderr(int indent, LogLevel, const char *file, int line, 
                         const char *fmt, ...); 
   static void LogStatus(int indent, const Status&, const char *file, int line);

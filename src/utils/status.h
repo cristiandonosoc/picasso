@@ -43,6 +43,8 @@ class Status {
  public:
   Status(StatusEnum status, const std::string& error_msg = "") 
     : status_(status), error_msg_(error_msg) {}
+
+  PRINTF_FORMAT_ATTRIBUTE(3, 4)
   Status(StatusEnum status, const char *fmt, ...) : status_(status) {
     PROCESS_FMT_VAR_ARGS(buffer, 1024);
     error_msg_ = buffer;
@@ -54,6 +56,8 @@ class Status {
          StatusEnum status, const std::string& error_msg = "") 
     : status_(status), error_msg_(error_msg), 
       file_(file), line_(line) {}
+
+  PRINTF_FORMAT_ATTRIBUTE(5, 6)
   Status(const std::string& file, int line, 
          StatusEnum status, const char *fmt, ...)
     : status_(status), file_(file), line_(line) {
@@ -99,6 +103,7 @@ class StatusOr : public Status {
     assert(status != StatusEnum::STATUS_OK);
   }
 
+  PRINTF_FORMAT_ATTRIBUTE(3, 4)
   StatusOr(StatusEnum status, const char *fmt, ...) : Status(status) {
     assert(status != StatusEnum::STATUS_OK);
     PROCESS_FMT_VAR_ARGS(buffer, 1024);
@@ -110,6 +115,8 @@ class StatusOr : public Status {
   StatusOr(const std::string& file, int line, 
          StatusEnum status, const std::string& error_msg = "") 
     : Status(file, line, status, error_msg) {}
+
+  PRINTF_FORMAT_ATTRIBUTE(5, 6)
   StatusOr(const std::string& file, int line, 
          StatusEnum status, const char *fmt, ...)
     : Status(file, line, status) {

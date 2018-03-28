@@ -195,7 +195,6 @@ int main(int, char **) {
   picasso::ui::UiData ui_data;
   ui_data.clear_color = { 0.137f, 0.152f, 0.637f, 1.00f };
 
-
   // Main loop
   bool done = false;
   while (!done)
