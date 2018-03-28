@@ -30,7 +30,6 @@ class Registry : Singleton<Registry<ParentClass, Key, Value>> {
   DISABLE_COPY(Registry);
   DISABLE_MOVE(Registry);
 
- 
  public:
   static Registry& Instance() {
     static Registry instance;
@@ -42,6 +41,9 @@ class Registry : Singleton<Registry<ParentClass, Key, Value>> {
 
  public:
   using RegistryMapType = decltype(map_);
+  static const RegistryMapType& GetMap() {
+    return Instance().map_;
+  }
 
  public:
   friend class Singleton<Registry<ParentClass, Key, Value>>;

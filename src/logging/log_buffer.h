@@ -28,16 +28,6 @@ using ::picasso::utils::StatusOr;
 PRINTABLE_ENUM(LogLevel, LOG_FATAL, LOG_ERROR, LOG_WARN,
                          LOG_INFO, LOG_DEBUG);
 
-#if defined(__clang__) || defined(__GNUC__) || defined(__GNUG__)
-#define PRINTF_FORMAT_ATTRIBUTE(fmt_one_index, varargs_one_index) \
-  __attribute__ ((format (printf, fmt_one_index, varargs_one_index)))
-#else
-#define PRINTF_FORMAT_ATTRIBUTE(ignore1, ignore2)
-#endif
-
-/* void Log(FILE *output, LogLevel, const char *file, int line, */
-/*          int indent, const char *fmt, ...) PRINTF_FORMAT_ATTRIBUTE(6, 7); */
-
 /**
  * Singleton in charge of keeping the log entries
  */

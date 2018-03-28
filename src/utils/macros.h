@@ -13,6 +13,16 @@
 
 #include <memory>
 
+// Setup printf formatting for the formatting function
+#if defined(__clang__) || defined(__GNUC__) || defined(__GNUG__)
+#define PRINTF_FORMAT_ATTRIBUTE(fmt_one_index, varargs_one_index) \
+  __attribute__ ((format (printf, fmt_one_index, varargs_one_index)))
+#else
+#define PRINTF_FORMAT_ATTRIBUTE(ignore1, ignore2)
+#endif
+
+
+
 // Ignore warnings for Windows because they don't have a good way
 // of ignoring warnings for certain includes
 // (I mean, they did add it in 2018...)
