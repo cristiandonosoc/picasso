@@ -127,16 +127,12 @@ int main(int, char **) {
     return 1;
   }
 
-  shader->DebugPrint();
-
   // We load a texture
-  auto texture_key = TextureRegistry::Create("test_texture", 
-                                             GetExecutableDir() + "textures/container.jpg").ConsumeOrDie();
+  auto texture_key = TextureRegistry::Create("test_texture", GetExecutableDir() + "textures/container.jpg").ConsumeOrDie();
   auto texture = TextureRegistry::Get(texture_key).lock();
   LOG_DEBUG("TEXTURE READ. POINTER: %p, WIDTH: %d, HEIGHT: %d",  texture->GetData(), texture->GetWidth(), texture->GetHeight());
 
-  auto res = TextureRegistry::Create("happy",
-                                     GetExecutableDir() + "textures/awesomeface.png");
+  auto res = TextureRegistry::Create("happy", GetExecutableDir() + "textures/awesomeface.png");
   if (!res.Ok()) {
     LOGERR_FATAL("Could not load texture: %s", res.GetErrorMsg().c_str());
     return 1;
@@ -159,7 +155,7 @@ int main(int, char **) {
   LOG_INFO("Setting program to \"%s\"", shader_name.c_str());
 
   auto mapping_res = ShaderMaterialMapper::AddMapping(shader->GetName(), mat_key);
-  LOG_STATUS(mapping_res);
+  LOG_NON_OK_STATUS(mapping_res);
 
   material->SetValue<uint32_t>("tex0", texture->GetId());
   material->SetValue<uint32_t>("tex1", tex2->GetId());
@@ -191,13 +187,6 @@ int main(int, char **) {
   model.AddAttributePointer({AttributeKind::COLOR, 3, GL_FLOAT, false, stride, 3 * sizeof(float)});
   model.AddAttributePointer({AttributeKind::UV, 2, GL_FLOAT, false, stride, 6 * sizeof(float)});
 
-
-  LOG_DEBUG("Attribute pointer count: %zu", model.AttributePointers.size());
-  for (auto&& it : model.AttributePointers) {
-    LOG_SEPARATOR;
-    it.second.DebugPrint();
-  }
-
   model.SetupBuffers();
 
   // Setup style
@@ -205,9 +194,6 @@ int main(int, char **) {
 
   picasso::UiData ui_data;
   ui_data.clear_color = { 0.137f, 0.152f, 0.637f, 1.00f };
-
-  glm::vec2 vec(2.0f, 3.0f);
-  LOG_DEBUG("Printing vector -> X: %f, Y: %f", vec.x, vec.y);
 
 
   // Main loop

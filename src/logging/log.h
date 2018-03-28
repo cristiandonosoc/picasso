@@ -29,7 +29,12 @@ namespace logging {
 #define LOG_SEPARATOR ::picasso::logging::LogBuffer::Log(0, ::picasso::logging::LogLevel::LOG_DEBUG, __FILE__, __LINE__, "---------------------------------");
 
 #define LOG_STATUS(status) ::picasso::logging::LogBuffer::LogStatus(0, status, __FILE__, __LINE__);
+#define LOG_NON_OK_STATUS(status) if (!status.Ok()) { LOG_STATUS(status); }
+    
 #define LOG_STATUS_OR(status_or) ::picasso::logging::LogBuffer::LogStatusOr(0, status_or, __FILE__, __LINE__);
+#define LOG_NON_OK_STATUS_OR(status_or) if (!status_or.Ok()) { LOG STATUS_OR(status_or); }
+
+
 #define LOG_INDENT_STATUS(indent, status) ::picasso::logging::LogBuffer::LogStatus(indent, status, __FILE__, __LINE__);
 #define LOG_INDENT_STATUS_OR(indent, status_or) ::picasso::logging::LogBuffer::LogStatusOr(indent, status_or, __FILE__, __LINE__);
 
