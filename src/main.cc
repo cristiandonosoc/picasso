@@ -153,17 +153,14 @@ int main(int, char **) {
   }
 
   const MaterialRegistry::KeyType mat_key = material_res.ConsumeOrDie();
-  Material *material = MaterialRegistry::Get(mat_key);
+  Material *material = MaterialRegistry::Get(mat_key).ConsumeOrDie();
 
   LOG_INFO("Created material \"%s\"", mat_name.c_str());
   LOG_INFO("Setting program to \"%s\"", shader_name.c_str());
-  auto bind_res = material->SetShader(shader);
-  if(!bind_res.Ok()) {
-    LOGERR_FATAL("Could not bind shader \"%s\" to material \"%s\": %s",
-                 shader->GetName().c_str(), material->GetName().c_str(),
-                 bind_res.GetErrorMsg().c_str());
-    return 1;
-  }
+
+  auto mapping_res = ShaderMaterialMapper::AddMapping(shader->GetName(), mat_key);
+  LOG_STATUS(mapping_res);
+
   material->SetValue<uint32_t>("tex0", texture->GetId());
   material->SetValue<uint32_t>("tex1", tex2->GetId());
 
@@ -212,10 +209,6 @@ int main(int, char **) {
   glm::vec2 vec(2.0f, 3.0f);
   LOG_DEBUG("Printing vector -> X: %f, Y: %f", vec.x, vec.y);
 
-  Status status = ShaderMaterialMapper::AddMapping("from", "to");
-  LOG_STATUS(status);
-  status = ShaderMaterialMapper::RemoveMapping("from", "to");
-  LOG_STATUS(status);
 
   // Main loop
   bool done = false;

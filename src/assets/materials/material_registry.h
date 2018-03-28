@@ -29,7 +29,7 @@ using ::picasso::utils::Registry;
 class MaterialRegistry : public Registry<MaterialRegistry, std::string, Material::UniquePtr> {
  public:
   static StatusOr<KeyType> Create(const std::string& name);
-  static Material *Get(const KeyType& key);
+  static StatusOr<Material*> Get(const KeyType& key);
 
   // IMPORTANT: The pointers are not assured to be valid 
   //            through time, so they should be *always*

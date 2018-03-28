@@ -21,7 +21,9 @@ namespace picasso {
 namespace mappers {
 
 using ::picasso::assets::shaders::ShaderRegistry;
+using ::picasso::assets::shaders::Shader;
 using ::picasso::assets::materials::MaterialRegistry;
+using ::picasso::assets::materials::Material;
 
 class ShaderMaterialMapper : public Mapper<ShaderMaterialMapper, ShaderRegistry, MaterialRegistry> {
  public:
@@ -31,14 +33,20 @@ class ShaderMaterialMapper : public Mapper<ShaderMaterialMapper, ShaderRegistry,
   }
 
  public:
-  static Status AddCallback(const FromKeyType& from_key, const ToKeyType&) {
-    auto from_res = ShaderRegistry::Get(from_key);
-    if (!from_res.Ok()) {
-      return from_res;
+  static Status AddCallback(const FromKeyType& shader_key, const ToKeyType& material_key) {
+    auto shader_res = ShaderRegistry::Get(shader_key);
+    if (!shader_res.Ok()) { 
+      return shader_res; 
     }
 
-    LOG_DEBUG("Called AddCallback: %s", __FUNCTION__);
-    return Status::STATUS_OK;
+    auto material_res = MaterialRegistry::Get(material_key);
+    if (!material_res.Ok()) { 
+      return material_res; 
+    }
+
+    Material *material = material_res.ConsumeOrDie();
+    Shader *shader = shader_res.ConsumeOrDie();
+    return material->SetShader(shader);
   }
 
   static Status RemoveCallback(const FromKeyType&, const ToKeyType&) {

@@ -31,11 +31,12 @@ StatusOr<MaterialRegistry::KeyType> MaterialRegistry::Create(const std::string& 
   return name;
 }
 
-Material *MaterialRegistry::Get(const std::string& name) {
+StatusOr<Material*> MaterialRegistry::Get(const MaterialRegistry::KeyType& name) {
   auto& map = Instance().map_;
   auto it = map.find(name);
   if (it == map.end()) {
-    return nullptr;
+    return FILENO_STATUS(Status::STATUS_ERROR, "Cannot find key \"%s\"",
+                         name.c_str());
   }
   return it->second.get();
 }
