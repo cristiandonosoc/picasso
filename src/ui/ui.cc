@@ -1,3 +1,13 @@
+/******************************************************************************
+ * @file: ui.cc
+ * @author: Cristián Donoso C.
+ * @email: cristiandonosoc@gmail.com
+ * @date: 2018-03-27
+ * @license: 2018 Cristián Donoso C. - All Rights Reserved.
+ *
+ * @description: TODO(Cristian): Add description
+ ******************************************************************************/
+
 #include <algorithm>
 #include <cstring>
 #include <regex>
@@ -7,6 +17,7 @@
 #include "assets/materials/material_registry.h"
 #include "logging/log.h"
 #include "utils/snprintf.h"
+#include "utils/string.h"
 #include "assets/texture_registry.h"
 
 #include "platform.h"
@@ -18,6 +29,7 @@
 #undef max
 
 namespace picasso {
+namespace ui {
 
 using ::picasso::assets::shaders::ShaderRegistry;
 using ::picasso::assets::shaders::Shader;
@@ -32,50 +44,9 @@ using ::picasso::utils::picasso_snprintf;
 using ::picasso::assets::Texture;
 using ::picasso::assets::TextureRegistry;
 
+using ::picasso::utils::FormattedString;
+
 using ::picasso::Platform;
-
-#if 0
-void ImGuiExample(const ImVec4& clear_color, bool show_demo_window,
-                  bool show_another_window) {
-  // 1. Show a simple window.
-  // Tip: if we don't call ImGui::Begin()/ImGui::End() the widgets automatically appears in a window called "Debug".
-  {
-      static float f = 0.0f;
-      static int counter = 0;
-      ImGui::Text("Hello, world!");                           // Display some text (you can use a format string too)
-      ImGui::SliderFloat("float", &f, 0.0f, 1.0f);            // Edit 1 float using a slider from 0.0f to 1.0f
-      ImGui::ColorEdit3("clear color", (float*)&clear_color); // Edit 3 floats representing a color
-
-      ImGui::Checkbox("Demo Window", &show_demo_window);      // Edit bools storing our windows open/close state
-      ImGui::Checkbox("Another Window", &show_another_window);
-
-      if (ImGui::Button("Button"))                            // Buttons return true when clicked (NB: most widgets return true when edited/activated)
-          counter++;
-      ImGui::SameLine();
-      ImGui::Text("counter = %d", counter);
-
-      ImGui::Text("Application average %.3f ms/frame (%.1f FPS)", 1000.0f / ImGui::GetIO().Framerate, ImGui::GetIO().Framerate);
-  }
-
-  // 2. Show another simple window. In most cases you will use an explicit Begin/End pair to name your windows.
-  if (show_another_window)
-  {
-      ImGui::Begin("Another Window", &show_another_window);
-      ImGui::Text("Hello from another window!");
-      if (ImGui::Button("Close Me"))
-          show_another_window = false;
-      ImGui::End();
-  }
-
-  // 3. Show the ImGui demo window. Most of the sample code is in ImGui::ShowDemoWindow(). Read its code to learn more about Dear ImGui!
-  if (show_demo_window)
-  {
-      ImGui::SetNextWindowPos(ImVec2(650, 20), ImGuiCond_FirstUseEver); // Normally user code doesn't need/want to call this because positions are saved in .ini file anyway. Here we just want to make the demo initial state a bit more friendly!
-      ImGui::ShowDemoWindow(&show_demo_window);
-  }
-}
-
-#endif
 
 void SystemWindow(UiData *ui_data, ImVec2 start_pos, ImVec2 start_size) {
   ImGui::SetNextWindowPos(start_pos, ImGuiCond_Once);
@@ -201,10 +172,53 @@ void MaterialWindow(UiData *, ImVec2 start_pos, ImVec2 start_size) {
     material = it != materials.end() ? it->second.get() : nullptr;
   }
 
-  /* float height = ImGui::GetContentRegionAvail().y; */
 
   if (material) {
     ImGui::BeginChild("Material", {-1, -1});
+
+    std::string title = "Material";
+    const Shader *material_shader = material->GetShader();
+    if (material_shader) {
+      title += FormattedString(" [Shader: %s]", 
+          material_shader->GetName().c_str());
+    }
+    static bool once = false;
+
+    if (ImGui::CollapsingHeader(title.c_str())) {
+      int current_index = -1;
+      std::vector<const char*> shader_names;
+      std::vector<ShaderRegistry::KeyType> shader_keys;
+      const auto& map = ShaderRegistry::GetMap();
+      shader_names.reserve(map.size());
+      shader_keys.reserve(map.size());
+      int index = 0;
+      for (const auto& it : ShaderRegistry::GetMap()) {
+        const auto& key = it.first;
+        shader_keys.push_back(key);
+
+        const Shader *shader = it.second.get();
+        if (!once) {
+          LOG_DEBUG("MATERIAL: %p, SHADER: %p", material->GetShader(), shader);
+        }
+
+        shader_names.push_back(shader->GetName().c_str());
+        if (shader == material->GetShader()) {
+          current_index = index;
+        }
+        index++;
+      }
+
+      once = true;
+
+      int prev_index = current_index;
+      LOG_DEBUG("CURRENT INDEX: %d", current_index);
+      ImGui::ListBox("Shader", &current_index, 
+                     &shader_names[0], shader_names.size(), 4);
+      if (prev_index != current_index) {
+        LOG_INFO("Changed index!");
+      }
+    }
+
     ImGui::Text("Uniforms");
     ImGui::Separator();
 
@@ -404,6 +418,5 @@ void RunUi(UiData *ui_data) {
   LogWindow(ui_data, {600, 800}, {1200, 300});
 }
 
-
-
+}   // namespace ui
 }   // namespace picasso

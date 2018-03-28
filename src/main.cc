@@ -13,7 +13,7 @@
 
 #include "assets/texture_registry.h"
 
-#include "ui.h"
+#include "ui/ui.h"
 #include "utils/file.h"
 #include "utils/gl.h"
 #include "logging/log.h"
@@ -192,7 +192,7 @@ int main(int, char **) {
   // Setup style
   ImGui::StyleColorsDark();
 
-  picasso::UiData ui_data;
+  picasso::ui::UiData ui_data;
   ui_data.clear_color = { 0.137f, 0.152f, 0.637f, 1.00f };
 
 
@@ -220,7 +220,7 @@ int main(int, char **) {
       
 
       /* picasso::ImGuiExample(clear_color, show_demo_window, show_another_window); */
-      picasso::RunUi(&ui_data);
+      picasso::ui::RunUi(&ui_data);
       /* ImGui::ShowMetricsWindow(nullptr); */
       static bool show_demo = true;
       ImGui::ShowDemoWindow(&show_demo);
