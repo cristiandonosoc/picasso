@@ -32,14 +32,13 @@ using ::picasso::utils::Registry;
 class ShaderRegistry : public Registry<ShaderRegistry, std::string, Shader::UniquePtr> {
 
  public:
-  static StatusOr<Shader*> CreateFromFiles(const std::string& name,
-                                             const std::string& vertex_path,
-                                             const std::string& fragment_path);
-  static StatusOr<Shader*> Create(const std::string& name, 
+  static StatusOr<KeyType> CreateFromFiles(const std::string& name,
+                                           const std::string& vertex_path,
+                                           const std::string& fragment_path);
+  static StatusOr<KeyType> Create(const std::string& name, 
                                   const std::string& vs,
                                   const std::string& fs);
   static StatusOr<Shader*> Get(const std::string& name);
-
   static std::vector<Shader*> GetShaders();
 
  private:

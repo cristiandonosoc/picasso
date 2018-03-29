@@ -50,7 +50,7 @@ StatusOr<int> CompileShader(const std::string& shader_name,
 /**
  * STATIC INTERFACE
  **/
-StatusOr<Shader*> ShaderRegistry::CreateFromFiles(
+StatusOr<ShaderRegistry::KeyType> ShaderRegistry::CreateFromFiles(
     const std::string& name,
     const std::string& vertex_path,
     const std::string& fragment_path) {
@@ -60,7 +60,7 @@ StatusOr<Shader*> ShaderRegistry::CreateFromFiles(
   return Create(name, vs, fs);
 }
 
-StatusOr<Shader*> ShaderRegistry::Create(const std::string& name,
+StatusOr<ShaderRegistry::KeyType> ShaderRegistry::Create(const std::string& name,
                                            const std::string& vs,
                                            const std::string& fs) {
   auto& map = Instance().map_;
@@ -78,7 +78,8 @@ StatusOr<Shader*> ShaderRegistry::Create(const std::string& name,
   }
 
   // Add it to the registry
-  return (map[name] = res.ConsumeOrDie()).get();
+  map[name] = res.ConsumeOrDie();
+  return name;
 }
 
 StatusOr<Shader*> ShaderRegistry::Get(const std::string& name) {

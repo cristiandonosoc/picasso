@@ -114,18 +114,12 @@ int main(int, char **) {
   LOG_INFO("OpenGL Extension: %s", glGetString(GL_EXTENSIONS));
 
   // Load a shader
-	std::string vs = ::picasso::utils::ReadWholeFile(GetExecutableDir() + "/shaders/simple.vert");
-	std::string fs = ::picasso::utils::ReadWholeFile(GetExecutableDir() + "/shaders/simple.frag");
-  std::string shader_name = "test_shader";
-  auto shader_res = ShaderRegistry::Create(shader_name, vs, fs);
-  Shader *shader = nullptr;
-  if (shader_res.Ok()) {
-    shader = shader_res.ConsumeOrDie();
-    LOG_INFO("Successful shader");
-  } else {
-    LOGERR_ERROR("Error getting shader: %s\n", shader_res.GetErrorMsg().c_str());
-    return 1;
-  }
+	std::string simple_vs = ::picasso::utils::ReadWholeFile(GetExecutableDir() + "/shaders/simple.vert");
+	std::string simple_fs = ::picasso::utils::ReadWholeFile(GetExecutableDir() + "/shaders/simple.frag");
+  std::string color_fs = ::picasso::utils::ReadWholeFile(GetExecutableDir() + "/shaders/color.frag");
+
+  auto simple_shader_key = ShaderRegistry::Create("test_shader", simple_vs, simple_fs).ConsumeOrDie();
+  auto color_shader_key= ShaderRegistry::Create("color_shader", simple_vs, color_fs).ConsumeOrDie();
 
   // We load a texture
   auto texture_key = TextureRegistry::Create("test_texture", GetExecutableDir() + "textures/container.jpg").ConsumeOrDie();
@@ -151,10 +145,7 @@ int main(int, char **) {
   const MaterialRegistry::KeyType mat_key = material_res.ConsumeOrDie();
   Material *material = MaterialRegistry::Get(mat_key).ConsumeOrDie();
 
-  LOG_INFO("Created material \"%s\"", mat_name.c_str());
-  LOG_INFO("Setting program to \"%s\"", shader_name.c_str());
-
-  auto mapping_res = ShaderMaterialMapper::AddMapping(shader->GetName(), mat_key);
+  auto mapping_res = ShaderMaterialMapper::AddMapping(simple_shader_key, mat_key);
   LOG_NON_OK_STATUS(mapping_res);
 
   material->SetValue<uint32_t>("tex0", texture->GetId());
