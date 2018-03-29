@@ -49,9 +49,14 @@ class ShaderMaterialMapper : public Mapper<ShaderMaterialMapper, ShaderRegistry,
     return material->SetShader(shader);
   }
 
-  static Status RemoveCallback(const FromKeyType&, const ToKeyType&) {
-    LOG_DEBUG("Called RemoveCallback: %s", __FUNCTION__);
-    return Status::STATUS_OK;
+  static Status RemoveCallback(const FromKeyType&, const ToKeyType& material_key) {
+    auto material_res = MaterialRegistry::Get(material_key);
+    if (!material_res.Ok()) { 
+      return material_res; 
+    }
+
+    Material *material = material_res.ConsumeOrDie();
+    return material->UnsetShader();
   }
 
 

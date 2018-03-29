@@ -20,6 +20,8 @@
 #include "utils/string.h"
 #include "assets/texture_registry.h"
 
+#include "mappers/shader_material_mapper.h"
+
 #include "platform.h"
 
 #include <ctime>
@@ -43,6 +45,8 @@ using ::picasso::logging::LogBuffer;
 using ::picasso::utils::picasso_snprintf;
 using ::picasso::assets::Texture;
 using ::picasso::assets::TextureRegistry;
+
+using ::picasso::mappers::ShaderMaterialMapper;
 
 using ::picasso::utils::FormattedString;
 
@@ -182,7 +186,6 @@ void MaterialWindow(UiData *, ImVec2 start_pos, ImVec2 start_size) {
       title += FormattedString(" [Shader: %s]", 
           material_shader->GetName().c_str());
     }
-    static bool once = false;
 
     if (ImGui::CollapsingHeader(title.c_str())) {
       int current_index = -1;
@@ -197,10 +200,6 @@ void MaterialWindow(UiData *, ImVec2 start_pos, ImVec2 start_size) {
         shader_keys.push_back(key);
 
         const Shader *shader = it.second.get();
-        if (!once) {
-          LOG_DEBUG("MATERIAL: %p, SHADER: %p", material->GetShader(), shader);
-        }
-
         shader_names.push_back(shader->GetName().c_str());
         if (shader == material->GetShader()) {
           current_index = index;
@@ -208,14 +207,14 @@ void MaterialWindow(UiData *, ImVec2 start_pos, ImVec2 start_size) {
         index++;
       }
 
-      once = true;
-
       int prev_index = current_index;
-      LOG_DEBUG("CURRENT INDEX: %d", current_index);
       ImGui::ListBox("Shader", &current_index, 
                      &shader_names[0], shader_names.size(), 4);
       if (prev_index != current_index) {
-        LOG_INFO("Changed index!");
+        const auto& prev_shader_key = shader_keys[prev_index];
+        const auto& shader_key = shader_keys[current_index];
+        ShaderMaterialMapper::RemoveMapping(prev_shader_key, selected_key);
+        ShaderMaterialMapper::AddMapping(shader_key, selected_key);
       }
     }
 

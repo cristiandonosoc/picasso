@@ -46,6 +46,13 @@ class Mapper : Singleton<Mapper<DerivedMapper, FromRegistry, ToRegistry>> {
   using FromToMap = std::map<FromKeyType, std::set<ToKeyType>>;
 
  public:
+  /*************************************************************
+   * ADDING
+   *************************************************************/
+
+  /**
+   * Mappers go one way (FromKey -> ToKey). It's one to many.
+   */
   static Status AddMapping(const FromKeyType& from_key, const ToKeyType& to_key) {
     auto& map = Instance().map_;
     auto& mapped_keys = map[from_key];
@@ -71,15 +78,15 @@ class Mapper : Singleton<Mapper<DerivedMapper, FromRegistry, ToRegistry>> {
     auto& map = Instance().map_;
     auto from_it = map.find(from_key);
     if (from_it == map.end()) {
-      return { Status::STATUS_ERROR,
+      return FILENO_STATUS(Status::STATUS_WARNING, 
              "Mapper \"%s\": Cannot find key \"%s\"", 
-             DerivedMapper::TypeName().c_str(), from_key.c_str() };
+             DerivedMapper::TypeName().c_str(), from_key.c_str());
     }
 
     auto& mapped_keys = from_it->second;
     auto to_it = mapped_keys.find(to_key);
     if (to_it == mapped_keys.end()) {
-      return { Status::STATUS_ERROR, 
+      return { Status::STATUS_WARNING, 
                "Mapper \"%s\": Mapping (%s) -> (%s) doesn't exists",
                DerivedMapper::TypeName().c_str(), from_key.c_str(), to_key.c_str() };
     }
