@@ -61,13 +61,8 @@ void SystemWindow(UiData *ui_data, ImVec2 start_pos, ImVec2 start_size) {
 
   if (ImGui::Button("Open File")) {
     auto res = Platform::FileDialog("");
-    if (res.Ok()) {
-      LOG_INFO("Found file: %s", res.ConsumeOrDie().c_str());
-    } else {
-      LOG_ERROR("Could not find file");
-    }
+    LOG_NON_OK_STATUS(res);
   }
-
 
   ImGui::End();
 }
