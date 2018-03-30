@@ -207,7 +207,7 @@ int main(int, char **) {
 			}
 
       ImGui_ImplSdlGL3_NewFrame(window);
-      
+
 
       /* picasso::ImGuiExample(clear_color, show_demo_window, show_another_window); */
       picasso::ui::RunUi(&ui_data);
@@ -224,7 +224,7 @@ int main(int, char **) {
                    ui_data.clear_color.w);
       glClear(GL_COLOR_BUFFER_BIT);
 
-  
+
       /* glPolygonMode(GL_FRONT_AND_BACK, GL_LINE); */
       model.Render(material);
 

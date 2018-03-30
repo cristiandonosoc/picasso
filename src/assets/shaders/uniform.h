@@ -41,8 +41,8 @@ class Uniform {
   std::string type_name;
   int location;
   GLenum type;
-  int count;
-  int type_size;
+  size_t count;
+  size_t type_size;
   UniformWidget widget;
 };  // class Uniform
 

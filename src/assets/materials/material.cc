@@ -20,7 +20,7 @@ namespace materials {
  **/
 Status Material::SetShader(Shader *shader) {
   if (shader_ != nullptr) {
-    return { Status::STATUS_ERROR, 
+    return { Status::STATUS_ERROR,
              "Material \"%s\": already has a shader (\"%s\") associated with it",
              name_.c_str(), shader->GetName().c_str() };
   }
@@ -34,7 +34,8 @@ Status Material::SetShader(Shader *shader) {
 
 Status Material::UnsetShader() {
   if (shader_ == nullptr) {
-    LOG_WARN("Material \"%s\": de-registering from a unset material.");
+    LOG_WARN("Material \"%s\": de-registering from a unset material.",
+             name_.c_str());
   }
   shader_ = nullptr;
   uniforms_.clear();
@@ -42,6 +43,6 @@ Status Material::UnsetShader() {
   return Status::STATUS_OK;
 }
 
-}   // namespace materials 
+}   // namespace materials
 }   // namespace assets
 }   // namespace picasso

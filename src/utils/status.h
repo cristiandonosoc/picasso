@@ -30,6 +30,12 @@ namespace utils {
 #define FILENO_STATUS(status, fmt, ...) \
   { __FILE__, __LINE__, status, fmt, __VA_ARGS__ }
 
+// NOTE(Cristian): Those geniuses at X11 decided that it was a good idea
+//                 name their macros Status.... sigh
+#ifdef Status
+#undef Status
+#endif
+
 class Status {
  public:
   enum StatusEnum {
@@ -41,7 +47,7 @@ class Status {
   };  // enum StatusEnum
 
  public:
-  Status(StatusEnum status, const std::string& error_msg = "") 
+  Status(StatusEnum status, const std::string& error_msg = "")
     : status_(status), error_msg_(error_msg) {}
 
   PRINTF_FORMAT_ATTRIBUTE(3, 4)
@@ -52,13 +58,13 @@ class Status {
 
   // FILE:NUMBER INTERFACE
  public:
-  Status(const std::string& file, int line, 
-         StatusEnum status, const std::string& error_msg = "") 
-    : status_(status), error_msg_(error_msg), 
+  Status(const std::string& file, int line,
+         StatusEnum status, const std::string& error_msg = "")
+    : status_(status), error_msg_(error_msg),
       file_(file), line_(line) {}
 
   PRINTF_FORMAT_ATTRIBUTE(5, 6)
-  Status(const std::string& file, int line, 
+  Status(const std::string& file, int line,
          StatusEnum status, const char *fmt, ...)
     : status_(status), file_(file), line_(line) {
     PROCESS_FMT_VAR_ARGS(buffer, 1024);
@@ -92,13 +98,13 @@ class StatusOr : public Status {
  public:
   DISABLE_COPY(StatusOr);
   DEFAULT_MOVE(StatusOr);
-    
+
  public:
   // TODO(Cristian): Do we want a copy constructor
   StatusOr(T&& t) : Status(StatusEnum::STATUS_OK), val_(std::move(t)) {}
   StatusOr(const T& t) : Status(StatusEnum::STATUS_OK), val_(t) {}
 
-  StatusOr(StatusEnum status, const std::string& error_msg = "") 
+  StatusOr(StatusEnum status, const std::string& error_msg = "")
     : Status(status, error_msg) {
     assert(status != StatusEnum::STATUS_OK);
   }
@@ -112,12 +118,12 @@ class StatusOr : public Status {
 
   // FILE:NUMBER INTERFACE
  public:
-  StatusOr(const std::string& file, int line, 
-         StatusEnum status, const std::string& error_msg = "") 
+  StatusOr(const std::string& file, int line,
+         StatusEnum status, const std::string& error_msg = "")
     : Status(file, line, status, error_msg) {}
 
   PRINTF_FORMAT_ATTRIBUTE(5, 6)
-  StatusOr(const std::string& file, int line, 
+  StatusOr(const std::string& file, int line,
          StatusEnum status, const char *fmt, ...)
     : Status(file, line, status) {
     PROCESS_FMT_VAR_ARGS(buffer, 1024);
@@ -127,7 +133,7 @@ class StatusOr : public Status {
   // PIPING ANOTHER STATUS
  public:
   template <typename U>
-  StatusOr(const StatusOr<U>& other_status) 
+  StatusOr(const StatusOr<U>& other_status)
     : Status(other_status.GetStatus(), other_status.GetErrorMsg()) {}
 
  public:

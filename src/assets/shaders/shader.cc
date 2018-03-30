@@ -48,9 +48,9 @@ void Shader::ObtainAttributes() {
     // TODO(Cristian): Don't crash here!
     attrib.type_size = GL_TYPES_TO_STRING.GetSize(type).ConsumeOrDie();
     attrib.type_name = GL_TYPES_TO_STRING.GetName(type).ConsumeOrDie();
-    
+
     // We set the widget
-    
+
 
 
     attributes_[attrib.name] = std::move(attrib);
@@ -111,21 +111,22 @@ using ::picasso::assets::shaders::Attribute;
 using ::picasso::assets::shaders::Uniform;
 
 void DebugPrintAttribute(const Attribute& attribute, int indent) {
-  LOG_INDENT_DEBUG(indent, "ATTRIBUTE debug print for \"%s\"", attribute.name.c_str());
+  LOG_INDENT_DEBUG(indent, "ATTRIBUTE debug print for \"%s\"",
+                           attribute.name.c_str());
   LOG_INDENT_DEBUG(indent, "Location: %d", attribute.location);
   LOG_INDENT_DEBUG(indent, "Type: %s", attribute.type_name.c_str());
   LOG_INDENT_DEBUG(indent, "Type Size: %zu", attribute.type_size);
-  LOG_INDENT_DEBUG(indent, "Count: %d", attribute.count);
+  LOG_INDENT_DEBUG(indent, "Count: %zu", attribute.count);
 }
 
 void DebugPrintUniform(const Uniform& uniform, int indent) {
-  LOG_INDENT_DEBUG(indent, "UNIFORM debug print for \"%s\"", uniform.name.c_str());
+  LOG_INDENT_DEBUG(indent, "UNIFORM debug print for \"%s\"",
+                           uniform.name.c_str());
   LOG_INDENT_DEBUG(indent, "Location: %d", uniform.location);
   LOG_INDENT_DEBUG(indent, "Type: %s", uniform.type_name.c_str());
   LOG_INDENT_DEBUG(indent, "Type Size: %zu", uniform.type_size);
-  LOG_INDENT_DEBUG(indent, "Count: %d", uniform.count);
+  LOG_INDENT_DEBUG(indent, "Count: %zu", uniform.count);
 }
-
 
 }   // namespace
 
@@ -147,10 +148,10 @@ void Shader::DebugPrint(int indent) const {
     DebugPrintAttribute(it.second, indent + 4);
   }
 
-  /* LOG_INDENT_DEBUG(indent, "Found %zu attribte mappings", */ 
+  /* LOG_INDENT_DEBUG(indent, "Found %zu attribte mappings", */
   /*                     AttributeMapping.size()); */
   /* for (auto&& it : AttributeMapping) { */
-  /*   LOG_INDENT_DEBUG(indent + 4, "%s: %s", */ 
+  /*   LOG_INDENT_DEBUG(indent + 4, "%s: %s", */
   /*                       AttributeKind::ToString(it.first).c_str(), */
   /*                       it.second.c_str()); */
 

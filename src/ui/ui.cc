@@ -183,7 +183,7 @@ void MaterialWindow(UiData *, ImVec2 start_pos, ImVec2 start_size) {
     std::string title = "Material";
     const Shader *material_shader = material->GetShader();
     if (material_shader) {
-      title += FormattedString(" [Shader: %s]", 
+      title += FormattedString(" [Shader: %s]",
           material_shader->GetName().c_str());
     }
 
@@ -208,7 +208,7 @@ void MaterialWindow(UiData *, ImVec2 start_pos, ImVec2 start_size) {
       }
 
       int prev_index = current_index;
-      ImGui::ListBox("Shader", &current_index, 
+      ImGui::ListBox("Shader", &current_index,
                      &shader_names[0], shader_names.size(), 4);
       if (prev_index != current_index) {
         const auto& prev_shader_key = shader_keys[prev_index];
@@ -234,8 +234,8 @@ void MaterialWindow(UiData *, ImVec2 start_pos, ImVec2 start_size) {
       if(ImGui::TreeNode(name.c_str(), "%s", name.c_str())) {
         ImGui::BulletText("Location: %d", uniform->location);
         ImGui::BulletText("Type: %s", uniform->type_name.c_str());
-        ImGui::BulletText("Type Size: %d", uniform->type_size);
-        ImGui::BulletText("Size: %d", uniform->count);
+        ImGui::BulletText("Type Size: %zu", uniform->type_size);
+        ImGui::BulletText("Size: %zu", uniform->count);
         ImGui::TreePop();
       }
 
@@ -328,10 +328,17 @@ inline void PrintEntry(const LogBuffer::Entry& entry, int count,
   if (entry.msg.empty()) { return; }
 
   // Obtain the time
+#ifdef _WIN32
   struct tm result;
   localtime_s(&result, &entry.time);
   char buf[128];
   strftime(buf, sizeof(buf), "%H:%M:%S", &result);
+#else
+  struct tm result;
+  result = *localtime(&entry.time);
+  char buf[128];
+  strftime(buf, sizeof(buf), "%H:%M:%S", &result);
+#endif
 
   if (entry.level == LogLevel::LOG_ERROR || entry.level == LogLevel::LOG_WARN) {
     ImVec2 pos = ImGui::GetCursorScreenPos();
@@ -340,7 +347,7 @@ inline void PrintEntry(const LogBuffer::Entry& entry, int count,
     ImDrawList* draw_list = ImGui::GetWindowDrawList();
 
     ImVec4& color = entry.level == LogLevel::LOG_ERROR ? error_color : warn_color;
-    draw_list->AddRectFilled(pos, {pos.x + width, pos.y + height}, 
+    draw_list->AddRectFilled(pos, {pos.x + width, pos.y + height},
                              ImGui::ColorConvertFloat4ToU32(color));
   }
 
@@ -357,7 +364,7 @@ void LogWindow(UiData *, ImVec2 start_pos, ImVec2 start_size) {
   ImGui::SetNextWindowPos(start_pos, ImGuiCond_Once);
   ImGui::SetNextWindowSize(start_size, ImGuiCond_Once);
   ImGui::Begin("Log", &open, ImGuiWindowFlags_MenuBar);
-  
+
   static bool docked = true;
   if (ImGui::BeginMenuBar()) {
 

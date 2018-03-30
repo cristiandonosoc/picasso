@@ -23,6 +23,7 @@ set(BOOST_DIR ${CMAKE_SOURCE_DIR}/boost)
 set(GLM_DIR ${CMAKE_SOURCE_DIR}/glm)
 
 set(WINDOWS_PLATFORM_DIR ${CMAKE_SOURCE_DIR}/platforms/win32)
+set(LINUX_PLATFORM_DIR ${CMAKE_SOURCE_DIR}/platforms/linux)
 
 #####################################################
 # SOURCE GLOBBING
@@ -40,12 +41,12 @@ file(GLOB_RECURSE EXTERNAL_SRCS ${EXTERNAL_DIR}/*.cpp
 
 file(GLOB_RECURSE WINDOWS_SRCS ${WINDOWS_PLATFORM_DIR}/*.cc
                                ${WINDOWS_PLATFORM_DIR}/*.h)
+file(GLOB_RECURSE LINUX_SRCS ${LINUX_PLATFORM_DIR}/*.cc
+                             ${LINUX_PLATFORM_DIR}/*.h)
 
 file(GLOB IMGUI_SRCS ${IMGUI_DIR}/*.cpp
                      ${IMGUI_DIR}/*.h
 )
-
-
 
 set(SOURCES ${INTERNAL_SRCS} ${EXTERNAL_SRCS} ${IMGUI_SRCS})
 
@@ -62,7 +63,8 @@ file(GLOB_RECURSE NO_WARN_AS_ERROR ${EXTERNAL_DIR}/*
 # INCLUDES
 #####################################################
 
-include_directories(${CMAKE_SOURCE_DIR})
+# For includes like <external/bla.h> or <glm/glm.h>
+include_directories(SYSTEM ${CMAKE_SOURCE_DIR})
 include_directories(${SOURCE_DIR})
 include_directories(SYSTEM ${INCLUDE_DIR}
                            ${IMGUI_DIR}
@@ -81,6 +83,7 @@ if (UNIX)
   set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} ${LINUX_CXX_FLAGS}")
   # Adding linux linker flags
   set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -ldl")
+  add_library(platform STATIC ${LINUX_SRCS})
 else()
   message(STATUS "Setting MSVC flags")
   set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} /W4 /WX /EHsc")
