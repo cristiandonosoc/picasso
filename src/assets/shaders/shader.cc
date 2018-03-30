@@ -48,6 +48,11 @@ void Shader::ObtainAttributes() {
     // TODO(Cristian): Don't crash here!
     attrib.type_size = GL_TYPES_TO_STRING.GetSize(type).ConsumeOrDie();
     attrib.type_name = GL_TYPES_TO_STRING.GetName(type).ConsumeOrDie();
+    
+    // We set the widget
+    
+
+
     attributes_[attrib.name] = std::move(attrib);
   }
 }

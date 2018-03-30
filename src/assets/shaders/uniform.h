@@ -11,12 +11,29 @@
 #ifndef SRC_ASSETS_SHADERS_UNIFORM_H
 #define SRC_ASSETS_SHADERS_UNIFORM_H
 
+#include <map>
 #include <string>
 #include <GL/gl3w.h>
+
+#include "utils/printable_enum.h"
 
 namespace picasso {
 namespace assets {
 namespace shaders {
+
+PRINTABLE_ENUM(UniformWidget,
+    COLOR,
+    FLOAT,
+    FLOAT_VEC2,
+    FLOAT_VEC3,
+    FLOAT_VEC4,
+    MAT3,
+    MAT4,
+    TEXTURE_2D
+    );
+
+
+extern std::map<GLenum, UniformWidget> UNIFORM_WIDGET_MAPPING;
 
 class Uniform {
  public:
@@ -26,6 +43,7 @@ class Uniform {
   GLenum type;
   int count;
   int type_size;
+  UniformWidget widget;
 };  // class Uniform
 
 }   // namespace shaders
