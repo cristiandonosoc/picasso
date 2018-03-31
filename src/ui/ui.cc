@@ -94,45 +94,53 @@ void ShaderWindow(UiData *, ImVec2 start_pos, ImVec2 start_size) {
   Shader *shader = nullptr;
   if (selected_shader >= 0) {
     shader = shaders[selected_shader];
+  } else {
+    ImGui::End();
+    return;
   }
 
   float text_height = (ImGui::GetContentRegionAvail().y - 2 * ImGui::GetFontSize()) / 2;
-  /* ImGui::BeginGroup(); */
-    /* ImGui::BeginChild("Vertex Shader", {-1, -window_height / 2}); */
-    ImGui::BeginChild("Vertex Shader", {-1, -1});
-      ImGui::Text("Vertex Shader");
-      ImGui::Separator();
-      {
 
-        char buf[4096] = "No source available";
-        size_t len = 0;
 
-        if (shader) {
-          const std::string& vertex_src = shader->GetVertexSource();
-          len = std::min(vertex_src.size(), sizeof(buf));
-          memcpy(buf, vertex_src.c_str(), len);
-        }
+  ImGui::BeginChild("Vertex Shader", {-1, -1});
+    ImGui::Text("Uniforms");
+    for (auto& it : shader->Uniforms) {
+      Uniform& uniform = it.second;
+      ImGui::BulletText("%s", uniform.name.c_str());
+    }
+    ImGui::Separator();
 
-        ImGui::InputTextMultiline("##vs", buf, len, {-1, text_height},
-                                  ImGuiInputTextFlags_AllowTabInput);
+    ImGui::Text("Vertex Shader");
+    {
+
+      char buf[4096] = "No source available";
+      size_t len = 0;
+
+      if (shader) {
+        const std::string& vertex_src = shader->GetVertexSource();
+        len = std::min(vertex_src.size(), sizeof(buf));
+        memcpy(buf, vertex_src.c_str(), len);
       }
-      {
-        char buf[4096] = "No source available";
-        size_t len = 0;
 
-        if (shader) {
-          const std::string& fragment_src = shader->GetFragmentSource();
-          len = std::min(fragment_src.size(), sizeof(buf));
-          memcpy(buf, fragment_src.c_str(), len);
-        }
-
-        ImGui::Text("Fragment Shader");
-        ImGui::Separator();
-        ImGui::InputTextMultiline("##fs", buf, len, {-1, -1},
+      ImGui::InputTextMultiline("##vs", buf, len, {-1, text_height},
                                 ImGuiInputTextFlags_AllowTabInput);
+    }
+    {
+      ImGui::Separator();
+      char buf[4096] = "No source available";
+      size_t len = 0;
+
+      if (shader) {
+        const std::string& fragment_src = shader->GetFragmentSource();
+        len = std::min(fragment_src.size(), sizeof(buf));
+        memcpy(buf, fragment_src.c_str(), len);
       }
-    ImGui::EndChild();
-  /* ImGui::EndGroup(); */
+
+      ImGui::Text("Fragment Shader");
+      ImGui::InputTextMultiline("##fs", buf, len, {-1, -1},
+                              ImGuiInputTextFlags_AllowTabInput);
+    }
+  ImGui::EndChild();
 
   ImGui::End();
 

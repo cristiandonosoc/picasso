@@ -14,11 +14,14 @@ namespace picasso {
 namespace assets {
 namespace shaders {
 
-std::map<GLenum, UniformWidget> UNIFORM_WIDGET_MAPPING = {
+const std::map<GLenum, UniformWidget>& UNIFORM_WIDGET_MAPPING = {
   { GL_FLOAT,         UniformWidget::FLOAT  },
   { GL_FLOAT_VEC2,    UniformWidget::FLOAT_VEC2   },
   { GL_FLOAT_VEC3,    UniformWidget::FLOAT_VEC3   },
   { GL_FLOAT_VEC4,    UniformWidget::FLOAT_VEC4   },
+  { GL_FLOAT_MAT2,    UniformWidget::FLOAT_MAT2   },
+  { GL_FLOAT_MAT3,    UniformWidget::FLOAT_MAT3   },
+  { GL_FLOAT_MAT4,    UniformWidget::FLOAT_MAT4   },
   { GL_SAMPLER_2D,    UniformWidget::TEXTURE_2D   },
 };
 

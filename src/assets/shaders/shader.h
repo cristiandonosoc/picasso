@@ -75,19 +75,10 @@ class Shader {
   // ATTRIBUTES
  public:
   const AttributeMap& Attributes = attributes_;
-  /* const AttributeMap& AttributeMapping = attribute_map_; */
-  /* using ConstAttribIt = VariableMap::const_iterator; */
-  /* const VariableMap& GetAttributes() const { return attributes_; } */
-  /* ConstAttribIt AttribBegin() const { return attributes_.cbegin(); } */
-  /* ConstAttribIt AttribEnd() const { return attributes_.cend(); } */
 
   // UNIFORMS
  public:
-  const UniformMap& Uniforms = uniforms_;
-  /* using ConstUniformIt = VariableMap::const_iterator; */
-  /* const VariableMap& GetUniforms() const { return uniforms_; } */
-  /* ConstUniformIt UniformBegin() const { return uniforms_.cbegin(); } */
-  /* ConstUniformIt UniformEnd() const { return uniforms_.cend(); } */
+  UniformMap& Uniforms = uniforms_;
 
  private:
   // Cleans up handles

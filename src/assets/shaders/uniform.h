@@ -22,18 +22,15 @@ namespace assets {
 namespace shaders {
 
 PRINTABLE_ENUM(UniformWidget,
+    NONE,
     COLOR,
     FLOAT,
-    FLOAT_VEC2,
-    FLOAT_VEC3,
-    FLOAT_VEC4,
-    MAT3,
-    MAT4,
-    TEXTURE_2D
-    );
+    FLOAT_VEC2, FLOAT_VEC3, FLOAT_VEC4,
+    FLOAT_MAT2, FLOAT_MAT3, FLOAT_MAT4,
+    TEXTURE_2D);
 
 
-extern std::map<GLenum, UniformWidget> UNIFORM_WIDGET_MAPPING;
+extern const std::map<GLenum, UniformWidget>& UNIFORM_WIDGET_MAPPING;
 
 class Uniform {
  public:
@@ -43,7 +40,7 @@ class Uniform {
   GLenum type;
   size_t count;
   size_t type_size;
-  UniformWidget widget;
+  UniformWidget widget = UniformWidget::NONE;
 };  // class Uniform
 
 }   // namespace shaders

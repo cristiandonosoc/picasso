@@ -49,10 +49,6 @@ void Shader::ObtainAttributes() {
     attrib.type_size = GL_TYPES_TO_STRING.GetSize(type).ConsumeOrDie();
     attrib.type_name = GL_TYPES_TO_STRING.GetName(type).ConsumeOrDie();
 
-    // We set the widget
-
-
-
     attributes_[attrib.name] = std::move(attrib);
   }
 }
@@ -84,6 +80,13 @@ void Shader::ObtainUniforms() {
     // TODO(Cristian): Don't crash here!
     uniform.type_size = GL_TYPES_TO_STRING.GetSize(type).ConsumeOrDie();
     uniform.type_name = GL_TYPES_TO_STRING.GetName(type).ConsumeOrDie();
+
+    // We set the widget
+    auto widget_it = UNIFORM_WIDGET_MAPPING.find(uniform.type);
+    if (widget_it != UNIFORM_WIDGET_MAPPING.end()) {
+      uniform.widget = widget_it->second;
+    }
+
     uniforms_[uniform.name] = std::move(uniform);
   }
 }
