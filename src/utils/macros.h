@@ -13,6 +13,11 @@
 
 #include <memory>
 
+// Useful for combining names with __LINE__, for automatic variable name
+// creation
+#define _COMBINE(x, y) x##y
+#define COMBINE(x, y) _COMBINE(x, y)
+
 // Setup printf formatting for the formatting function
 #if defined(__clang__) || defined(__GNUC__) || defined(__GNUG__)
 #define PRINTF_FORMAT_ATTRIBUTE(fmt_one_index, varargs_one_index) \

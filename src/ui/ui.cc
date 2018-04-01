@@ -74,14 +74,14 @@ void ShaderWindow(UiData *, ImVec2 start_pos, ImVec2 start_size) {
   ImGui::SetNextWindowPos(start_pos, ImGuiCond_Once);
   ImGui::SetNextWindowSize(start_size, ImGuiCond_Once);
   static bool open = true;
-  ImGui::Begin("Shaders", &open);
+  SCOPED_TRIGGER(ImGui::Begin("Shaders", &open), ImGui::End());
 
   static int selected_shader = -1;
   auto&& shaders = ShaderRegistry::GetShaders();
 
   {
-    auto trigger = CreateScopeTrigger([]() { ImGui::BeginChild("Left Pane", {150, 0}, true); },
-                                      []() { ImGui::EndChild(); });
+    SCOPED_TRIGGER(ImGui::BeginChild("Left Pane", {150, 0}, true),
+                   ImGui::EndChild());
     int i = 0;
     for (auto&& it = shaders.begin();
          it != shaders.end();
@@ -101,82 +101,79 @@ void ShaderWindow(UiData *, ImVec2 start_pos, ImVec2 start_size) {
   if (selected_shader >= 0) {
     shader = shaders[selected_shader];
   } else {
-    ImGui::End();
     return;
   }
 
   float text_height = (ImGui::GetContentRegionAvail().y - 2 * ImGui::GetFontSize()) / 2;
 
+  SCOPED_TRIGGER(ImGui::BeginChild("Vertex Shader", {-1, -1}), ImGui::EndChild());
 
-  ImGui::BeginChild("Vertex Shader", {-1, -1});
-    ImGui::Text("Uniforms");
-    for (auto& it : shader->Uniforms) {
-      Uniform& uniform = it.second;
-      ImGui::BulletText("%s", uniform.name.c_str());
-    }
-    ImGui::Separator();
+  ImGui::Text("Uniforms");
+  for (auto& it : shader->Uniforms) {
+    Uniform& uniform = it.second;
+    ImGui::BulletText("%s", uniform.name.c_str());
+  }
+  ImGui::Separator();
 
-    ImGui::Text("Vertex Shader");
-    {
+  // VERTEX
+  ImGui::Text("Vertex Shader");
+  char vertex_buf[4096] = "No source available";
+  size_t len = 0;
+  if (shader) {
+    const std::string& vertex_src = shader->GetVertexSource();
+    len = std::min(vertex_src.size(), sizeof(vertex_buf));
+    memcpy(vertex_buf, vertex_src.c_str(), len);
+  }
+  ImGui::InputTextMultiline("##vs", vertex_buf, len, {-1, text_height},
+                            ImGuiInputTextFlags_AllowTabInput);
 
-      char buf[4096] = "No source available";
-      size_t len = 0;
+  ImGui::Separator();
 
-      if (shader) {
-        const std::string& vertex_src = shader->GetVertexSource();
-        len = std::min(vertex_src.size(), sizeof(buf));
-        memcpy(buf, vertex_src.c_str(), len);
-      }
+  // FRAGMENT
+  
+  char frag_buf[4096] = "No source available";
+  len = 0;
 
-      ImGui::InputTextMultiline("##vs", buf, len, {-1, text_height},
-                                ImGuiInputTextFlags_AllowTabInput);
-    }
-    {
-      ImGui::Separator();
-      char buf[4096] = "No source available";
-      size_t len = 0;
+  if (shader) {
+    const std::string& fragment_src = shader->GetFragmentSource();
+    len = std::min(fragment_src.size(), sizeof(frag_buf));
+    memcpy(frag_buf, fragment_src.c_str(), len);
+  }
 
-      if (shader) {
-        const std::string& fragment_src = shader->GetFragmentSource();
-        len = std::min(fragment_src.size(), sizeof(buf));
-        memcpy(buf, fragment_src.c_str(), len);
-      }
-
-      ImGui::Text("Fragment Shader");
-      ImGui::InputTextMultiline("##fs", buf, len, {-1, -1},
-                              ImGuiInputTextFlags_AllowTabInput);
-    }
-  ImGui::EndChild();
-
-  ImGui::End();
-
+  ImGui::Text("Fragment Shader");
+  ImGui::InputTextMultiline("##fs", frag_buf, len, {-1, -1},
+                          ImGuiInputTextFlags_AllowTabInput);
 }
 
 void MaterialWindow(UiData *, ImVec2 start_pos, ImVec2 start_size) {
   ImGui::SetNextWindowPos(start_pos, ImGuiCond_Once);
   ImGui::SetNextWindowSize(start_size, ImGuiCond_Once);
   static bool open = true;
-  ImGui::Begin("Materials", &open);
 
-  ImGui::BeginChild("Left Pane", {150, 0}, true);
+  SCOPED_TRIGGER(ImGui::Begin("Materials", &open), ImGui::End());
+
   auto&& materials = MaterialRegistry::GetMaterials();
   static int selected_material = -1;
   static MaterialRegistry::KeyType selected_key;
-  int i = 0;
-  for (auto&& it = materials.begin();
-       it != materials.end();
-       it++, i++) {
-    MaterialRegistry::KeyType key = it->first;
-    /* Material* material = it->second; */
-    char label[128];
-    picasso_snprintf(label, sizeof(label), "%s", key.c_str());
-    if (ImGui::Selectable(label, selected_material == i)) {
-      selected_material = i;
-      selected_key = key;
+
+  {
+    SCOPED_TRIGGER(ImGui::BeginChild("Left Pane", {150, 0}, true),
+                   ImGui::EndChild());
+    int i = 0;
+    for (auto&& it = materials.begin();
+         it != materials.end();
+         it++, i++) {
+      MaterialRegistry::KeyType key = it->first;
+      /* Material* material = it->second; */
+      char label[128];
+      picasso_snprintf(label, sizeof(label), "%s", key.c_str());
+      if (ImGui::Selectable(label, selected_material == i)) {
+        selected_material = i;
+        selected_key = key;
+      }
     }
   }
 
-  ImGui::EndChild();
   ImGui::SameLine();
 
   Material *material= nullptr;
@@ -187,7 +184,8 @@ void MaterialWindow(UiData *, ImVec2 start_pos, ImVec2 start_size) {
 
 
   if (material) {
-    ImGui::BeginChild("Material", {-1, -1});
+    SCOPED_TRIGGER(ImGui::BeginChild("Material", {-1, -1}),
+                   ImGui::EndChild());
 
     std::string title = "Material";
     const Shader *material_shader = material->GetShader();
@@ -266,39 +264,37 @@ void MaterialWindow(UiData *, ImVec2 start_pos, ImVec2 start_size) {
       mat_count++;
       ImGui::Separator();
     }
-
-    ImGui::EndChild();
   }
-
-
-  ImGui::End();
 }
 
 void TextureWindow(UiData*, ImVec2 start_pos, ImVec2 start_size) {
   ImGui::SetNextWindowPos(start_pos, ImGuiCond_Once);
   ImGui::SetNextWindowSize(start_size, ImGuiCond_Once);
   static bool open = true;
-  ImGui::Begin("Textures", &open);
+  SCOPED_TRIGGER(ImGui::Begin("Textures", &open), ImGui::End());
 
-  ImGui::BeginChild("Left Pane", {150, 0}, true);
   auto&& texture_map = TextureRegistry::GetTextureMap();
   static int selected_index = -1;
   static MaterialRegistry::KeyType selected_key;
-  int i = 0;
-  for (auto&& it = texture_map.begin();
-       it != texture_map.end();
-       it++, i++) {
-    auto&& key = it->first;
-    /* Material* material = it->second; */
-    char label[128];
-    picasso_snprintf(label, sizeof(label), "%s", key.c_str());
-    if (ImGui::Selectable(label, selected_index == i)) {
-      selected_index = i;
-      selected_key = key;
+
+  {
+    SCOPED_TRIGGER(ImGui::BeginChild("Left Pane", {150, 0}, true),
+                   ImGui::EndChild());
+    int i = 0;
+    for (auto&& it = texture_map.begin();
+         it != texture_map.end();
+         it++, i++) {
+      auto&& key = it->first;
+      /* Material* material = it->second; */
+      char label[128];
+      picasso_snprintf(label, sizeof(label), "%s", key.c_str());
+      if (ImGui::Selectable(label, selected_index == i)) {
+        selected_index = i;
+        selected_key = key;
+      }
     }
   }
 
-  ImGui::EndChild();
   ImGui::SameLine();
 
   Texture::SharedPtr texture = nullptr;
@@ -310,7 +306,8 @@ void TextureWindow(UiData*, ImVec2 start_pos, ImVec2 start_size) {
   /* float height = ImGui::GetContentRegionAvail().y; */
 
   if (texture) {
-    ImGui::BeginChild("Texture", {-1, -1});
+    SCOPED_TRIGGER(ImGui::BeginChild("Texture", {-1, -1}),
+                   ImGui::EndChild());
 
     ImGui::PushTextWrapPos(ImGui::GetCursorPosX() + ImGui::GetContentRegionAvailWidth());
     ImGui::BulletText("Name: %s", texture->GetName().c_str());
@@ -323,12 +320,7 @@ void TextureWindow(UiData*, ImVec2 start_pos, ImVec2 start_size) {
     ImGui::PopTextWrapPos();
     ImGui::Separator();
     ImGui::Image((void*)(size_t)texture->GetId(), {200, 200});
-
-
-    ImGui::EndChild();
-
   }
-  ImGui::End();
 }
 
 inline void PrintEntry(const LogBuffer::Entry& entry, int count,

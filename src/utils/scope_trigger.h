@@ -18,10 +18,8 @@ namespace utils {
 
 
 // We need combine because we need __LINE__ evaluated
-#define _COMBINE1(x, y) x##y
-#define _COMBINE(x, y) _COMBINE1(x, y)
 #define SCOPED_TRIGGER(begin_trigger, end_trigger)           \
-  auto _COMBINE(trigger, __LINE__) = ::picasso::utils::CreateScopeTrigger(        \
+  auto COMBINE(trigger, __LINE__) = ::picasso::utils::CreateScopeTrigger(        \
       [&]() { (begin_trigger); },                              \
       [&]() { (end_trigger); }                                 \
   );
