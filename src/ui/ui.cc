@@ -24,6 +24,8 @@
 
 #include "platform.h"
 
+#include "utils/scope_trigger.h"
+
 #include <ctime>
 #include <iomanip>
 
@@ -52,19 +54,20 @@ using ::picasso::utils::FormattedString;
 
 using ::picasso::Platform;
 
+using ::picasso::utils::CreateScopeTrigger;
+
 void SystemWindow(UiData *ui_data, ImVec2 start_pos, ImVec2 start_size) {
   ImGui::SetNextWindowPos(start_pos, ImGuiCond_Once);
   ImGui::SetNextWindowSize(start_size, ImGuiCond_Once);
   static bool open = true;
-  ImGui::Begin("System", &open);
-  ImGui::ColorEdit3("Clear Color", (float*)&ui_data->clear_color);
 
+  SCOPED_TRIGGER(ImGui::Begin("System", &open), ImGui::End());
+
+  ImGui::ColorEdit3("Clear Color", (float*)&ui_data->clear_color);
   if (ImGui::Button("Open File")) {
     auto res = Platform::FileDialog("");
     LOG_NON_OK_STATUS(res);
   }
-
-  ImGui::End();
 }
 
 void ShaderWindow(UiData *, ImVec2 start_pos, ImVec2 start_size) {
@@ -73,22 +76,25 @@ void ShaderWindow(UiData *, ImVec2 start_pos, ImVec2 start_size) {
   static bool open = true;
   ImGui::Begin("Shaders", &open);
 
-  ImGui::BeginChild("Left Pane", {150, 0}, true);
-  auto&& shaders = ShaderRegistry::GetShaders();
   static int selected_shader = -1;
-  int i = 0;
-  for (auto&& it = shaders.begin();
-       it != shaders.end();
-       it++, i++) {
-    auto&& shader = *it;
-    char label[128];
-    picasso_snprintf(label, sizeof(label), "Shader: %s", shader->GetName().c_str());
-    if (ImGui::Selectable(label, selected_shader == i)) {
-      selected_shader = i;
+  auto&& shaders = ShaderRegistry::GetShaders();
+
+  {
+    auto trigger = CreateScopeTrigger([]() { ImGui::BeginChild("Left Pane", {150, 0}, true); },
+                                      []() { ImGui::EndChild(); });
+    int i = 0;
+    for (auto&& it = shaders.begin();
+         it != shaders.end();
+         it++, i++) {
+      auto&& shader = *it;
+      char label[128];
+      picasso_snprintf(label, sizeof(label), "Shader: %s", shader->GetName().c_str());
+      if (ImGui::Selectable(label, selected_shader == i)) {
+        selected_shader = i;
+      }
     }
   }
 
-  ImGui::EndChild();
   ImGui::SameLine();
 
   Shader *shader = nullptr;

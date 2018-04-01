@@ -27,6 +27,8 @@
 #include "Windows.h"
 #endif
 
+#include "utils/scope_trigger.h"
+
 using ::picasso::assets::Mesh;
 using ::picasso::assets::TextureRegistry;
 
@@ -44,7 +46,12 @@ using ::picasso::utils::paths::GetExecutableDir;
 
 using ::picasso::mappers::ShaderMaterialMapper;
 
+using ::picasso::utils::ScopeTrigger;
+
 using namespace ::picasso::utils;
+
+
+
 
 #include <external/stb_image.h>
 
