@@ -35,7 +35,7 @@ class AttributePointer {
                    GLsizei stride, GLsizei offset) 
     : kind_(kind), size_(size), type_(type), normalize_(normalize), 
       stride_(stride), offset_(offset) {
-    type_size_ = GL_TYPES_TO_STRING.GetSize(type).ConsumeOrDie();
+    type_size_ = (GLsizei)GL_TYPES_TO_STRING.GetSize(type).ConsumeOrDie();
   }
 
  public:

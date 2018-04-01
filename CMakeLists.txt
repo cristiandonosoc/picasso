@@ -1,5 +1,6 @@
-cmake_minimum_required(VERSION 3.0)
+cmake_minimum_required(VERSION 3.1)
 project(picasso)
+set(CMAKE_CXX_STANDARD 11)
 
 #####################################################
 # SDL2 LOADING
@@ -79,14 +80,17 @@ include_directories(SYSTEM ${INCLUDE_DIR}
 if (UNIX)
   message(STATUS "Setting linux C++ flags")
   # Linux CXX flags
-  set(LINUX_CXX_FLAGS "-Wall -Wextra -Werror -std=c++11")
+  set(LINUX_CXX_FLAGS "-Wall -Wextra -Werror")
   set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} ${LINUX_CXX_FLAGS}")
   # Adding linux linker flags
   set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -ldl")
   add_library(platform STATIC ${LINUX_SRCS})
 else()
   message(STATUS "Setting MSVC flags")
-  set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} /W4 /WX /EHsc")
+  # Ignoring the following warnings
+  # warning C4267: 'argument': conversion from 'size_t' to 'int', possible loss of data
+  set(IGNORES "/wd4267")
+  set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} ${IGNORES} /MP /WX /EHsc")
   add_library(platform STATIC ${WINDOWS_SRCS})
 endif()
 

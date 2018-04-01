@@ -36,7 +36,7 @@ bool UniformValue::SendValue(int *texture_unit_count) const {
 
   GLenum type = uniform_->type;
   GLint location = uniform_->location;
-  GLsizei count = uniform_->count;
+  size_t count = uniform_->count;
 
   if (count == 1) {
     switch (type) {
