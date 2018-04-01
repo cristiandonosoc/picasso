@@ -26,6 +26,8 @@
 
 #include "utils/scope_trigger.h"
 
+#include "ui/widgets.h"
+
 #include <ctime>
 #include <iomanip>
 
@@ -55,6 +57,8 @@ using ::picasso::utils::FormattedString;
 using ::picasso::Platform;
 
 using ::picasso::utils::CreateScopeTrigger;
+
+using ::picasso::ui::widgets::GetPopupIndex;
 
 void SystemWindow(UiData *ui_data, ImVec2 start_pos, ImVec2 start_size) {
   ImGui::SetNextWindowPos(start_pos, ImGuiCond_Once);
@@ -130,7 +134,7 @@ void ShaderWindow(UiData *, ImVec2 start_pos, ImVec2 start_size) {
   ImGui::Separator();
 
   // FRAGMENT
-  
+
   char frag_buf[4096] = "No source available";
   len = 0;
 
@@ -213,28 +217,9 @@ void MaterialWindow(UiData *, ImVec2 start_pos, ImVec2 start_size) {
         index++;
       }
 
-      /* int prev_index = current_index; */
-      /* ImGui::ListBox("Shader", &current_index, */
-      /*                &shader_names[0], shader_names.size(), 4); */
+      current_index = GetPopupIndex("shaders", current_index, shader_names);
+
       int prev_index = current_index;
-      if (ImGui::Button(current_index == -1 ? "<NONE>" : shader_names[current_index])) {
-        ImGui::OpenPopup("ShaderSelect");
-      }
-      if (ImGui::BeginPopup("ShaderSelect")) {
-
-        if (ImGui::Selectable("<NONE>")) {
-          current_index = -1;
-        }
-        for (size_t i = 0; i < shader_names.size(); i++) {
-          if (ImGui::Selectable(shader_names[i])) {
-            current_index = i;
-          }
-        }
-
-        ImGui::EndPopup();
-      }
-
-
       if (prev_index != current_index) {
         if (prev_index >= 0) {
           const auto& prev_shader_key = shader_keys[prev_index];

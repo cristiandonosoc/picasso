@@ -20,8 +20,8 @@
 #include "utils/dynamic_array.h"
 #include "models/transform.h"
 
-using ::picasso::models::Transform;
 using ::picasso::models::AttributeKind;
+using ::picasso::models::Transform;
 using ::picasso::models::AttributePointer;
 
 namespace picasso {
