@@ -194,7 +194,6 @@ void MaterialWindow(UiData *, ImVec2 start_pos, ImVec2 start_size) {
           material_shader->GetName().c_str());
     }
 
-    if (ImGui::CollapsingHeader(title.c_str())) {
       int current_index = -1;
       std::vector<const char*> shader_names;
       std::vector<ShaderRegistry::KeyType> shader_keys;
@@ -214,16 +213,38 @@ void MaterialWindow(UiData *, ImVec2 start_pos, ImVec2 start_size) {
         index++;
       }
 
+      /* int prev_index = current_index; */
+      /* ImGui::ListBox("Shader", &current_index, */
+      /*                &shader_names[0], shader_names.size(), 4); */
       int prev_index = current_index;
-      ImGui::ListBox("Shader", &current_index,
-                     &shader_names[0], shader_names.size(), 4);
-      if (prev_index != current_index) {
-        const auto& prev_shader_key = shader_keys[prev_index];
-        const auto& shader_key = shader_keys[current_index];
-        ShaderMaterialMapper::RemoveMapping(prev_shader_key, selected_key);
-        ShaderMaterialMapper::AddMapping(shader_key, selected_key);
+      if (ImGui::Button(current_index == -1 ? "<NONE>" : shader_names[current_index])) {
+        ImGui::OpenPopup("ShaderSelect");
       }
-    }
+      if (ImGui::BeginPopup("ShaderSelect")) {
+
+        if (ImGui::Selectable("<NONE>")) {
+          current_index = -1;
+        }
+        for (size_t i = 0; i < shader_names.size(); i++) {
+          if (ImGui::Selectable(shader_names[i])) {
+            current_index = i;
+          }
+        }
+
+        ImGui::EndPopup();
+      }
+
+
+      if (prev_index != current_index) {
+        if (prev_index >= 0) {
+          const auto& prev_shader_key = shader_keys[prev_index];
+          ShaderMaterialMapper::RemoveMapping(prev_shader_key, selected_key);
+        }
+        if (current_index >= 0) {
+          const auto& shader_key = shader_keys[current_index];
+          ShaderMaterialMapper::AddMapping(shader_key, selected_key);
+        }
+      }
 
     ImGui::Text("Uniforms");
     ImGui::Separator();
