@@ -51,6 +51,10 @@ class Material {
   Status SetValues(const std::string& uniform, size_t count, const T*);
 
  public:
+  template<typename T>
+  Status SetMetadata(const std::string& unfiform, const std::string& metadata);
+
+ public:
   ValueMap& Uniforms = uniforms_;
   ValueMap& Attributes = attributes_;
 
@@ -72,7 +76,9 @@ template <typename T>
 Status Material::SetValue(const std::string& uniform, const T& val) {
   auto it = Uniforms.find(uniform);
   if (it == uniforms_.end()) {
-    return Status::STATUS_ERROR;
+    return FILENO_STATUS(Status::STATUS_ERROR, 
+                         "Could not find uniform \"%s\"",
+                         uniform.c_str());
   }
   auto&& value = it->second;
   value.SetValue<T>(val);
@@ -83,11 +89,25 @@ template <typename T>
 Status Material::SetValues(const std::string& uniform, size_t count, const T* val) {
   auto it = Uniforms.find(uniform);
   if (it == Uniforms.end()) {
-    LOG_ERROR("Could not find uniform \"%s\"", uniform.c_str());
-    return Status::STATUS_ERROR;
+    return FILENO_STATUS(Status::STATUS_ERROR, 
+                         "Could not find uniform \"%s\"",
+                         uniform.c_str());
   }
   auto&& value = it->second;
   value.SetValues<T>(count, val);
+  return Status::STATUS_OK;
+}
+
+template <typename T>
+Status Material::SetMetadata(const std::string& uniform, const std::string& metadata) {
+  auto it = Uniforms.find(uniform);
+  if (it == Uniforms.end()) {
+    return FILENO_STATUS(Status::STATUS_ERROR, 
+                         "Could not find uniform \"%s\"",
+                         uniform.c_str());
+  }
+  auto&& value = it->second;
+  value.metadata = metadata;
   return Status::STATUS_OK;
 }
 

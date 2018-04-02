@@ -46,6 +46,8 @@ void GenerateUniformWidget(UniformValue& value) {
       ImGui::ColorEdit4(uniform->name.c_str(), value.GetValue<float>(), flags);
       break;
     }
+    case UniformWidget::TEXTURE_2D: {
+    }
     default:
       break;
   }

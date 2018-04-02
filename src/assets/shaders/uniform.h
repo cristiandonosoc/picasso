@@ -82,6 +82,9 @@ class UniformValue {
   int GetLocation() const;
   const Uniform *GetUniform() { return uniform_; }
 
+ public:
+  std::string metadata;
+
  private:
   // Buffer to hold in the memory
   DynamicArray<uint8_t> backend_;
