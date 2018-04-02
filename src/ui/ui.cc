@@ -36,6 +36,7 @@
 
 
 #include "ui/shader_window.h"
+#include "ui/material_window.h"
 
 namespace picasso {
 namespace ui {
@@ -74,130 +75,6 @@ void SystemWindow(UiData *ui_data, ImVec2 start_pos, ImVec2 start_size) {
   if (ImGui::Button("Open File")) {
     auto res = Platform::FileDialog("");
     LOG_NON_OK_STATUS(res);
-  }
-}
-
-void MaterialWindow(UiData *, ImVec2 start_pos, ImVec2 start_size) {
-  ImGui::SetNextWindowPos(start_pos, ImGuiCond_Once);
-  ImGui::SetNextWindowSize(start_size, ImGuiCond_Once);
-  static bool open = true;
-
-  SCOPED_TRIGGER(ImGui::Begin("Materials", &open), ImGui::End());
-
-  auto&& materials = MaterialRegistry::GetMaterials();
-  static int selected_material = -1;
-  static MaterialRegistry::KeyType selected_key;
-
-  {
-    SCOPED_TRIGGER(ImGui::BeginChild("Left Pane", {150, 0}, true),
-                   ImGui::EndChild());
-    int i = 0;
-    for (auto&& it = materials.begin();
-         it != materials.end();
-         it++, i++) {
-      MaterialRegistry::KeyType key = it->first;
-      /* Material* material = it->second; */
-      char label[128];
-      picasso_snprintf(label, sizeof(label), "%s", key.c_str());
-      if (ImGui::Selectable(label, selected_material == i)) {
-        selected_material = i;
-        selected_key = key;
-      }
-    }
-  }
-
-  ImGui::SameLine();
-
-  Material *material= nullptr;
-  if (selected_material >= 0) {
-    auto it = materials.find(selected_key);
-    material = it != materials.end() ? it->second.get() : nullptr;
-  }
-
-
-  if (material) {
-    SCOPED_TRIGGER(ImGui::BeginChild("Material", {-1, -1}),
-                   ImGui::EndChild());
-
-    std::string title = "Material";
-    const Shader *material_shader = material->GetShader();
-    if (material_shader) {
-      title += FormattedString(" [Shader: %s]",
-          material_shader->GetName().c_str());
-    }
-
-      int current_index = -1;
-      std::vector<std::string> shader_names;
-      std::vector<ShaderRegistry::KeyType> shader_keys;
-      const auto& map = ShaderRegistry::GetMap();
-      shader_names.reserve(map.size());
-      shader_keys.reserve(map.size());
-      int index = 0;
-      for (const auto& it : ShaderRegistry::GetMap()) {
-        const auto& key = it.first;
-        shader_keys.push_back(key);
-
-        const Shader *shader = it.second.get();
-        shader_names.push_back(shader->GetName().c_str());
-        if (shader == material->GetShader()) {
-          current_index = index;
-        }
-        index++;
-      }
-
-      current_index = GetPopupIndex("shaders", current_index, shader_names);
-
-      int prev_index = current_index;
-      if (prev_index != current_index) {
-        if (prev_index >= 0) {
-          const auto& prev_shader_key = shader_keys[prev_index];
-          ShaderMaterialMapper::RemoveMapping(prev_shader_key, selected_key);
-        }
-        if (current_index >= 0) {
-          const auto& shader_key = shader_keys[current_index];
-          ShaderMaterialMapper::AddMapping(shader_key, selected_key);
-        }
-      }
-
-    ImGui::Text("Uniforms");
-    ImGui::Separator();
-
-    static std::regex color_regex("color", std::regex_constants::ECMAScript |
-                                           std::regex_constants::icase);
-
-    int mat_count = 0;
-    for (auto&& it : material->Uniforms) {
-      UniformValue& value = it.second;
-      const Uniform *uniform = value.GetUniform();
-
-      ImGui::PushID(mat_count);
-      const std::string& name = uniform->name;
-      if(ImGui::TreeNode(name.c_str(), "%s", name.c_str())) {
-        ImGui::BulletText("Location: %d", uniform->location);
-        ImGui::BulletText("Type: %s", uniform->type_name.c_str());
-        ImGui::BulletText("Type Size: %zu", uniform->type_size);
-        ImGui::BulletText("Size: %zu", uniform->count);
-        ImGui::TreePop();
-      }
-
-      float *ptr = value.GetValue<GLfloat>();
-      ImGui::Text("PTR: %p, VAL: %f", ptr, *ptr);
-      if (uniform->type == GL_FLOAT) {
-        ImGui::SliderFloat("Value", ptr, 0.0f, 1.0f);
-      }
-
-      // TODO(Cristian): Do actual mapping from the shaders
-      if (std::regex_search(name, color_regex)) {
-        if (uniform->type_size == 4) {
-          ImGui::ColorEdit4("", value.GetValue<float>());
-        } else {
-          ImGui::ColorEdit3("", value.GetValue<float>());
-        }
-      }
-      ImGui::PopID();
-      mat_count++;
-      ImGui::Separator();
-    }
   }
 }
 

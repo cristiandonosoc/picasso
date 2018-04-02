@@ -27,7 +27,10 @@ Status Material::SetShader(Shader *shader) {
   shader_ = shader;
   // Create the UniformValues
   for (auto&& it : shader->Uniforms) {
-    uniforms_[it.first] = UniformValue(&it.second);
+    UniformValue value(it.second);
+    // We copy the value over
+    value.Copy(it.second.default_value);
+	  uniforms_[it.first] = std::move(value);
   }
   return Status::STATUS_OK;
 }

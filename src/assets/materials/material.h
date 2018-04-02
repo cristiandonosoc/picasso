@@ -16,7 +16,7 @@
 #include <map>
 
 #include "assets/shaders/shader.h"
-#include "assets/materials/uniform_value.h"
+#include "assets/shaders/uniform.h"
 #include "utils/macros.h"
 #include "utils/status.h"
 
@@ -24,8 +24,8 @@ namespace picasso {
 namespace assets {
 namespace materials {
 
-using ::picasso::assets::materials::UniformValue;
 using ::picasso::assets::shaders::Shader;
+using ::picasso::assets::shaders::UniformValue;
 using ::picasso::utils::Status;
 
 class Material {

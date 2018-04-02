@@ -333,19 +333,19 @@ bool Mesh::Render(Material* material) const {
   // We set the transformation uniforms
   auto u_it = material->Uniforms.find("M_MODEL");
   if (u_it != material->Uniforms.end()) {
-    location = u_it->second.GetUniform()->location;
+    location = u_it->second.GetLocation();
     glUniformMatrix4fv(location, 1, GL_FALSE, glm::value_ptr(transform_.GetModelMatrix()));
   }
 
   u_it = material->Uniforms.find("M_VIEW");
   if (u_it != material->Uniforms.end()) {
-    location = u_it->second.GetUniform()->location;
+    location = u_it->second.GetLocation();
     glUniformMatrix4fv(location, 1, GL_FALSE, glm::value_ptr(glm::mat4(1.0f)));
   }
 
   u_it = material->Uniforms.find("M_PROJ");
   if (u_it != material->Uniforms.end()) {
-    location = u_it->second.GetUniform()->location;
+    location = u_it->second.GetLocation();
     glUniformMatrix4fv(location, 1, GL_FALSE, glm::value_ptr(glm::mat4(1.0f)));
   }
 

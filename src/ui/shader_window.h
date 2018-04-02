@@ -16,6 +16,7 @@
 #include "utils/scope_trigger.h"
 #include "assets/shaders/shader_registry.h"
 #include "utils/snprintf.h"
+#include "assets/shaders/uniform.h"
 
 #include "logging/log.h"
 
@@ -31,41 +32,9 @@ using namespace ::picasso::ui::widgets;
 using ::picasso::utils::picasso_snprintf;
 
 using namespace ::picasso::assets::shaders;
+using ::picasso::assets::shaders::Uniform;
 
 namespace {
-
-void GenerateWidget(Uniform& uniform) {
-  switch (uniform.widget) {
-    case UniformWidget::FLOAT: {
-      ImGui::InputFloat(uniform.name.c_str(), uniform.default_value.GetValue<float>());
-      break;
-    }
-    case UniformWidget::FLOAT_VEC2: {
-      ImGui::InputFloat2(uniform.name.c_str(), uniform.default_value.GetValue<float>());
-      break;
-    }
-    case UniformWidget::FLOAT_VEC3: {
-      ImGui::InputFloat3(uniform.name.c_str(), uniform.default_value.GetValue<float>());
-      break;
-    }
-    case UniformWidget::FLOAT_VEC4: {
-      ImGui::InputFloat4(uniform.name.c_str(), uniform.default_value.GetValue<float>());
-      break;
-    }
-    case UniformWidget::COLOR3: {
-      auto flags = ImGuiColorEditFlags_NoInputs;
-      ImGui::ColorEdit3(uniform.name.c_str(), uniform.default_value.GetValue<float>(), flags);
-      break;
-    }
-    case UniformWidget::COLOR4: {
-      auto flags = ImGuiColorEditFlags_NoInputs;
-      ImGui::ColorEdit4(uniform.name.c_str(), uniform.default_value.GetValue<float>(), flags);
-      break;
-    }
-    default:
-      break;
-  }
-}
 
 void ShowUniformWidget(Uniform& uniform) {
   ImGui::Text("%s", uniform.name.c_str());
@@ -82,7 +51,7 @@ void ShowUniformWidget(Uniform& uniform) {
     uniform.widget = widget;
   }
 
-  GenerateWidget(uniform);
+  GenerateUniformWidget(uniform.default_value);
 
   ImGui::Separator();
 }

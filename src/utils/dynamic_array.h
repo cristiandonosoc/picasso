@@ -34,8 +34,7 @@ class DynamicArray {
 
  public:
   DISABLE_COPY(DynamicArray);
-  DynamicArray(DynamicArray&&) noexcept = default;
-  DynamicArray& operator=(DynamicArray&&) noexcept = default;
+  DEFAULT_MOVE(DynamicArray);
 
  public:
   void Reset() {
@@ -47,7 +46,7 @@ class DynamicArray {
     buffer_.reset(new T[count_]);
     ClearArray();
   }
-  void Reset(size_t count, T* array) {
+  void Reset(size_t count, const T* array) {
     count_ = count;
     buffer_.reset(new T[count_]);
     FillArray(count_, array);
@@ -73,7 +72,7 @@ class DynamicArray {
   size_t Size() const { return sizeof(T) * count_; }
 
  private:
-  void FillArray(size_t count, T* array) {
+  void FillArray(size_t count, const T* array) {
     T *ptr = Get();
     for (size_t i = 0; i < count; i++) {
       *ptr++ = *array++;

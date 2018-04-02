@@ -16,6 +16,8 @@
 
 #include <imgui/imgui.h>
 
+#include "assets/shaders/uniform.h"
+
 #include <cassert>
 #include <string>
 #include <vector>
@@ -24,7 +26,8 @@ namespace picasso {
 namespace ui {
 namespace widgets {
 
-using ::picasso::utils::StatusOr;
+using ::picasso::assets::shaders::UniformValue;
+void GenerateUniformWidget(UniformValue& uniform);
 
 class Popup {
  public:

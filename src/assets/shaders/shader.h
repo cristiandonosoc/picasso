@@ -35,10 +35,6 @@ class Shader {
   using AttributeMap = std::map<std::string, Attribute>;
   using UniformMap = std::map<std::string, Uniform>;
 
- /* public: */
- /*  using VariableMap = std::map<std::string, Variable>; */
- /*  using AttributeMap = std::map<AttributeKind, std::string>; */
-
  public:
   DEFINE_PTR_TYPES(Shader);
 
@@ -50,13 +46,6 @@ class Shader {
 
  public:
   ~Shader();
-
-  /* // COPY-MOVE CONSTRUCTORWS */
- /* public: */
-  /* DISABLE_COPY(Shader); */
-  /* // no-except moving */
-  /* Shader(Shader&&) noexcept; */
-  /* Shader& operator=(Shader&&) noexcept; */
 
  public:
   void DebugPrint(int indent = 0) const;
