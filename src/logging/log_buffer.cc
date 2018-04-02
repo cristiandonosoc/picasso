@@ -28,24 +28,24 @@ static std::map<LogLevel, const char*> level_map = {
 std::string CreateEntryMsg(int indent, LogLevel level, const char *file, int line,
                         const char *fmt, va_list arglist) {
   const char *prefix = level_map[level];
-  char fmt_buf[128];
+  char fmt_buf[1024];
   // Log output will be like
   // <INDENT>[INFO] (main.cc:234): Created shader
-  
+
   if (file) {
-    snprintf(fmt_buf, sizeof(fmt_buf),  "%*s%s (%s:%d): %s", 
+    snprintf(fmt_buf, sizeof(fmt_buf),  "%*s%s (%s:%d): %s",
              indent, " ", prefix, file, line, fmt);
   } else {
     snprintf(fmt_buf, sizeof(fmt_buf), "%*s%s: %s", indent, " ", prefix, fmt);
   }
 
-  char buf[1024];
+  char buf[4096];
   vsnprintf(buf, sizeof(buf), fmt_buf, arglist);
 
   // Return the created buffer
   return buf;
 }
-                        
+
 
 }   // namespace
 
@@ -68,7 +68,7 @@ void LogBuffer::AddEntry(LogLevel level, const std::string& msg) {
   PrivateInstance().container_.push_back(std::move(entry));
 }
 
-void LogBuffer::Log(int indent, LogLevel level, const char *file, int line, 
+void LogBuffer::Log(int indent, LogLevel level, const char *file, int line,
                     const char *fmt, ...) {
   va_list arglist;
   va_start(arglist, fmt);
@@ -77,7 +77,7 @@ void LogBuffer::Log(int indent, LogLevel level, const char *file, int line,
   PrivateInstance().AddEntry(level, msg);
 }
 
-void LogBuffer::LogStderr(int indent, LogLevel level, const char *file, int line, 
+void LogBuffer::LogStderr(int indent, LogLevel level, const char *file, int line,
                     const char *fmt, ...) {
   va_list arglist;
   va_start(arglist, fmt);

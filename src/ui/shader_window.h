@@ -17,6 +17,8 @@
 #include "assets/shaders/shader_registry.h"
 #include "utils/snprintf.h"
 
+#include "logging/log.h"
+
 namespace picasso {
 namespace ui {
 
@@ -31,7 +33,16 @@ void ShowUniformWidget(Uniform& uniform) {
   ImGui::Text("%s", uniform.name.c_str());
   ImGui::BulletText("TYPE: %s", uniform.type_name.c_str());
   ImGui::BulletText("WIDGET:");
-  uniform.widget = EnumPopup(uniform.name.c_str(), uniform.widget);
+  UniformWidget widget = EnumPopup(uniform.name.c_str(), uniform.widget);
+  size_t widget_size = UNIFORM_WIDGET_SIZES.find(widget)->second;
+  if (widget_size != uniform.type_size) {
+    LOG_DEBUG("Widget \"%s\" (%zu) doesn't have the correct size for uniform type \"%s\" (%zu)",
+              UniformWidget::ToString(widget).c_str(), widget_size,
+              uniform.type_name.c_str(), uniform.type_size);
+  } else {
+    uniform.widget = widget;
+  }
+
   ImGui::Separator();
 }
 

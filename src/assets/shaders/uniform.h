@@ -34,6 +34,7 @@ PRINTABLE_ENUM(UniformWidget,
     TEXTURE_2D);
 
 extern const std::map<GLenum, UniformWidget>& UNIFORM_WIDGET_MAPPING;
+extern const std::map<UniformWidget, size_t>& UNIFORM_WIDGET_SIZES;
 
 class Uniform;  // Forward-declaration
 class UniformValue {
