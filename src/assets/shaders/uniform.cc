@@ -25,6 +25,10 @@ const std::map<GLenum, UniformWidget>& UNIFORM_WIDGET_MAPPING = {
   { GL_SAMPLER_2D,    UniformWidget::TEXTURE_2D   },
 };
 
+void UniformValue::SetValueSize(const Uniform& uniform) {
+  backend_ = {uniform.count * uniform.type_size};
+}
+
 }   // namespace shaders
 }   // namespace assets
 }   // namespace picasso

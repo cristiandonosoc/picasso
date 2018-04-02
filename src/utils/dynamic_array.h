@@ -11,6 +11,7 @@
 #ifndef SRC_UTILS_DYNAMIC_ARRAY_H
 #define SRC_UTILS_DYNAMIC_ARRAY_H
 
+#include <cassert>
 #include <cstring>
 #include <memory>
 
@@ -26,7 +27,7 @@ class DynamicArray {
   DynamicArray(size_t count) : count_(count), buffer_(new T[count_]) {
     ClearArray();
   }
-  DynamicArray(size_t count, T* array) 
+  DynamicArray(size_t count, T* array)
     : count_(count), buffer_(new T[count_]) {
     FillArray(count, array);
   }
@@ -60,13 +61,13 @@ class DynamicArray {
   }
 
  public:
-  T *Get() { 
+  T *Get() {
     assert(count_ > 0);
-    return buffer_.get(); 
+    return buffer_.get();
   }
-  const T* Get() const {  
+  const T* Get() const {
     assert(count_ > 0);
-    return buffer_.get(); 
+    return buffer_.get();
   }
   size_t Count() const { return count_; }
   size_t Size() const { return sizeof(T) * count_; }

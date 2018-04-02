@@ -18,6 +18,8 @@
 #define _COMBINE(x, y) x##y
 #define COMBINE(x, y) _COMBINE(x, y)
 
+#define UNIQUE_VAR COMBINE(__FILE__, __LINE__)
+
 // Setup printf formatting for the formatting function
 #if defined(__clang__) || defined(__GNUC__) || defined(__GNUG__)
 #define PRINTF_FORMAT_ATTRIBUTE(fmt_one_index, varargs_one_index) \
@@ -35,8 +37,8 @@
 #define BEGIN_IGNORE_WARNINGS() __pragma(warning(push, 0))
 #define END_IGNORE_WARNINGS() __pragma(warning(pop))
 #else
-#define BEGIN_IGNORE_WARNINGS() 
-#define END_IGNORE_WARNINGS() 
+#define BEGIN_IGNORE_WARNINGS()
+#define END_IGNORE_WARNINGS()
 #endif
 
 
