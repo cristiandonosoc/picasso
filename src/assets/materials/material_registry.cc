@@ -14,21 +14,14 @@ namespace picasso {
 namespace assets {
 namespace materials {
 
-StatusOr<MaterialRegistry::KeyType> MaterialRegistry::Create(const std::string& name) {
-  auto& map = Instance().map_;
-  auto it = map.find(name);
-  if (it != map.end()) {
-    return { Status::STATUS_ERROR, "Material \"%s\" already exists", 
-                                   name.c_str() };
-  }
-
-  // Attempt to create 
-  auto res = InternalCreate(name);
+StatusOr<Material*> MaterialRegistry::Create(const std::string& name) {
+  auto res = Register(name);
   if (!res.Ok()) {
     return res;
   }
-  map[name] = res.ConsumeOrDie();
-  return name;
+  Material *material = res.ConsumeOrDie();
+  material->name_ = name;
+  return material;
 }
 
 StatusOr<Material*> MaterialRegistry::Get(const MaterialRegistry::KeyType& name) {
@@ -43,12 +36,6 @@ StatusOr<Material*> MaterialRegistry::Get(const MaterialRegistry::KeyType& name)
 
 const MaterialRegistry::RegistryMapType& MaterialRegistry::GetMaterials() {
   return Instance().map_;
-}
-
-StatusOr<Material::UniquePtr> MaterialRegistry::InternalCreate(const std::string& name) {
-  Material::UniquePtr material(new Material());   // Private Constructor
-  material->name_ = name;
-  return material;
 }
 
 }   // namespace materials

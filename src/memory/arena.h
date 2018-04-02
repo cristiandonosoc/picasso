@@ -11,6 +11,7 @@
 #ifndef SRC_MEMORY_ARENA_H
 #define SRC_MEMORY_ARENA_H
 
+#include <cassert>
 #include <bitset>
 #include <cstdint>
 
@@ -23,10 +24,13 @@ namespace memory {
 using ::picasso::utils::Singleton;
 
 template <typename T, size_t ARENA_SIZE>
-class Arena : public Singleton<Arena<T, ARENA_SIZE>> {
+class Arena : Singleton<Arena<T, ARENA_SIZE>> {
  public:
-  static constexpr size_t ARENA_SIZE = ARENA_SIZE;
-  static constexpr size_t ARENA_BYTE_SIZE = ARENA_SIZE * sizeof(T);
+  static constexpr size_t ArenaSize = ARENA_SIZE;
+  static constexpr size_t ArenaByteSize = ARENA_SIZE * sizeof(T);
+
+ public:
+  using Singleton<Arena<T, ARENA_SIZE>>::Instance;
 
  private:
   Arena() = default;
@@ -54,7 +58,7 @@ class Arena : public Singleton<Arena<T, ARENA_SIZE>> {
     // We see if that pointer was allocated
     auto diff = ptr - instance.arena_;
     assert((diff >= 0) &&
-           (diff < ARENA_BYTE_SIZE) &&
+           (diff < ArenaByteSize) &&
            ((diff % sizeof(T)) == 0));
     int index = diff / sizeof(T);
     assert(instance.used_[index]);
@@ -62,7 +66,7 @@ class Arena : public Singleton<Arena<T, ARENA_SIZE>> {
   }
 
  private:
-  uint8_t arena_[ARENA_BYTE_SIZE] = {};  // Starts at 0
+  uint8_t arena_[ArenaByteSize] = {};  // Starts at 0
   std::bitset<ARENA_SIZE> used_;
 };  // class Arena
 
@@ -70,7 +74,8 @@ template <typename T, typename ArenaAllocator>
 class ArenaDeleter {
  public:
   void operator()(T* ptr) {
-    std::allocator_traits<ArenaAllocator>::deallocate(ptr);
+    ArenaAllocator allocator;
+    std::allocator_traits<ArenaAllocator>::deallocate(allocator, ptr, 1);
   }
 };  // class ArenaDeleter
 

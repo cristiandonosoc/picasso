@@ -11,8 +11,6 @@
 #ifndef SRC_UTILS_SINGLETON_H
 #define SRC_UTILS_SINGLETON_H
 
-#include <type_traits>
-
 namespace picasso {
 namespace utils {
 

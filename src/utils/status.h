@@ -132,6 +132,9 @@ class StatusOr : public Status {
 
   // PIPING ANOTHER STATUS
  public:
+  StatusOr(const Status& other_status)
+    : Status(other_status.GetStatus(), other_status.GetErrorMsg()) {}
+
   template <typename U>
   StatusOr(const StatusOr<U>& other_status)
     : Status(other_status.GetStatus(), other_status.GetErrorMsg()) {}

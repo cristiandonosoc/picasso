@@ -45,6 +45,8 @@ StatusOr<int> CompileShader(const std::string& shader_name,
   return shader_handle;
 }
 
+
+
 }   // namespace
 
 /**
@@ -63,22 +65,19 @@ StatusOr<ShaderRegistry::KeyType> ShaderRegistry::CreateFromFiles(
 StatusOr<ShaderRegistry::KeyType> ShaderRegistry::Create(const std::string& name,
                                            const std::string& vs,
                                            const std::string& fs) {
-  auto& map = Instance().map_;
-
-  // We check if it exists already
-  auto it = map.find(name);
-  if (it != map.end()) {
-    return { Status::STATUS_ERROR, "Shader %s already exists", name.c_str() };
+  // We attempt to allocate it
+  auto reg_res = Register(name);
+  if (!reg_res.Ok()) {
+    return reg_res;
   }
 
-  // We attempt to create it
-  auto res = InternalCreate(name, vs, fs); 
-  if (!res.Ok()) { 
-    return res;
+  // We attempt to register the shader
+  Shader *shader = reg_res.ConsumeOrDie();
+  auto load_res = LoadShader(shader, name, vs, fs);
+  if (!load_res.Ok()) {
+    Unregister(name);
+    return load_res;
   }
-
-  // Add it to the registry
-  map[name] = res.ConsumeOrDie();
   return name;
 }
 
@@ -103,12 +102,10 @@ std::vector<Shader*> ShaderRegistry::GetShaders() {
   return programs;
 }
 
-StatusOr<Shader::UniquePtr> ShaderRegistry::InternalCreate(const std::string& name,
-                                           const std::string& vertex_src,
-                                           const std::string& fragment_src) {
-  // If some result is invalid, the Shader destructor will
-  // free the resources
-  Shader::UniquePtr shader(new Shader());   // private constructor
+Status ShaderRegistry::LoadShader(Shader *shader,
+                  const std::string& name,
+                  const std::string& vertex_src,
+                  const std::string& fragment_src) {
   shader->name_ = name;
 
   // Vertex Shader
@@ -151,7 +148,7 @@ StatusOr<Shader::UniquePtr> ShaderRegistry::InternalCreate(const std::string& na
   shader->ObtainUniforms();
 
   shader->valid_ = true;
-  return shader;
+  return Status::STATUS_OK;
 }
 
 }   // namespace shaders

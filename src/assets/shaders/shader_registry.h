@@ -26,25 +26,27 @@ namespace picasso {
 namespace assets {
 namespace shaders {
 
+using ::picasso::utils::Status;
 using ::picasso::utils::StatusOr;
 using ::picasso::utils::Registry;
 
-class ShaderRegistry : public Registry<ShaderRegistry, std::string, Shader::UniquePtr> {
+class ShaderRegistry : public Registry<ShaderRegistry, std::string, Shader> {
 
  public:
   static StatusOr<KeyType> CreateFromFiles(const std::string& name,
                                            const std::string& vertex_path,
                                            const std::string& fragment_path);
-  static StatusOr<KeyType> Create(const std::string& name, 
+  static StatusOr<KeyType> Create(const std::string& name,
                                   const std::string& vs,
                                   const std::string& fs);
   static StatusOr<Shader*> Get(const std::string& name);
   static std::vector<Shader*> GetShaders();
 
  private:
-  static StatusOr<Shader::UniquePtr> InternalCreate(const std::string& name,
-                                                    const std::string& vs,
-                                                    const std::string& fs);
+  static Status LoadShader(Shader*,
+                           const std::string& name,
+                           const std::string& vs,
+                           const std::string& fs);
 
 };
 

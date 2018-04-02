@@ -42,7 +42,7 @@ class Shader {
  private:
   Shader() = default;
   DISABLE_COPY(Shader);
-  DISABLE_MOVE(Shader);
+  DEFAULT_MOVE(Shader);
 
  public:
   ~Shader();

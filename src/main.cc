@@ -149,10 +149,9 @@ int main(int, char **) {
     return 1;
   }
 
-  const MaterialRegistry::KeyType mat_key = material_res.ConsumeOrDie();
-  Material *material = MaterialRegistry::Get(mat_key).ConsumeOrDie();
+  Material* material = material_res.ConsumeOrDie();
 
-  auto mapping_res = ShaderMaterialMapper::AddMapping(simple_shader_key, mat_key);
+  auto mapping_res = ShaderMaterialMapper::AddMapping(simple_shader_key, mat_name);
   LOG_NON_OK_STATUS(mapping_res);
 
   material->SetValue<uint32_t>("tex0", texture->GetId());

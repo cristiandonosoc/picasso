@@ -22,33 +22,29 @@
 namespace picasso {
 namespace utils {
 
-
 using ::picasso::memory::ArenaDeleter;
 
-template <typename ParentClass, 
-          typename Key, typename Value, 
-          typename ArenaAllocator>
-class Registry : Singleton<Registry<ParentClass, Key, Value, ArenaAllocator>> {
+template <typename ParentClass,
+          typename Key, typename Value,
+          typename ArenaAllocator = std::allocator<Value>>
+class Registry : Singleton<Registry<ParentClass, Key, Value,
+                                    ArenaAllocator>> {
  public:
   using KeyType = Key;
   using ValueType = Value;
 
  public:
   using AllocatorTraits = std::allocator_traits<ArenaAllocator>;
-
-  using ArenaUniquePtr = std::unique_ptr<Value, 
+  using ArenaUniquePtr = std::unique_ptr<Value,
                                          ArenaDeleter<Value, ArenaAllocator>>;
+
+ public:
+  using Singleton<Registry<ParentClass, Key, Value, ArenaAllocator>>::Instance;
 
  protected:
   Registry() = default;
   DISABLE_COPY(Registry);
   DISABLE_MOVE(Registry);
-
- public:
-  static Registry& Instance() {
-    static Registry instance;
-    return instance;
-  }
 
  public:
   static StatusOr<ValueType*> Register(const KeyType& key) {
@@ -59,14 +55,15 @@ class Registry : Singleton<Registry<ParentClass, Key, Value, ArenaAllocator>> {
                            "Key \"%s\" already exists!",
                            key.c_str());
     }
-    ArenaUniquePtr value = AllocatorTraits::allocate(new ArenaAllocator(), 1);
+    ArenaAllocator allocator;
+    ArenaUniquePtr value(AllocatorTraits::allocate(allocator, 1));
     if (!value) {
       return FILENO_STATUS(Status::STATUS_ERROR,
                            "Could not allocate memory for key \"%s\"",
                            key.c_str());
     }
-    instance.map_[key] = value;
-    return value.get();
+    instance.map_[key] = std::move(value);
+    return instance.map_[key].get();
   }
 
   static Status Unregister(const KeyType& key) {
@@ -76,7 +73,7 @@ class Registry : Singleton<Registry<ParentClass, Key, Value, ArenaAllocator>> {
       return FILENO_STATUS(Status::STATUS_ERROR,
                            "Key \"%s\" already exists!",
                            key.c_str());
-    } 
+    }
     instance.map_.erase(it);
     return Status::STATUS_OK;
   }
