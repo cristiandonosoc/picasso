@@ -12,18 +12,32 @@
 #define SRC_UTILS_REGISTRY_H
 
 #include <map>
+#include <memory>
 
 #include "utils/macros.h"
 #include "utils/singleton.h"
+#include "utils/status.h"
+#include "memory/arena.h"
 
 namespace picasso {
 namespace utils {
 
-template <typename ParentClass, typename Key, typename Value>
-class Registry : Singleton<Registry<ParentClass, Key, Value>> {
+
+using ::picasso::memory::ArenaDeleter;
+
+template <typename ParentClass, 
+          typename Key, typename Value, 
+          typename ArenaAllocator>
+class Registry : Singleton<Registry<ParentClass, Key, Value, ArenaAllocator>> {
  public:
   using KeyType = Key;
   using ValueType = Value;
+
+ public:
+  using AllocatorTraits = std::allocator_traits<ArenaAllocator>;
+
+  using ArenaUniquePtr = std::unique_ptr<Value, 
+                                         ArenaDeleter<Value, ArenaAllocator>>;
 
  protected:
   Registry() = default;
@@ -36,8 +50,39 @@ class Registry : Singleton<Registry<ParentClass, Key, Value>> {
     return instance;
   }
 
+ public:
+  static StatusOr<ValueType*> Register(const KeyType& key) {
+    auto& instance = Instance();
+    auto it = instance.map_.find(key);
+    if (it != instance.map_.end()) {
+      return FILENO_STATUS(Status::STATUS_ERROR,
+                           "Key \"%s\" already exists!",
+                           key.c_str());
+    }
+    ArenaUniquePtr value = AllocatorTraits::allocate(new ArenaAllocator(), 1);
+    if (!value) {
+      return FILENO_STATUS(Status::STATUS_ERROR,
+                           "Could not allocate memory for key \"%s\"",
+                           key.c_str());
+    }
+    instance.map_[key] = value;
+    return value.get();
+  }
+
+  static Status Unregister(const KeyType& key) {
+    auto& instance = Instance();
+    auto it = instance.map_.find(key);
+    if (it == instance.map_.end()) {
+      return FILENO_STATUS(Status::STATUS_ERROR,
+                           "Key \"%s\" already exists!",
+                           key.c_str());
+    } 
+    instance.map_.erase(it);
+    return Status::STATUS_OK;
+  }
+
  private:
-  std::map<KeyType, ValueType> map_;
+  std::map<KeyType, ArenaUniquePtr> map_;
 
  public:
   using RegistryMapType = decltype(map_);
@@ -46,7 +91,7 @@ class Registry : Singleton<Registry<ParentClass, Key, Value>> {
   }
 
  public:
-  friend class Singleton<Registry<ParentClass, Key, Value>>;
+  friend class Singleton<Registry<ParentClass, Key, Value, ArenaAllocator>>;
   friend ParentClass;
 };  // class Registry
 
