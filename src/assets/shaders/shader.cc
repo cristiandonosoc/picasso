@@ -85,6 +85,7 @@ void Shader::ObtainUniforms() {
     auto widget_it = UNIFORM_WIDGET_MAPPING.find(uniform.type);
     if (widget_it != UNIFORM_WIDGET_MAPPING.end()) {
       uniform.widget = widget_it->second;
+      uniform.default_value.SetValueSize(uniform.count * uniform.type_size);
     }
 
     uniforms_[uniform.name] = std::move(uniform);

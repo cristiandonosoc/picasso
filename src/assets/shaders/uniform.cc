@@ -31,7 +31,8 @@ const std::map<GLenum, UniformWidget>& UNIFORM_WIDGET_MAPPING = {
 const std::map<UniformWidget, size_t>& UNIFORM_WIDGET_SIZES = {
   { UniformWidget::NONE, 0 },
   { UniformWidget::FLOAT, sizeof(GLfloat) },
-  { UniformWidget::COLOR, 4 * sizeof(GLfloat) },
+  { UniformWidget::COLOR3, 3 * sizeof(GLfloat) },
+  { UniformWidget::COLOR4, 4 * sizeof(GLfloat) },
   { UniformWidget::FLOAT_VEC2, 2 * sizeof(GLfloat) },
   { UniformWidget::FLOAT_VEC3, 3 * sizeof(GLfloat) },
   { UniformWidget::FLOAT_VEC4, 4 * sizeof(GLfloat) },
@@ -41,8 +42,8 @@ const std::map<UniformWidget, size_t>& UNIFORM_WIDGET_SIZES = {
   { UniformWidget::TEXTURE_2D, 4 },
 };
 
-void UniformValue::SetValueSize(const Uniform& uniform) {
-  backend_ = {uniform.count * uniform.type_size};
+void UniformValue::SetValueSize(size_t size) {
+  backend_ = {size};
 }
 
 }   // namespace shaders

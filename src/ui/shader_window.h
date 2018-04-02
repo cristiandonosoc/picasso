@@ -19,6 +19,11 @@
 
 #include "logging/log.h"
 
+#include <algorithm>
+
+#undef min
+#undef max
+
 namespace picasso {
 namespace ui {
 
@@ -29,10 +34,44 @@ using namespace ::picasso::assets::shaders;
 
 namespace {
 
+void GenerateWidget(Uniform& uniform) {
+  switch (uniform.widget) {
+    case UniformWidget::FLOAT: {
+      ImGui::InputFloat(uniform.name.c_str(), uniform.default_value.GetValue<float>());
+      break;
+    }
+    case UniformWidget::FLOAT_VEC2: {
+      ImGui::InputFloat2(uniform.name.c_str(), uniform.default_value.GetValue<float>());
+      break;
+    }
+    case UniformWidget::FLOAT_VEC3: {
+      ImGui::InputFloat3(uniform.name.c_str(), uniform.default_value.GetValue<float>());
+      break;
+    }
+    case UniformWidget::FLOAT_VEC4: {
+      ImGui::InputFloat4(uniform.name.c_str(), uniform.default_value.GetValue<float>());
+      break;
+    }
+    case UniformWidget::COLOR3: {
+      auto flags = ImGuiColorEditFlags_NoInputs;
+      ImGui::ColorEdit3(uniform.name.c_str(), uniform.default_value.GetValue<float>(), flags);
+      break;
+    }
+    case UniformWidget::COLOR4: {
+      auto flags = ImGuiColorEditFlags_NoInputs;
+      ImGui::ColorEdit4(uniform.name.c_str(), uniform.default_value.GetValue<float>(), flags);
+      break;
+    }
+    default:
+      break;
+  }
+}
+
 void ShowUniformWidget(Uniform& uniform) {
   ImGui::Text("%s", uniform.name.c_str());
   ImGui::BulletText("TYPE: %s", uniform.type_name.c_str());
   ImGui::BulletText("WIDGET:");
+  ImGui::SameLine();
   UniformWidget widget = EnumPopup(uniform.name.c_str(), uniform.widget);
   size_t widget_size = UNIFORM_WIDGET_SIZES.find(widget)->second;
   if (widget_size != uniform.type_size) {
@@ -42,6 +81,8 @@ void ShowUniformWidget(Uniform& uniform) {
   } else {
     uniform.widget = widget;
   }
+
+  GenerateWidget(uniform);
 
   ImGui::Separator();
 }

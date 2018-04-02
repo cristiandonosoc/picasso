@@ -27,7 +27,8 @@ using ::picasso::utils::DynamicArray;
 
 PRINTABLE_ENUM(UniformWidget,
     NONE,
-    COLOR,
+    COLOR3,
+    COLOR4,
     FLOAT,
     FLOAT_VEC2, FLOAT_VEC3, FLOAT_VEC4,
     FLOAT_MAT2, FLOAT_MAT3, FLOAT_MAT4,
@@ -36,13 +37,12 @@ PRINTABLE_ENUM(UniformWidget,
 extern const std::map<GLenum, UniformWidget>& UNIFORM_WIDGET_MAPPING;
 extern const std::map<UniformWidget, size_t>& UNIFORM_WIDGET_SIZES;
 
-class Uniform;  // Forward-declaration
 class UniformValue {
  public:
   UniformValue() = default;
 
  public:
-  void SetValueSize(const Uniform&);
+  void SetValueSize(size_t);
 
  public:
   // TODO(Cristian): Move to explicit interface
