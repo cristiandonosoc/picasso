@@ -36,6 +36,9 @@ class Transform {
   void SetScale(const glm::vec3& scale);
 
  public:
+  glm::mat4 CalculateMatrix(bool translate = true,
+                            bool rotate = true,
+                            bool scale = true) const;
   void RecalculateModelMatrix();
 
  private:

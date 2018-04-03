@@ -34,16 +34,29 @@ void Transform::SetScale(const glm::vec3& scale) {
 }
 
 void Transform::RecalculateModelMatrix() {
-  m_model_ = glm::mat4(1.0f);  
-  m_model_ = glm::scale(m_model_, scale_);
+  m_model_ = CalculateMatrix();
+}
+
+glm::mat4 Transform::CalculateMatrix(bool translate, 
+                                     bool rotate,
+                                     bool scale) const {
+  glm::mat4 mat = glm::mat4(1.0f);  
+  if (scale) {
+    mat = glm::scale(mat, scale_);
+  }
 
   // We rotate according each axis
-  m_model_ = glm::rotate(m_model_, glm::radians(rotation_.x), glm::vec3(1, 0, 0));
-  m_model_ = glm::rotate(m_model_, glm::radians(rotation_.y), glm::vec3(0, 1, 0));
-  m_model_ = glm::rotate(m_model_, glm::radians(rotation_.z), glm::vec3(0, 0, -1));
+  if (rotate) {
+    mat = glm::rotate(mat, glm::radians(rotation_.x), glm::vec3(1, 0, 0));
+    mat = glm::rotate(mat, glm::radians(rotation_.y), glm::vec3(0, 1, 0));
+    mat = glm::rotate(mat, glm::radians(rotation_.z), glm::vec3(0, 0, -1));
+  }
 
   // Translate
-  m_model_ = glm::translate(m_model_, translation_);
+  if (translate) {
+    mat = glm::translate(mat, translation_);
+  }
+  return mat;
 }
 
 }   // namespace models
