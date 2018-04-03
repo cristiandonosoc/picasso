@@ -38,9 +38,9 @@ void Transform::RecalculateModelMatrix() {
   m_model_ = glm::scale(m_model_, scale_);
 
   // We rotate according each axis
-  m_model_ = glm::rotate(m_model_, rotation_.x, glm::vec3(1, 0, 0));
-  m_model_ = glm::rotate(m_model_, rotation_.y, glm::vec3(0, 1, 0));
-  m_model_ = glm::rotate(m_model_, rotation_.z, glm::vec3(0, 0, 1));
+  m_model_ = glm::rotate(m_model_, glm::radians(rotation_.x), glm::vec3(1, 0, 0));
+  m_model_ = glm::rotate(m_model_, glm::radians(rotation_.y), glm::vec3(0, 1, 0));
+  m_model_ = glm::rotate(m_model_, glm::radians(rotation_.z), glm::vec3(0, 0, -1));
 
   // Translate
   m_model_ = glm::translate(m_model_, translation_);
