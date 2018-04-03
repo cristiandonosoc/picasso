@@ -30,6 +30,13 @@ namespace utils {
 #define FILENO_STATUS(status, fmt, ...) \
   { __FILE__, __LINE__, status, fmt, __VA_ARGS__ }
 
+#define RETURN_OR_ASSIGN(varname, status)                                     \
+  if (!status.Ok()) {                                                         \
+    return status;                                                            \
+  }                                                                           \
+  auto varname = status.ConsumeOrDie() 
+
+
 // NOTE(Cristian): Those geniuses at X11 decided that it was a good idea
 //                 name their macros Status.... sigh
 #ifdef Status

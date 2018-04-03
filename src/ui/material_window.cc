@@ -52,7 +52,7 @@ void MaterialWindow(UiData *, ImVec2 start_pos, ImVec2 start_size) {
 
   SCOPED_TRIGGER(ImGui::Begin("Materials", &open), ImGui::End());
 
-  auto&& materials = MaterialRegistry::GetMaterials();
+  auto&& materials = MaterialRegistry::GetMap();
   static int selected_material = -1;
   static MaterialRegistry::KeyType selected_key;
 
@@ -87,47 +87,40 @@ void MaterialWindow(UiData *, ImVec2 start_pos, ImVec2 start_size) {
     SCOPED_TRIGGER(ImGui::BeginChild("Material", {-1, -1}),
                    ImGui::EndChild());
 
-    std::string title = "Material";
-    const Shader *material_shader = material->GetShader();
-    if (material_shader) {
-      title += FormattedString(" [Shader: %s]",
-          material_shader->GetName().c_str());
+    int current_index = -1;
+    std::vector<std::string> shader_names;
+    std::vector<ShaderRegistry::KeyType> shader_keys;
+    const auto& map = ShaderRegistry::GetMap();
+    shader_names.reserve(map.size());
+    shader_keys.reserve(map.size());
+    int index = 0;
+    for (const auto& it : ShaderRegistry::GetMap()) {
+      const auto& key = it.first;
+      shader_keys.push_back(key);
+
+      const Shader *shader = it.second.get();
+      shader_names.push_back(shader->GetName().c_str());
+      if (shader == material->GetShader()) {
+        current_index = index;
+      }
+      index++;
     }
 
-      int current_index = -1;
-      std::vector<std::string> shader_names;
-      std::vector<ShaderRegistry::KeyType> shader_keys;
-      const auto& map = ShaderRegistry::GetMap();
-      shader_names.reserve(map.size());
-      shader_keys.reserve(map.size());
-      int index = 0;
-      for (const auto& it : ShaderRegistry::GetMap()) {
-        const auto& key = it.first;
-        shader_keys.push_back(key);
+    int prev_index = current_index;
+    current_index = GetPopupIndex("shaders", current_index, shader_names);
 
-        const Shader *shader = it.second.get();
-        shader_names.push_back(shader->GetName().c_str());
-        if (shader == material->GetShader()) {
-          current_index = index;
-        }
-        index++;
+    if (prev_index != current_index) {
+      if (prev_index >= 0) {
+        const auto& prev_shader_key = shader_keys[prev_index];
+        auto res = ShaderMaterialMapper::RemoveMapping(prev_shader_key, selected_key);
+        LOG_NON_OK_STATUS(res);
       }
-
-      int prev_index = current_index;
-      current_index = GetPopupIndex("shaders", current_index, shader_names);
-
-      if (prev_index != current_index) {
-        if (prev_index >= 0) {
-          const auto& prev_shader_key = shader_keys[prev_index];
-          auto res = ShaderMaterialMapper::RemoveMapping(prev_shader_key, selected_key);
-          LOG_NON_OK_STATUS(res);
-        }
-        if (current_index >= 0) {
-          const auto& shader_key = shader_keys[current_index];
-          auto res = ShaderMaterialMapper::AddMapping(shader_key, selected_key);
-          LOG_NON_OK_STATUS(res);
-        }
+      if (current_index >= 0) {
+        const auto& shader_key = shader_keys[current_index];
+        auto res = ShaderMaterialMapper::AddMapping(shader_key, selected_key);
+        LOG_NON_OK_STATUS(res);
       }
+    }
 
     ImGui::Text("Uniforms");
     ImGui::Separator();

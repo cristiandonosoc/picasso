@@ -34,13 +34,6 @@ class MaterialRegistry : public Registry<MaterialRegistry, std::string, Material
                                          ArenaAllocator<Material, 1024>> {
  public:
   static StatusOr<Material*> Create(const std::string& name);
-  static StatusOr<Material*> Get(const KeyType& key);
-
-  // IMPORTANT: The pointers are not assured to be valid
-  //            through time, so they should be *always*
-  //            be obtained through here
-  // TODO(Cristian): Use shared pointer to represent this relationship
-  static const RegistryMapType& GetMaterials();
 
  private:
   static StatusOr<Material::UniquePtr> InternalCreate(const std::string& name);

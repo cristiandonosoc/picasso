@@ -32,11 +32,12 @@ class Registry : Singleton<Registry<ParentClass, Key, Value,
  public:
   using KeyType = Key;
   using ValueType = Value;
+  using ArenaUniquePtr = std::unique_ptr<ValueType,
+                                         ArenaDeleter<ValueType, ArenaAllocator>>;
+  using MapType = std::map<KeyType, ArenaUniquePtr>;
 
  public:
   using AllocatorTraits = std::allocator_traits<ArenaAllocator>;
-  using ArenaUniquePtr = std::unique_ptr<Value,
-                                         ArenaDeleter<Value, ArenaAllocator>>;
 
  public:
   using Singleton<Registry<ParentClass, Key, Value, ArenaAllocator>>::Instance;
@@ -80,14 +81,23 @@ class Registry : Singleton<Registry<ParentClass, Key, Value,
     return Status::STATUS_OK;
   }
 
- private:
-  std::map<KeyType, ArenaUniquePtr> map_;
-
  public:
-  using RegistryMapType = decltype(map_);
-  static const RegistryMapType& GetMap() {
+  static StatusOr<ValueType*> Get(const KeyType& key) {
+    auto& map = Instance().map_;
+    auto it = map.find(key);
+    if (it == map.end()) {
+      return FILENO_STATUS(Status::STATUS_ERROR, "Cannot find key \"%s\"",
+                           key.c_str());
+    }
+    return it->second.get();
+  }
+
+  static const MapType& GetMap() {
     return Instance().map_;
   }
+
+ private:
+  MapType map_;
 
  public:
   friend class Singleton<Registry<ParentClass, Key, Value, ArenaAllocator>>;

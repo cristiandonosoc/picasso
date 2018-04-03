@@ -17,6 +17,7 @@
 #include <imgui/imgui.h>
 
 #include "assets/shaders/uniform.h"
+#include "models/transform.h"
 
 #include <cassert>
 #include <string>
@@ -27,7 +28,10 @@ namespace ui {
 namespace widgets {
 
 using ::picasso::assets::shaders::UniformValue;
+using ::picasso::models::Transform;
+
 void GenerateUniformWidget(UniformValue& uniform);
+bool TransformWidget(Transform& transform);
 
 class Popup {
  public:

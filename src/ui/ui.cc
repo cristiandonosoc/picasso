@@ -37,6 +37,7 @@
 
 #include "ui/shader_window.h"
 #include "ui/material_window.h"
+#include "ui/mesh_window.h"
 
 namespace picasso {
 namespace ui {
@@ -232,7 +233,10 @@ void RunUi(UiData *ui_data) {
   SystemWindow(ui_data,   {0, 0},     {500, 500});
   ShaderWindow(ui_data,   {0, 500},   {500, 500});
   MaterialWindow(ui_data, {0, 1000},  {500, 500});
+
+  MeshWindow(ui_data, {500, 0}, {500, 500});
   TextureWindow(ui_data, {500, 500}, {500, 500});
+
   LogWindow(ui_data, {600, 800}, {1200, 300});
 }
 

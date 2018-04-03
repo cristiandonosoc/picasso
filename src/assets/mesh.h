@@ -63,6 +63,9 @@ class Mesh {
  public:
   bool Render(Material*) const;
 
+ public:
+  Transform& GetTransform() { return transform_; }
+
  private:
   Transform transform_;
 

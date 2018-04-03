@@ -15,6 +15,7 @@
 #include <string>
 
 #include "utils/macros.h"
+#include "utils/snprintf.h"
 
 namespace picasso {
 namespace utils {

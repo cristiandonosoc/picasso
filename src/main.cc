@@ -10,6 +10,7 @@
 #include "assets/mesh.h"
 #include "assets/shaders/shader_registry.h"
 #include "assets/materials/material_registry.h"
+#include "assets/mesh_registry.h"
 
 #include "assets/texture_registry.h"
 
@@ -34,10 +35,12 @@ using ::picasso::assets::TextureRegistry;
 
 
 using ::picasso::assets::shaders::Shader;
-using ::picasso::assets::shaders::ShaderRegistry;
-
 using ::picasso::assets::materials::Material;
+using ::picasso::assets::Mesh;
+
+using ::picasso::assets::shaders::ShaderRegistry;
 using ::picasso::assets::materials::MaterialRegistry;
+using ::picasso::assets::MeshRegistry;
 
 using ::picasso::models::AttributeKind;
 using ::picasso::models::AttributePointer;
@@ -175,16 +178,19 @@ int main(int, char **) {
     1, 2, 3    // second triangle
   };
 
-  Mesh model;
-  model.SetVertexBuffer(sizeof(vertices), vertices);
-  model.SetIndexBuffer(sizeof(indices), indices);
+  auto mesh_res = MeshRegistry::Create("mesh0");
+  assert(mesh_res.Ok());
+  Mesh *mesh = mesh_res.ConsumeOrDie();
+
+  mesh->SetVertexBuffer(sizeof(vertices), vertices);
+  mesh->SetIndexBuffer(sizeof(indices), indices);
 
   int stride = 8 * sizeof(float);
-  model.AddAttributePointer({AttributeKind::VERTEX, 3, GL_FLOAT, false, stride, 0});
-  model.AddAttributePointer({AttributeKind::COLOR, 3, GL_FLOAT, false, stride, 3 * sizeof(float)});
-  model.AddAttributePointer({AttributeKind::UV, 2, GL_FLOAT, false, stride, 6 * sizeof(float)});
+  mesh->AddAttributePointer({AttributeKind::VERTEX, 3, GL_FLOAT, false, stride, 0});
+  mesh->AddAttributePointer({AttributeKind::COLOR, 3, GL_FLOAT, false, stride, 3 * sizeof(float)});
+  mesh->AddAttributePointer({AttributeKind::UV, 2, GL_FLOAT, false, stride, 6 * sizeof(float)});
 
-  model.SetupBuffers();
+  mesh->SetupBuffers();
 
   // Setup style
   ImGui::StyleColorsDark();
@@ -232,7 +238,7 @@ int main(int, char **) {
 
 
       /* glPolygonMode(GL_FRONT_AND_BACK, GL_LINE); */
-      model.Render(material);
+      mesh->Render(material);
 
       ImGui::Render();
       ImGui_ImplSdlGL3_RenderDrawData(ImGui::GetDrawData());

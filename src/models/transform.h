@@ -35,7 +35,7 @@ class Transform {
   void SetRotation(const glm::vec3& rotation);
   void SetScale(const glm::vec3& scale);
 
- private:
+ public:
   void RecalculateModelMatrix();
 
  private:
