@@ -16,6 +16,8 @@
 #include "utils/status.h"
 #include "utils/registry.h"
 
+#include "memory/arena.h"
+
 #include <map>
 #include <vector>
 
@@ -26,7 +28,10 @@ namespace materials {
 using ::picasso::utils::StatusOr;
 using ::picasso::utils::Registry;
 
-class MaterialRegistry : public Registry<MaterialRegistry, std::string, Material> {
+using ::picasso::memory::ArenaAllocator;
+
+class MaterialRegistry : public Registry<MaterialRegistry, std::string, Material,
+                                         ArenaAllocator<Material, 1024>> {
  public:
   static StatusOr<Material*> Create(const std::string& name);
   static StatusOr<Material*> Get(const KeyType& key);

@@ -17,6 +17,7 @@
 
 #include "utils/singleton.h"
 #include "utils/macros.h"
+#include "logging/log.h"
 
 namespace picasso {
 namespace memory {
@@ -24,7 +25,7 @@ namespace memory {
 using ::picasso::utils::Singleton;
 
 template <typename T, size_t ARENA_SIZE>
-class Arena : Singleton<Arena<T, ARENA_SIZE>> {
+class Arena : public Singleton<Arena<T, ARENA_SIZE>> {
  public:
   static constexpr size_t ArenaSize = ARENA_SIZE;
   static constexpr size_t ArenaByteSize = ARENA_SIZE * sizeof(T);
@@ -32,7 +33,7 @@ class Arena : Singleton<Arena<T, ARENA_SIZE>> {
  public:
   using Singleton<Arena<T, ARENA_SIZE>>::Instance;
 
- private:
+ public:
   Arena() = default;
   DISABLE_COPY(Arena);
   DISABLE_MOVE(Arena);
@@ -43,7 +44,8 @@ class Arena : Singleton<Arena<T, ARENA_SIZE>> {
     // Search for a free element
     for (size_t i = 0; i < ARENA_SIZE; i++) {
       if (!instance.used_[i]) {
-        return instance.arena_ + i * sizeof(T);
+        instance.used_[i] = 1;
+        return (T*)(instance.arena_ + i * sizeof(T));
       }
     }
     // No more space
@@ -56,7 +58,7 @@ class Arena : Singleton<Arena<T, ARENA_SIZE>> {
     }
     auto& instance = Instance();
     // We see if that pointer was allocated
-    auto diff = ptr - instance.arena_;
+    auto diff = (uint8_t*)ptr - instance.arena_;
     assert((diff >= 0) &&
            (diff < ArenaByteSize) &&
            ((diff % sizeof(T)) == 0));
@@ -68,6 +70,9 @@ class Arena : Singleton<Arena<T, ARENA_SIZE>> {
  private:
   uint8_t arena_[ArenaByteSize] = {};  // Starts at 0
   std::bitset<ARENA_SIZE> used_;
+
+ public:
+  friend class Singleton<Arena<T, ARENA_SIZE>>;
 };  // class Arena
 
 template <typename T, typename ArenaAllocator>
@@ -97,16 +102,16 @@ class ArenaAllocator {
 
  public:
   T* allocate(size_t n) {
+    LOG_DEBUG("ALLOCATING");
     assert(n == 1);
     return Arena<T, ARENA_SIZE>::Allocate();
   }
 
   void deallocate(T* ptr, size_t n) {
+    LOG_DEBUG("ALLOCATING");
     assert(n == 1);
     return Arena<T, ARENA_SIZE>::Deallocate(ptr);
   }
-
- public:
 };  // class ArenaAllocator
 
 template <typename T, typename U>

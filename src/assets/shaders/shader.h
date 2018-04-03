@@ -23,7 +23,6 @@
 #include "assets/shaders/attribute.h"
 #include "assets/shaders/uniform.h"
 
-
 namespace picasso {
 namespace assets {
 namespace shaders {

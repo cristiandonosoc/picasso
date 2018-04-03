@@ -16,6 +16,8 @@
 #include "utils/status.h"
 #include "utils/registry.h"
 
+#include "memory/arena.h"
+
 #include <map>
 #include <memory>
 #include <string>
@@ -30,7 +32,10 @@ using ::picasso::utils::Status;
 using ::picasso::utils::StatusOr;
 using ::picasso::utils::Registry;
 
-class ShaderRegistry : public Registry<ShaderRegistry, std::string, Shader> {
+using ::picasso::memory::ArenaAllocator;
+
+class ShaderRegistry : public Registry<ShaderRegistry, std::string, Shader,
+                                       ArenaAllocator<Shader, 1024>> {
 
  public:
   static StatusOr<KeyType> CreateFromFiles(const std::string& name,

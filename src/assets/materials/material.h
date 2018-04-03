@@ -28,6 +28,7 @@ using ::picasso::assets::shaders::Shader;
 using ::picasso::assets::shaders::UniformValue;
 using ::picasso::utils::Status;
 
+
 class Material {
  public:
   using ValueMap = std::map<std::string, UniformValue>;
