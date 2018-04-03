@@ -74,8 +74,11 @@ template <typename T, typename ArenaAllocator>
 class ArenaDeleter {
  public:
   void operator()(T* ptr) {
-    ArenaAllocator allocator;
-    std::allocator_traits<ArenaAllocator>::deallocate(allocator, ptr, 1);
+    if (ptr) {
+      ArenaAllocator allocator;
+      std::allocator_traits<ArenaAllocator>::destroy(allocator, ptr);
+      std::allocator_traits<ArenaAllocator>::deallocate(allocator, ptr, 1);
+    }
   }
 };  // class ArenaDeleter
 

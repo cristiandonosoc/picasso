@@ -35,7 +35,7 @@ class Material {
  public:
    DEFINE_PTR_TYPES(Material);
 
- private:
+ public:
   Material() {}
   DISABLE_COPY(Material);
   DISABLE_MOVE(Material);

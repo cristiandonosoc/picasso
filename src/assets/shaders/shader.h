@@ -39,7 +39,7 @@ class Shader {
   DEFINE_PTR_TYPES(Shader);
 
   // CONSTRUCTORS
- private:
+ public:
   Shader() = default;
   DISABLE_COPY(Shader);
   DEFAULT_MOVE(Shader);

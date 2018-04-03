@@ -55,8 +55,10 @@ class Registry : Singleton<Registry<ParentClass, Key, Value,
                            "Key \"%s\" already exists!",
                            key.c_str());
     }
+    // Calling custom allocator
     ArenaAllocator allocator;
     ArenaUniquePtr value(AllocatorTraits::allocate(allocator, 1));
+    ::new (static_cast<void*>(value.get())) Value();
     if (!value) {
       return FILENO_STATUS(Status::STATUS_ERROR,
                            "Could not allocate memory for key \"%s\"",
