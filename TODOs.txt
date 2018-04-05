@@ -1,0 +1,12 @@
+TODOs.txt
+
+:Author: Cristian
+:Email: cristiandonosoc@gmail.com
+:Date: 2018-04-04 22:58
+
+- Write own matrix/vectorial code. Remove glm dependency.
+- Write texture loader widget
+- Create model entity that ties mesh and material together
+- Create transform parenting (scene graph)
+- Write custom assert. Completely remove <cassert>
+

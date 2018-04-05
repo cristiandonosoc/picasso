@@ -15,9 +15,7 @@
 #include "utils/printable_enum.h"
 #include "models/transform.h"
 
-BEGIN_IGNORE_WARNINGS();
-#include <glm/glm.hpp>
-END_IGNORE_WARNINGS();
+#include "utils/glm.h"
 
 namespace picasso {
 
@@ -28,11 +26,11 @@ PRINTABLE_ENUM(CameraProjection, ORTHOGRAPHIC,
 
 class Camera {
  public:
-  class OrthoData {
+  class OrthographicData {
    public:
     glm::vec3 min;
     glm::vec3 max;
-  };  // class OrthoData
+  };  // class OrthographicData
 
   class PerspectiveData {
    public:
@@ -41,10 +39,33 @@ class Camera {
     glm::vec2 distances = { 0.1f, 100.0f };
   };  // class PerspectiveData
 
- private:
-  Transform transform_;
-  
+ public:
+  Camera() {
+    ReloadProjectionMatrix();
+  }
 
+ public:
+  glm::mat4 GenerateProjectionMatrix() const;
+
+ public:
+  void ReloadProjectionMatrix();
+
+ public:
+  const glm::mat4& Projection() const { return proj_mat_; }
+
+  // Properties
+  // IMPORTANT(Cristian): Any change to any of this fields must
+  //                      be followed by a call to ReloadProjMatrix()!
+  // TODO(Cristian): See a good way to enforce this
+ public:
+  Transform transform;
+  OrthographicData ortho_data;
+  PerspectiveData perspective_data;
+  CameraProjection proj_type = CameraProjection::PERSPECTIVE;
+
+ private:
+  // Must be kept up to date
+  glm::mat4 proj_mat_;
 };  // class Camera
 
 }   // namespace picasso

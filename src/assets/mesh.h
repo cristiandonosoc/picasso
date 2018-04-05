@@ -20,16 +20,22 @@
 #include "utils/dynamic_array.h"
 #include "models/transform.h"
 
-using ::picasso::models::AttributeKind;
-using ::picasso::models::Transform;
-using ::picasso::models::AttributePointer;
+#include "camera.h"
+
 
 namespace picasso {
 namespace assets {
 
+
+using ::picasso::models::AttributeKind;
+using ::picasso::models::Transform;
+using ::picasso::models::AttributePointer;
+
 using ::picasso::assets::materials::Material;
 using ::picasso::assets::materials::MaterialRegistry;
 using ::picasso::utils::DynamicArray;
+
+using ::picasso::Camera;
 
 class Mesh {
  public:
@@ -61,7 +67,7 @@ class Mesh {
   bool RemoveAttributePointer(const AttributePointer&);
 
  public:
-  bool Render(Material*) const;
+  bool Render(const Camera&, const Material&) const;
 
  public:
   Transform& GetTransform() { return transform_; }

@@ -30,6 +30,9 @@
 
 #include "utils/scope_trigger.h"
 
+#include "camera.h"
+
+
 using ::picasso::assets::Mesh;
 using ::picasso::assets::TextureRegistry;
 
@@ -53,7 +56,10 @@ using ::picasso::utils::ScopeTrigger;
 
 using namespace ::picasso::utils;
 
+using ::picasso::Camera;
 
+// global camera
+Camera gCamera;
 
 
 #include <external/stb_image.h>
@@ -62,6 +68,8 @@ BEGIN_IGNORE_WARNINGS();
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/type_ptr.hpp>
+#define GLM_ENABLE_EXPERIMENTAL
+#include <glm/gtx/string_cast.hpp>
 END_IGNORE_WARNINGS();
 
 namespace {
@@ -124,19 +132,26 @@ int main(int, char **) {
   LOG_INFO("OpenGL Extension: %s", glGetString(GL_EXTENSIONS));
 
   // Load a shader
-	std::string simple_vs = ::picasso::utils::ReadWholeFile(GetExecutableDir() + "/shaders/simple.vert");
-	std::string simple_fs = ::picasso::utils::ReadWholeFile(GetExecutableDir() + "/shaders/simple.frag");
-  std::string color_fs = ::picasso::utils::ReadWholeFile(GetExecutableDir() + "/shaders/color.frag");
+	std::string simple_vs = ReadWholeFile(GetExecutableDir() +
+                                        "/shaders/simple.vert");
+	std::string simple_fs = ReadWholeFile(GetExecutableDir() +
+                                        "/shaders/simple.frag");
+  std::string color_fs = ReadWholeFile(GetExecutableDir() +
+                                       "/shaders/color.frag");
 
-  auto simple_shader_key = ShaderRegistry::Create("test_shader", simple_vs, simple_fs).ConsumeOrDie();
-  auto color_shader_key= ShaderRegistry::Create("color_shader", simple_vs, color_fs).ConsumeOrDie();
+  auto simple_shader_key = ShaderRegistry::Create("test_shader",
+      simple_vs, simple_fs).ConsumeOrDie();
+  auto color_shader_key= ShaderRegistry::Create("color_shader",
+      simple_vs, color_fs).ConsumeOrDie();
 
   // We load a texture
-  auto texture_key = TextureRegistry::Create("test_texture", GetExecutableDir() + "textures/container.jpg").ConsumeOrDie();
+  auto texture_key = TextureRegistry::Create("test_texture",
+      GetExecutableDir() + "textures/container.jpg").ConsumeOrDie();
   auto texture = TextureRegistry::Get(texture_key).lock();
   LOG_DEBUG("TEXTURE READ. POINTER: %p, WIDTH: %d, HEIGHT: %d",  texture->GetData(), texture->GetWidth(), texture->GetHeight());
 
-  auto res = TextureRegistry::Create("happy", GetExecutableDir() + "textures/awesomeface.png");
+  auto res = TextureRegistry::Create("happy",
+      GetExecutableDir() + "textures/awesomeface.png");
   if (!res.Ok()) {
     LOGERR_FATAL("Could not load texture: %s", res.GetErrorMsg().c_str());
     return 1;
@@ -198,6 +213,9 @@ int main(int, char **) {
   picasso::ui::UiData ui_data;
   ui_data.clear_color = { 0.137f, 0.152f, 0.637f, 1.00f };
 
+  const auto& mat = gCamera.Projection();
+  LOG_DEBUG("%s", glm::to_string(mat).c_str());
+
   // Main loop
   bool done = false;
   while (!done)
@@ -238,7 +256,7 @@ int main(int, char **) {
 
 
       /* glPolygonMode(GL_FRONT_AND_BACK, GL_LINE); */
-      mesh->Render(material);
+      mesh->Render(gCamera, *material);
 
       ImGui::Render();
       ImGui_ImplSdlGL3_RenderDrawData(ImGui::GetDrawData());

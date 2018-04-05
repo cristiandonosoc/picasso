@@ -8,9 +8,6 @@
  * @description: TODO(Cristian): Add description
  ******************************************************************************/
 
-#ifndef SRC_UTILS_GLM_H
-#define SRC_UTILS_GLM_H
-
 // NOTE(donosoc): This is so that we don't have to add the
 //                f*cking BEGIN/END WARNING block everytime
 //                we want the glm
@@ -27,4 +24,3 @@ BEGIN_IGNORE_WARNINGS();
 #endif
 END_IGNORE_WARNINGS();
 
-#endif  // SRC_UTILS_GLM_H

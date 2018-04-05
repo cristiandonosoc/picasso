@@ -54,17 +54,17 @@ void BindAttributePointer(int location, const AttributePointer& attrib_pointer) 
       // Size: How many types are per attrib "element".
       //       Effectivelly this is saying where we have
       //       a vec, vec2, vec3 or vec4
-      attrib_pointer.GetSize(),    
+      attrib_pointer.GetSize(),
       // Type of value this attribute is (GL_FLOAT, GL_DOUBLE, etc)
-      attrib_pointer.GetType(), 
+      attrib_pointer.GetType(),
       // Whether to normalize the data
       attrib_pointer.GetNormalize(),
-      // Stride: Space in bytes between two consecutive values of this 
-      //         attribute in the array. 
+      // Stride: Space in bytes between two consecutive values of this
+      //         attribute in the array.
       // A value of 0 is saying that the buffer is densely packed.
-      attrib_pointer.GetStride(),    
+      attrib_pointer.GetStride(),
       // Offset: Space in bytes from the start of the array where the
-      //        first value is. 
+      //        first value is.
       // Value starts from the beginning of the array
       (void*)(size_t)attrib_pointer.GetOffset());
 }
@@ -97,17 +97,17 @@ bool Mesh::SetupBuffers() {
   //    This means that this is a per material object.
   glGenVertexArrays(1, &vao_);
   glBindVertexArray(vao_);
-  
+
   // 1. VBO
-  //    VBO stands for Vertex Buffer Object. 
+  //    VBO stands for Vertex Buffer Object.
   //    This is a buffer that contains vertices data.
-  
+
 
   // 1.1  We create a buffers. In OpenGL, you create buffers that get binded to
   //      certain types of buffers. The in received is the "name" of the buffer
   //      that we are generating. They are unbinded (have no type) at first.
   glGenBuffers(1, &vbo_);
-  
+
   // 1.2 Bind it to a particular type. In this case to GL_ARRAY_BUFFER.
   //     This will make vbo into a VERTEX BUFFER OBJECT (hence the name).
   //     When a buffer is binded some things happen:
@@ -118,7 +118,7 @@ bool Mesh::SetupBuffers() {
   //       This means that any future calls that affect GL_ARRAY_BUFFER will
   //       now affect the one binded to the vbo, until another binding occurs.
   glBindBuffer(GL_ARRAY_BUFFER, vbo_);
-  
+
   // 1.3 Send data to the active buffer (vbo in this case).
   //     This call will scale the buffer to the size specified here.
   //     Any previous data associated with the buffer will be discarded.
@@ -127,7 +127,7 @@ bool Mesh::SetupBuffers() {
                vertex_buffer_.Get(),    // Pointer to the array to send
                GL_STATIC_DRAW);         // Type of memory storing the data
 
-  // 2. [OPTIONAL] 
+  // 2. [OPTIONAL]
   //  OpenGL now has a buffer with data. But it can be when drawing
   //  primitives that a lot of them averlap (ie. a rectangle made out of
   //  2 triangles share 2 of the 3 vertices). It's possible to tell OpenGL
@@ -152,9 +152,9 @@ bool Mesh::SetupBuffers() {
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ebo_);
 
     // 2.3 Send the indices data
-    glBufferData(GL_ELEMENT_ARRAY_BUFFER, 
-                 index_buffer_.Size(), 
-                 index_buffer_.Get(), 
+    glBufferData(GL_ELEMENT_ARRAY_BUFFER,
+                 index_buffer_.Size(),
+                 index_buffer_.Get(),
                  GL_STATIC_DRAW);
     indexed_ =  true;
   }
@@ -172,32 +172,32 @@ bool Mesh::SetupBuffers() {
 GLuint Mesh::SetupMaterialVAO(const MaterialKey& key) {
   // 3.1 Generate the VAO buffer
   GLuint vao = 0;
-  glGenVertexArrays(1, &vao); 
+  glGenVertexArrays(1, &vao);
 
   // 3.2 Bind the current VAO
   glBindVertexArray(vao);
 
   // From this moment on, the current state of the buffers is saved on the VAO
   // We could leave it as it is, but being explicit is never bad
-  
+
   // 3.3 Bind the VBO to the VAO
   glBindBuffer(GL_ARRAY_BUFFER, vbo_);
 
-  // [OPTIONAL] 3.4 Bind the EBO. 
+  // [OPTIONAL] 3.4 Bind the EBO.
   //  0 unbinds, so if we never had indices, this will effectively unbind it
   glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ebo_);
 
   // 4. Set the vertex attributes.
-  //    Attributes are inputs for the vertex shader that come from the 
+  //    Attributes are inputs for the vertex shader that come from the
   //    GL_ARRAY_BUFFER. But the GL_ARRAY_BUFFER can store a lot of
   //    information together (Position, Normal, Color, UV, etc.)
   //    The Vertex Attributes Pointers are the way OpenGL gets to know
   //    how to obtain the information from the GL_ARRAY_BUFFER.
   //    You can think this as the key to decode the "multiplexing"
   //    of the GL_ARRAY_BUFFER.
-  //    These calls are also recorded in the VAO, so we only 
+  //    These calls are also recorded in the VAO, so we only
   //    need to do it once every vertex setup.
-  
+
   // 4.1 Declare the vertex attribute
   //
   // For this we need the locations in the shader, and we obtain
@@ -282,7 +282,8 @@ bool Mesh::RemoveAttributePointer(const AttributePointer& attrib_pointer) {
   return true;
 }
 
-bool Mesh::Render(Material* material) const {
+bool Mesh::Render(const Camera& camera,
+                  const Material& material) const {
   if (!setup_) {
     // TODO(Cristian): Send error message
     LOG_WARN("Calling render on an not ready model");
@@ -290,8 +291,8 @@ bool Mesh::Render(Material* material) const {
   }
 
   // Get the shader from the material
-  const Shader *shader = material->GetShader();
-  if (!shader) { 
+  const Shader *shader = material.GetShader();
+  if (!shader) {
     LOG_WARN("Rendering with null shader");
     return false;
   }
@@ -315,7 +316,7 @@ bool Mesh::Render(Material* material) const {
   glBindBuffer(GL_ARRAY_BUFFER, vbo_);
   glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ebo_);
 
-  // TODO(Cristian): Do this Attribute pointer binding when the model is set a particular 
+  // TODO(Cristian): Do this Attribute pointer binding when the model is set a particular
   //                 material + mesh, instead of per-frame
   int location = -1;
   auto at_it = shader->Attributes.find("SV_POSITION");
@@ -331,27 +332,30 @@ bool Mesh::Render(Material* material) const {
   }
 
   // We set the transformation uniforms
-  auto u_it = material->Uniforms.find("M_MODEL");
-  if (u_it != material->Uniforms.end()) {
+  auto u_it = material.Uniforms.find("M_MODEL");
+  if (u_it != material.Uniforms.end()) {
     location = u_it->second.GetLocation();
     glUniformMatrix4fv(location, 1, GL_FALSE, glm::value_ptr(transform_.GetModelMatrix()));
   }
 
-  u_it = material->Uniforms.find("M_VIEW");
-  if (u_it != material->Uniforms.end()) {
+  u_it = material.Uniforms.find("M_VIEW");
+  if (u_it != material.Uniforms.end()) {
     location = u_it->second.GetLocation();
-    glUniformMatrix4fv(location, 1, GL_FALSE, glm::value_ptr(glm::mat4(1.0f)));
+    glm::mat4 view(1.0f);
+    view = glm::translate(view, glm::vec3(0, 0, -3));
+    glUniformMatrix4fv(location, 1, GL_FALSE, glm::value_ptr(view));
   }
 
-  u_it = material->Uniforms.find("M_PROJ");
-  if (u_it != material->Uniforms.end()) {
+  u_it = material.Uniforms.find("M_PROJ");
+  if (u_it != material.Uniforms.end()) {
     location = u_it->second.GetLocation();
-    glUniformMatrix4fv(location, 1, GL_FALSE, glm::value_ptr(glm::mat4(1.0f)));
+    glUniformMatrix4fv(location, 1, GL_FALSE,
+                       glm::value_ptr(camera.Projection()));
   }
 
   // We bind the uniforms
   int texture_unit_count = 0;
-  for (auto&& uniform_it : material->Uniforms) {
+  for (auto&& uniform_it : material.Uniforms) {
     uniform_it.second.SendValue(&texture_unit_count);
   }
 
@@ -368,5 +372,5 @@ bool Mesh::Render(Material* material) const {
   return true;
 }
 
-}   // namespace assets 
+}   // namespace assets
 }   // namespace picasso
