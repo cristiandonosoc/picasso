@@ -37,19 +37,19 @@ void Transform::RecalculateModelMatrix() {
   m_model_ = CalculateMatrix();
 }
 
-glm::mat4 Transform::CalculateMatrix(bool translate, 
+glm::mat4 Transform::CalculateMatrix(bool translate,
                                      bool rotate,
                                      bool scale) const {
-  glm::mat4 mat = glm::mat4(1.0f);  
-  if (scale) {
-    mat = glm::scale(mat, scale_);
-  }
-
+  glm::mat4 mat = glm::mat4(1.0f);
   // We rotate according each axis
   if (rotate) {
     mat = glm::rotate(mat, glm::radians(rotation_.x), glm::vec3(1, 0, 0));
     mat = glm::rotate(mat, glm::radians(rotation_.y), glm::vec3(0, 1, 0));
     mat = glm::rotate(mat, glm::radians(rotation_.z), glm::vec3(0, 0, -1));
+  }
+
+  if (scale) {
+    mat = glm::scale(mat, scale_);
   }
 
   // Translate
