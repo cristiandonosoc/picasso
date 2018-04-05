@@ -1,25 +1,23 @@
 /******************************************************************************
- * @file: widgets.cc
+ * @file: uniform.cc
  * @author: Cristián Donoso C.
  * @email: cristiandonosoc@gmail.com
- * @date: 2018-04-01
+ * @date: 2018-04-04
  * @license: 2018 Cristián Donoso C. - All Rights Reserved.
  *
  * @description: TODO(Cristian): Add description
  ******************************************************************************/
 
-#include "ui/widgets.h"
 #include <imgui/imgui.h>
-#include "assets/shaders/uniform.h"
 
-#include <glm/glm.hpp>
-#include <glm/gtc/type_ptr.hpp>
+#include "ui/widgets/uniform.h"
 
 namespace picasso {
 namespace ui {
 namespace widgets {
 
-using namespace ::picasso::assets::shaders;
+using ::picasso::assets::shaders::Uniform;
+using ::picasso::assets::shaders::UniformWidget;
 
 void GenerateUniformWidget(UniformValue& value) {
   const Uniform *uniform = value.GetUniform();
@@ -55,17 +53,6 @@ void GenerateUniformWidget(UniformValue& value) {
     default:
       break;
   }
-}
-
-bool TransformWidget(Transform& transform) {
-  bool change = false; 
-  change |= ImGui::InputFloat3("TRANSFORM", 
-                     (float*)glm::value_ptr(transform.GetTranslation()));
-  change |= ImGui::InputFloat3("ROTATION", 
-                     (float*)glm::value_ptr(transform.GetRotation()));
-  change |= ImGui::InputFloat3("SCALE",
-                     (float*)glm::value_ptr(transform.GetScale()));
-  return change;
 }
 
 }   // namespace widgets

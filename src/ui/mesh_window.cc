@@ -12,7 +12,8 @@
 #include "ui/mesh_window.h"
 #include "utils/scope_trigger.h"
 #include "utils/string.h"
-#include "ui/widgets.h"
+
+#include "ui/widgets/transform.h"
 
 namespace picasso {
 namespace ui {

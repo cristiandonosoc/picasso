@@ -10,7 +10,8 @@
 
 #include "ui/shader_window.h"
 
-#include "ui/widgets.h"
+#include "ui/widgets/popup.h"
+#include "ui/widgets/uniform.h"
 #include "utils/scope_trigger.h"
 #include "assets/shaders/shader_registry.h"
 #include "utils/snprintf.h"

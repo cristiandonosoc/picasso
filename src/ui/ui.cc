@@ -26,7 +26,7 @@
 
 #include "utils/scope_trigger.h"
 
-#include "ui/widgets.h"
+#include "ui/widgets/popup.h"
 
 #include <ctime>
 #include <iomanip>

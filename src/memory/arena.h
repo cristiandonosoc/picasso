@@ -60,7 +60,7 @@ class Arena : public Singleton<Arena<T, ARENA_SIZE>> {
     // We see if that pointer was allocated
     auto diff = (uint8_t*)ptr - instance.arena_;
     assert((diff >= 0) &&
-           (diff < ArenaByteSize) &&
+           (diff < (int)ArenaByteSize) &&
            ((diff % sizeof(T)) == 0));
     int index = diff / sizeof(T);
     assert(instance.used_[index]);

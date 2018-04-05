@@ -8,9 +8,11 @@
  * @description: TODO(Cristian): Add description
  ******************************************************************************/
 
+#include "ui/widgets/popup.h"
+#include "ui/widgets/uniform.h"
+
 #include "ui/ui.h"
 #include "ui/material_window.h"
-#include "ui/widgets.h"
 #include "utils/scope_trigger.h"
 #include "assets/shaders/shader_registry.h"
 #include "assets/materials/material_registry.h"

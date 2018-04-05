@@ -1,37 +1,24 @@
 /******************************************************************************
- * @file: widgets.h
+ * @file: popup.h
  * @author: Cristián Donoso C.
  * @email: cristiandonosoc@gmail.com
- * @date: 2018-04-01
+ * @date: 2018-04-04
  * @license: 2018 Cristián Donoso C. - All Rights Reserved.
  *
  * @description: TODO(Cristian): Add description
  ******************************************************************************/
 
-#ifndef SRC_UI_WIDGETS_H
-#define SRC_UI_WIDGETS_H
+#ifndef SRC_UI_WIDGETS_POPUP_H
+#define SRC_UI_WIDGETS_POPUP_H
 
-#include "utils/macros.h"
-#include "utils/status.h"
-
-#include <imgui/imgui.h>
-
-#include "assets/shaders/uniform.h"
-#include "models/transform.h"
-
-#include <cassert>
 #include <string>
 #include <vector>
+
+#include <imgui/imgui.h>
 
 namespace picasso {
 namespace ui {
 namespace widgets {
-
-using ::picasso::assets::shaders::UniformValue;
-using ::picasso::models::Transform;
-
-void GenerateUniformWidget(UniformValue& uniform);
-bool TransformWidget(Transform& transform);
 
 class Popup {
  public:
@@ -119,4 +106,4 @@ Enum EnumPopup(const char *id, Enum val) {
 }   // namespace ui
 }   // namespace picasso
 
-#endif  // SRC_UI_WIDGETS_H
+#endif  // SRC_UI_WIDGETS_POPUP_H

@@ -37,6 +37,7 @@
 #define BEGIN_IGNORE_WARNINGS() __pragma(warning(push, 0))
 #define END_IGNORE_WARNINGS() __pragma(warning(pop))
 #else
+// Other compilers have decent ways of dealing with warnings on external code.
 #define BEGIN_IGNORE_WARNINGS()
 #define END_IGNORE_WARNINGS()
 #endif
