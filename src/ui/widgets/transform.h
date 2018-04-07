@@ -19,7 +19,7 @@ namespace widgets {
 
 using ::picasso::models::Transform;
 
-bool TransformWidget(Transform& transform);
+bool TransformWidget(const char *id, Transform& transform);
 
 }   // namespace widgets
 }   // namespace ui

@@ -61,7 +61,7 @@ void MeshWindow(UiData*, ImVec2 start_pos, ImVec2 start_size) {
   if (selected_mesh) {
     SCOPED_TRIGGER(ImGui::BeginChild("Mesh", {-1, -1}),
                    ImGui::EndChild());
-      if (TransformWidget(selected_mesh->GetTransform())) {
+      if (TransformWidget("mesh", selected_mesh->GetTransform())) {
         selected_mesh->GetTransform().RecalculateModelMatrix();
       }
 

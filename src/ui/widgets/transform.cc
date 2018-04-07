@@ -18,7 +18,8 @@ namespace picasso {
 namespace ui {
 namespace widgets {
 
-bool TransformWidget(Transform& transform) {
+bool TransformWidget(const char *id, Transform& transform) {
+  ImGui::PushID(id);
   bool change = false;
   change |= ImGui::InputFloat3("TRANSFORM",
                      (float*)glm::value_ptr(transform.GetTranslation()));
@@ -26,6 +27,8 @@ bool TransformWidget(Transform& transform) {
                      (float*)glm::value_ptr(transform.GetRotation()));
   change |= ImGui::InputFloat3("SCALE",
                      (float*)glm::value_ptr(transform.GetScale()));
+
+  ImGui::PopID();
   if (change) {
     transform.RecalculateModelMatrix();
   }
