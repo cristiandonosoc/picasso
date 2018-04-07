@@ -59,7 +59,7 @@ using namespace ::picasso::utils;
 using ::picasso::Camera;
 
 // global camera
-Camera gCamera;
+Camera GLOBAL_CAMERA;
 
 
 #include <external/stb_image.h>
@@ -213,7 +213,7 @@ int main(int, char **) {
   picasso::ui::UiData ui_data;
   ui_data.clear_color = { 0.137f, 0.152f, 0.637f, 1.00f };
 
-  const auto& mat = gCamera.Projection();
+  const auto& mat = GLOBAL_CAMERA.Projection();
   LOG_DEBUG("%s", glm::to_string(mat).c_str());
 
   // Main loop
@@ -256,7 +256,7 @@ int main(int, char **) {
 
 
       /* glPolygonMode(GL_FRONT_AND_BACK, GL_LINE); */
-      mesh->Render(gCamera, *material);
+      mesh->Render(GLOBAL_CAMERA, *material);
 
       ImGui::Render();
       ImGui_ImplSdlGL3_RenderDrawData(ImGui::GetDrawData());

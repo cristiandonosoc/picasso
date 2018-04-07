@@ -21,6 +21,7 @@ namespace ui {
 namespace windows {
 
 using ::picasso::assets::MeshRegistry;
+using ::picasso::models::TransformationType;
 using ::picasso::utils::picasso_snprintf;
 
 using ::picasso::ui::widgets::TransformWidget;
@@ -63,6 +64,17 @@ void MeshWindow(UiData*, ImVec2 start_pos, ImVec2 start_size) {
       if (TransformWidget(selected_mesh->GetTransform())) {
         selected_mesh->GetTransform().RecalculateModelMatrix();
       }
+
+      auto& model = selected_mesh->GetTransform().ModelMatrix;
+      float row1[4] = { model[0][0], model[1][0], model[2][0], model[3][0] };
+      float row2[4] = { model[0][1], model[1][1], model[2][1], model[3][1] };
+      float row3[4] = { model[0][2], model[1][2], model[2][2], model[3][2] };
+      float row4[4] = { model[0][3], model[1][3], model[2][3], model[3][3] };
+
+      ImGui::InputFloat4("", row1);
+      ImGui::InputFloat4("", row2);
+      ImGui::InputFloat4("", row3);
+      ImGui::InputFloat4("", row4);
   }
 }
 

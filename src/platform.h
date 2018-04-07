@@ -25,6 +25,5 @@ class Platform {
   static StatusOr<std::string> FileDialog(const std::string& title);
 };
 
-}   // namespace picasso
-
+}   // namespace picasso 
 #endif  // SRC_PLATFORM_H

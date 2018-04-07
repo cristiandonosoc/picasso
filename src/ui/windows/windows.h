@@ -21,6 +21,7 @@ namespace windows {
 void ShaderWindow(UiData*, ImVec2 start_pos, ImVec2 start_size);
 void MaterialWindow(UiData *, ImVec2 start_pos, ImVec2 start_size);
 void MeshWindow(UiData*, ImVec2 start_pos, ImVec2 start_size);
+void CameraWindow(UiData*, ImVec2 start_pos, ImVec2 start_size);
 
 }   // namespace windows
 }   // namespace ui

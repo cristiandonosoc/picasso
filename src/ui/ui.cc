@@ -223,13 +223,17 @@ void LogWindow(UiData *, ImVec2 start_pos, ImVec2 start_size) {
 }
 
 void RunUi(UiData *ui_data) {
-  SystemWindow(ui_data,   {0, 0},     {500, 500});
-  TextureWindow(ui_data, {500, 500}, {500, 500});
-  LogWindow(ui_data, {600, 800}, {1200, 300});
 
-  windows::ShaderWindow(ui_data,   {0, 500},   {500, 500});
-  windows::MaterialWindow(ui_data, {0, 1000},  {500, 500});
-  windows::MeshWindow(ui_data, {500, 0}, {500, 500});
+  SystemWindow(ui_data,             {0, 0},       {500, 500});
+  windows::ShaderWindow(ui_data,    {0, 500},     {500, 500});
+  windows::MaterialWindow(ui_data,  {0, 1000},    {500, 500});
+
+  windows::MeshWindow(ui_data,      {500, 0},     {500, 500});
+  TextureWindow(ui_data,            {500, 500},   {500, 500});
+  windows::CameraWindow(ui_data,    {500, 1000},  {500, 500});
+
+
+  LogWindow(ui_data, {1000, 1000}, {1200, 300});
 }
 
 }   // namespace ui
