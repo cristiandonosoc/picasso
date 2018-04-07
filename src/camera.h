@@ -63,6 +63,7 @@ class Camera {
   // TODO(Cristian): See a good way to enforce this
  public:
   Transform transform;
+  Transform target;
   OrthographicData ortho_data;
   PerspectiveData perspective_data;
   CameraProjection proj_type = CameraProjection::PERSPECTIVE;

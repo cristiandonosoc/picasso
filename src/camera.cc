@@ -29,7 +29,16 @@ glm::mat4 GeneratePerspectiveMatrix(const Camera& camera) {
 }   // namespace
 
 glm::mat4 Camera::GenerateViewMatrix() const {
-  return transform.CalculateMatrix();
+  glm::vec3 position = transform.ModelMatrix[3];
+  glm::vec3 camera_target = target.ModelMatrix[3];
+
+
+  /* glm::vec3 right = glm::normalize(glm::cross({0, 1, 0}, direction)); */
+  /* glm::vec3 up = glm::cross(direction, right); */
+
+
+
+  return glm::lookAt(position, camera_target, {0, 1, 0});
 }
 
 glm::mat4 Camera::GenerateProjectionMatrix() const {

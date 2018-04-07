@@ -26,6 +26,9 @@ bool TransformWidget(Transform& transform) {
                      (float*)glm::value_ptr(transform.GetRotation()));
   change |= ImGui::InputFloat3("SCALE",
                      (float*)glm::value_ptr(transform.GetScale()));
+  if (change) {
+    transform.RecalculateModelMatrix();
+  }
   return change;
 }
 
