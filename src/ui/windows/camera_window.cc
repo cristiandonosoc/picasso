@@ -32,7 +32,9 @@ void CameraWindow(UiData *, ImVec2 start_pos, ImVec2 start_size) {
   static bool open = true;
   SCOPED_TRIGGER(ImGui::Begin("Camera", &open), ImGui::End());
 
-  TransformWidget(GLOBAL_CAMERA.transform);
+  if (TransformWidget(GLOBAL_CAMERA.transform)) {
+    GLOBAL_CAMERA.ReloadViewMatrix();
+  }
 }
 
 }   // namespace windows

@@ -28,6 +28,10 @@ glm::mat4 GeneratePerspectiveMatrix(const Camera& camera) {
 
 }   // namespace
 
+glm::mat4 Camera::GenerateViewMatrix() const {
+  return transform.CalculateMatrix();
+}
+
 glm::mat4 Camera::GenerateProjectionMatrix() const {
   assert(proj_type == CameraProjection::PERSPECTIVE);
   return GeneratePerspectiveMatrix(*this);
@@ -35,6 +39,10 @@ glm::mat4 Camera::GenerateProjectionMatrix() const {
 
 void Camera::ReloadProjectionMatrix() {
   proj_mat_ = GenerateProjectionMatrix();
+}
+
+void Camera::ReloadViewMatrix() {
+  view_mat_ = GenerateViewMatrix();
 }
 
 }   // namespace picasso

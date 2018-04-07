@@ -213,8 +213,16 @@ int main(int, char **) {
   picasso::ui::UiData ui_data;
   ui_data.clear_color = { 0.137f, 0.152f, 0.637f, 1.00f };
 
-  const auto& mat = GLOBAL_CAMERA.Projection();
-  LOG_DEBUG("%s", glm::to_string(mat).c_str());
+  // Move the camera a bit
+  GLOBAL_CAMERA.transform.SetTranslation({0, 0, -3});
+  GLOBAL_CAMERA.ReloadViewMatrix();
+  LOG_DEBUG("%s", glm::to_string(GLOBAL_CAMERA.View()).c_str());
+
+  LOG_SEPARATOR;
+
+  glm::mat4 view(1.0f);
+  view = glm::translate(view, glm::vec3(0, 0, -3));
+  LOG_DEBUG("%s", glm::to_string(view).c_str());
 
   // Main loop
   bool done = false;

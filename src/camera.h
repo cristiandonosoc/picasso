@@ -41,16 +41,20 @@ class Camera {
 
  public:
   Camera() {
+    ReloadViewMatrix();
     ReloadProjectionMatrix();
   }
 
  public:
   glm::mat4 GenerateProjectionMatrix() const;
+  glm::mat4 GenerateViewMatrix() const;
 
  public:
   void ReloadProjectionMatrix();
+  void ReloadViewMatrix();
 
  public:
+  const glm::mat4& View() const { return view_mat_; }
   const glm::mat4& Projection() const { return proj_mat_; }
 
   // Properties
@@ -64,7 +68,8 @@ class Camera {
   CameraProjection proj_type = CameraProjection::PERSPECTIVE;
 
  private:
-  // Must be kept up to date
+  // IMPORTANT(Cristian): Must be kept up to date
+  glm::mat4 view_mat_;
   glm::mat4 proj_mat_;
 };  // class Camera
 

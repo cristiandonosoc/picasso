@@ -341,9 +341,9 @@ bool Mesh::Render(const Camera& camera,
   u_it = material.Uniforms.find("M_VIEW");
   if (u_it != material.Uniforms.end()) {
     location = u_it->second.GetLocation();
-    glm::mat4 view(1.0f);
-    view = glm::translate(view, glm::vec3(0, 0, -3));
-    glUniformMatrix4fv(location, 1, GL_FALSE, glm::value_ptr(view));
+    /* glm::mat4 view(1.0f); */
+    /* view = glm::translate(view, glm::vec3(0, 0, -3)); */
+    glUniformMatrix4fv(location, 1, GL_FALSE, glm::value_ptr(camera.View()));
   }
 
   u_it = material.Uniforms.find("M_PROJ");
