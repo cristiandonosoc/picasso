@@ -8,8 +8,9 @@
  * @description: TODO(Cristian): Add description
  ******************************************************************************/
 
+#include "ui/windows/windows.h"
+
 #include "assets/mesh_registry.h"
-#include "ui/mesh_window.h"
 #include "utils/scope_trigger.h"
 #include "utils/string.h"
 
@@ -17,6 +18,7 @@
 
 namespace picasso {
 namespace ui {
+namespace windows {
 
 using ::picasso::assets::MeshRegistry;
 using ::picasso::utils::picasso_snprintf;
@@ -64,5 +66,6 @@ void MeshWindow(UiData*, ImVec2 start_pos, ImVec2 start_size) {
   }
 }
 
+}   // namespace windows
 }   // namespace ui
 }   // namespace picasso

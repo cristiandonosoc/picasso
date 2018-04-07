@@ -3,6 +3,10 @@
 
 #include <cstddef>
 
+// cstddef creates some stupid ass macros
+#undef min
+#undef max
+
 namespace picasso {
 namespace utils {
 

@@ -7,8 +7,9 @@
  *
  * @description: TODO(Cristian): Add description
  ******************************************************************************/
+#include <algorithm>
 
-#include "ui/shader_window.h"
+#include "ui/windows/windows.h"
 
 #include "ui/widgets/popup.h"
 #include "ui/widgets/uniform.h"
@@ -19,14 +20,9 @@
 
 #include "logging/log.h"
 
-#include <algorithm>
-
-
-#undef min
-#undef max
-
 namespace picasso {
 namespace ui {
+namespace windows {
 
 using namespace ::picasso::ui::widgets;
 using ::picasso::utils::picasso_snprintf;
@@ -132,7 +128,6 @@ void ShaderWindow(UiData *, ImVec2 start_pos, ImVec2 start_size) {
                           ImGuiInputTextFlags_AllowTabInput);
 }
 
-
-
+}   // namespace windows
 }   // namespace ui
 }   // namespace picasso

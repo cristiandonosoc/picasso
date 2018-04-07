@@ -8,11 +8,13 @@
  * @description: TODO(Cristian): Add description
  ******************************************************************************/
 
+#include <algorithm>
+
+#include "ui/windows/windows.h"
+
 #include "ui/widgets/popup.h"
 #include "ui/widgets/uniform.h"
 
-#include "ui/ui.h"
-#include "ui/material_window.h"
 #include "utils/scope_trigger.h"
 #include "assets/shaders/shader_registry.h"
 #include "assets/materials/material_registry.h"
@@ -22,12 +24,10 @@
 
 #include "logging/log.h"
 
-#include <algorithm>
-
-
 
 namespace picasso {
 namespace ui {
+namespace windows {
 
 using namespace ::picasso::ui::widgets;
 using namespace ::picasso::assets::materials;
@@ -136,10 +136,6 @@ void MaterialWindow(UiData *, ImVec2 start_pos, ImVec2 start_size) {
   }
 }
 
-
-
+}   // namespace windows
 }   // namespace ui
 }   // namespace picasso
-
-
-
