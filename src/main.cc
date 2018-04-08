@@ -32,6 +32,8 @@
 
 #include "camera.h"
 
+#include "debug/debug.h"
+
 
 using ::picasso::assets::Mesh;
 using ::picasso::assets::TextureRegistry;
@@ -58,8 +60,11 @@ using namespace ::picasso::utils;
 
 using ::picasso::Camera;
 
+namespace picasso {
 // global camera
 Camera GLOBAL_CAMERA;
+
+}   // namespace picasso
 
 
 #include <external/stb_image.h>
@@ -213,16 +218,10 @@ int main(int, char **) {
   picasso::ui::UiData ui_data;
   ui_data.clear_color = { 0.137f, 0.152f, 0.637f, 1.00f };
 
-  // Move the camera a bit
-  GLOBAL_CAMERA.transform.SetTranslation({0, 0, -3});
-  GLOBAL_CAMERA.ReloadViewMatrix();
-  LOG_DEBUG("%s", glm::to_string(GLOBAL_CAMERA.View()).c_str());
 
-  LOG_SEPARATOR;
+  picasso::GLOBAL_CAMERA.transform.SetTranslation({0, 0, -3});
+  picasso::GLOBAL_CAMERA.ReloadViewMatrix();
 
-  glm::mat4 view(1.0f);
-  view = glm::translate(view, glm::vec3(0, 0, -3));
-  LOG_DEBUG("%s", glm::to_string(view).c_str());
 
   // Main loop
   bool done = false;
@@ -253,6 +252,7 @@ int main(int, char **) {
       static bool show_demo = true;
       ImGui::ShowDemoWindow(&show_demo);
 
+
       // Rendering
       // Clear the window
       glViewport(0, 0, (int)ImGui::GetIO().DisplaySize.x, (int)ImGui::GetIO().DisplaySize.y);
@@ -262,9 +262,14 @@ int main(int, char **) {
                    ui_data.clear_color.w);
       glClear(GL_COLOR_BUFFER_BIT);
 
+      ::picasso::debug::Debug::FrameInit();
+      ::picasso::debug::Debug::AddLine({0, 0, 0}, {1, 0, 0}, {1, 0, 0});
+      ::picasso::debug::Debug::AddLine({0, 0, 0}, {0, 1, 0}, {0, 1, 0});
+      ::picasso::debug::Debug::AddLine({0, 0, 0}, {0, 0, 1}, {0, 0, 1});
+      ::picasso::debug::Debug::FrameRender();
 
       /* glPolygonMode(GL_FRONT_AND_BACK, GL_LINE); */
-      mesh->Render(GLOBAL_CAMERA, *material);
+      /* mesh->Render(::picasso::GLOBAL_CAMERA, *material); */
 
       ImGui::Render();
       ImGui_ImplSdlGL3_RenderDrawData(ImGui::GetDrawData());

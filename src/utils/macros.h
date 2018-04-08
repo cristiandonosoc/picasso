@@ -28,8 +28,6 @@
 #define PRINTF_FORMAT_ATTRIBUTE(ignore1, ignore2)
 #endif
 
-
-
 // Ignore warnings for Windows because they don't have a good way
 // of ignoring warnings for certain includes
 // (I mean, they did add it in 2018...)

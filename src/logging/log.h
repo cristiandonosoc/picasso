@@ -38,6 +38,7 @@ namespace logging {
 #define LOG_INDENT_STATUS(indent, status) ::picasso::logging::LogBuffer::LogStatus(indent, status, __FILE__, __LINE__);
 #define LOG_INDENT_STATUS_OR(indent, status_or) ::picasso::logging::LogBuffer::LogStatusOr(indent, status_or, __FILE__, __LINE__);
 
+#define LOG_ARRAY(array, count) ::picasso::logging::LogBuffer::LogArray(array, count, __FILE__, __LINE__);
 
 // STDERR
 

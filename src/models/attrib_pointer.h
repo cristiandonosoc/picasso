@@ -39,6 +39,9 @@ class AttributePointer {
   }
 
  public:
+  void Bind(int location) const;
+
+ public:
   AttributeKind GetKind() const { return kind_; }
   GLint GetSize() const { return size_; }
   GLenum GetType() const { return type_; }

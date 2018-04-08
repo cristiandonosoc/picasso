@@ -74,6 +74,10 @@ class Camera {
   glm::mat4 proj_mat_;
 };  // class Camera
 
+
+// TODO(Cristian): Remove this globaL!!
+extern Camera GLOBAL_CAMERA;
+
 }   // namespace picasso
 
 #endif  // SRC_CAMERA_H

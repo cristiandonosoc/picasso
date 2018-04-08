@@ -148,7 +148,11 @@ class StatusOr : public Status {
 
  public:
   T&& ConsumeOrDie() {
-    assert(Ok());
+    if (!Ok()) {
+      fprintf(stderr, "ConsumeOrDie called on invalid StatusOr. ErrorMsg: %s\n", 
+                      error_msg_.c_str());
+      assert(Ok());
+    }
     return std::move(val_);
   }
 

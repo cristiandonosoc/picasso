@@ -305,12 +305,6 @@ bool Mesh::Render(const Camera& camera,
   // We setup the program
   glUseProgram(shader->GetShaderHandle());
 
-  /* // We bind our set VAO */
-  /* auto it = material_vao_map_.find(key); */
-  /* if (it != material_vao_map_.end()) { */
-  /*   glBindVertexArray(it->second); */
-  /* } */
-
   // We set the VAO (which will set the VBO and EBO)
   glBindVertexArray(vao_);
   glBindBuffer(GL_ARRAY_BUFFER, vbo_);

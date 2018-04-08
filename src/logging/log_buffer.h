@@ -14,6 +14,7 @@
 #include <string>
 #include <vector>
 #include <ctime>
+#include <sstream>
 
 #include "utils/macros.h"
 #include "utils/printable_enum.h"
@@ -64,6 +65,19 @@ class LogBuffer {
   template<typename T>
   static void LogStderrStatusOr(int indent, const StatusOr<T>& s, const char *file, int line) {
     LogStderrStatus(indent, s.DowncastToStatus(), file, line);
+  }
+
+  template <typename T>
+  static void LogArray(T *array, size_t count, const char *file, int line) {
+    std::stringstream ss;
+    for (size_t i = 0; i < count; i++) {
+      ss << array[i];
+      if (i < count - 1) {
+        ss << ", ";
+      }
+    }
+
+    Log(0, LogLevel::LOG_DEBUG, file, line, "%s", ss.str().c_str());
   }
 
   static const LogContainer& GetLogs();
