@@ -75,6 +75,13 @@ Status Debug::AddLine(glm::vec3 start, glm::vec3 end, glm::vec3 color) {
 
 }
 
+Status Debug::AddAxis() {
+  RETURN_IF_NOT_OK(AddLine({0, 0, 0}, {1, 0, 0}, {1, 0, 0}));
+  RETURN_IF_NOT_OK(AddLine({0, 0, 0}, {0, 1, 0}, {0, 1, 0}));
+  RETURN_IF_NOT_OK(AddLine({0, 0, 0}, {0, 0, 1}, {0, 0, 1}));
+  return Status::STATUS_OK;
+}
+
 void Debug::FrameRender() {
   auto& debug = Instance();
   glBindVertexArray(debug.vao_);

@@ -36,6 +36,10 @@ namespace utils {
   }                                                                           \
   auto varname = status.ConsumeOrDie() 
 
+#define RETURN_IF_NOT_OK(stmt) \
+  auto COMBINE(status, __LINE__) = stmt; \
+  if (!COMBINE(status, __LINE__).Ok()) { return COMBINE(status, __LINE__); }
+
 
 // NOTE(Cristian): Those geniuses at X11 decided that it was a good idea
 //                 name their macros Status.... sigh

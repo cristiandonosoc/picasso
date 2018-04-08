@@ -35,6 +35,7 @@ class Debug : public Singleton<Debug> {
  public:
   static void FrameInit();
   static Status AddLine(glm::vec3 start, glm::vec3 end, glm::vec3 color);
+  static Status AddAxis();
   static void FrameRender();
 
   static inline size_t PointToBytes(size_t point_count) {

@@ -263,9 +263,7 @@ int main(int, char **) {
       glClear(GL_COLOR_BUFFER_BIT);
 
       ::picasso::debug::Debug::FrameInit();
-      ::picasso::debug::Debug::AddLine({0, 0, 0}, {1, 0, 0}, {1, 0, 0});
-      ::picasso::debug::Debug::AddLine({0, 0, 0}, {0, 1, 0}, {0, 1, 0});
-      ::picasso::debug::Debug::AddLine({0, 0, 0}, {0, 0, 1}, {0, 0, 1});
+      ::picasso::debug::Debug::AddAxis();
       ::picasso::debug::Debug::FrameRender();
 
       /* glPolygonMode(GL_FRONT_AND_BACK, GL_LINE); */
