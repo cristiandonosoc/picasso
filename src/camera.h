@@ -54,6 +54,10 @@ class Camera {
   void ReloadViewMatrix();
 
  public:
+  glm::vec3 Direction() { return target_transform.GetTranslation() - 
+                                 transform.GetTranslation(); }
+
+ public:
   const glm::mat4& View() const { return view_mat_; }
   const glm::mat4& Projection() const { return proj_mat_; }
 

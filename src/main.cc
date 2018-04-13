@@ -34,6 +34,8 @@
 
 #include "debug/debug.h"
 
+#include "input.h"
+
 
 using ::picasso::assets::Mesh;
 using ::picasso::assets::TextureRegistry;
@@ -219,7 +221,7 @@ int main(int, char **) {
   ui_data.clear_color = { 0.137f, 0.152f, 0.637f, 1.00f };
 
 
-  picasso::GLOBAL_CAMERA.transform.SetTranslation({0, 0, -3});
+  picasso::GLOBAL_CAMERA.transform.SetTranslation({3, 3, 3});
   picasso::GLOBAL_CAMERA.ReloadViewMatrix();
 
 
@@ -244,7 +246,8 @@ int main(int, char **) {
 			}
 
       ImGui_ImplSdlGL3_NewFrame(window);
-
+      // Our application's input
+      picasso::HandleInput();
 
       /* picasso::ImGuiExample(clear_color, show_demo_window, show_another_window); */
       picasso::ui::RunUi(&ui_data);
