@@ -152,18 +152,14 @@ int main(int, char **) {
       simple_vs, color_fs).ConsumeOrDie();
 
   // We load a texture
-  auto texture_key = TextureRegistry::Create("test_texture",
-      GetExecutableDir() + "textures/container.jpg").ConsumeOrDie();
+  auto dir = GetExecutableDir();
+  auto texture_key = TextureRegistry::Create("test_texture", dir + "textures/container.jpg").ConsumeOrDie();
   auto texture = TextureRegistry::Get(texture_key).lock();
-  LOG_DEBUG("TEXTURE READ. POINTER: %p, WIDTH: %d, HEIGHT: %d",  texture->GetData(), texture->GetWidth(), texture->GetHeight());
 
-  auto res = TextureRegistry::Create("happy",
-      GetExecutableDir() + "textures/awesomeface.png");
-  if (!res.Ok()) {
-    LOGERR_FATAL("Could not load texture: %s", res.GetErrorMsg().c_str());
-    return 1;
-  }
+  auto res = TextureRegistry::Create("happy", dir + "textures/awesomeface.png");
   auto tex2 = TextureRegistry::Get(res.ConsumeOrDie()).lock();
+
+  TextureRegistry::Create("grid", dir + "textures/grid.png");
 
   LOG_SEPARATOR;
   LOG_INFO("Creating material");
@@ -221,7 +217,8 @@ int main(int, char **) {
   ui_data.clear_color = { 0.137f, 0.152f, 0.637f, 1.00f };
 
 
-  picasso::GLOBAL_CAMERA.transform.SetTranslation({3, 3, 3});
+  /* picasso::GLOBAL_CAMERA.transform; */
+  /* picasso::GLOBAL_CAMERA.transform; */
   picasso::GLOBAL_CAMERA.ReloadViewMatrix();
 
 

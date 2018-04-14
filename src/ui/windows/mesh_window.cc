@@ -21,7 +21,6 @@ namespace ui {
 namespace windows {
 
 using ::picasso::assets::MeshRegistry;
-using ::picasso::models::TransformationType;
 using ::picasso::utils::picasso_snprintf;
 
 using ::picasso::ui::widgets::TransformWidget;

@@ -36,12 +36,8 @@ void CameraWindow(UiData *, ImVec2 start_pos, ImVec2 start_size) {
   if (TransformWidget("camera", GLOBAL_CAMERA.transform)) {
     GLOBAL_CAMERA.ReloadViewMatrix();
   }
-  ImGui::Separator();
-
-  ImGui::Text("Target transform");
-  if (TransformWidget("target", GLOBAL_CAMERA.target_transform)) {
-    GLOBAL_CAMERA.ReloadViewMatrix();
-  }
+  auto direction = GLOBAL_CAMERA.GetLookDirection();
+  ImGui::InputFloat3("DIRECTION", (float*)&direction);
 }
 
 }   // namespace windows

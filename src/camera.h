@@ -54,8 +54,11 @@ class Camera {
   void ReloadViewMatrix();
 
  public:
-  glm::vec3 Direction() { return target_transform.GetTranslation() - 
-                                 transform.GetTranslation(); }
+  void GeneratePositionFromParameters();
+  void GenerateParametersFromPosition();
+
+ public:
+  glm::vec3 GetLookDirection() const;
 
  public:
   const glm::mat4& View() const { return view_mat_; }
@@ -67,7 +70,6 @@ class Camera {
   // TODO(Cristian): See a good way to enforce this
  public:
   Transform transform;
-  Transform target_transform;
   OrthographicData ortho_data;
   PerspectiveData perspective_data;
   CameraProjection proj_type = CameraProjection::PERSPECTIVE;

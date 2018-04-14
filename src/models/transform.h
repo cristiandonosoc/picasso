@@ -21,10 +21,6 @@ END_IGNORE_WARNINGS();
 namespace picasso {
 namespace models {
 
-PRINTABLE_ENUM(TransformationType, NONE,
-                                   LOCAL,
-                                   GLOBAL);                        
-
 class Transform {
  public:
   Transform() : translation_(0.0f), rotation_(0.0f), scale_(1.0f), m_model_(1.0f) {}
@@ -34,26 +30,22 @@ class Transform {
   const glm::vec3& GetRotation() const { return rotation_; }
   const glm::vec3& GetScale() const { return scale_; }
   const glm::mat4& GetModelMatrix() const { return m_model_; }
-  TransformationType GetTranslationType() const { return translation_type_; }
 
  public:
   void SetTranslation(const glm::vec3& translation);
   void SetRotation(const glm::vec3& rotation);
   void SetScale(const glm::vec3& scale);
-  void SetTranslationType(TransformationType);
 
  public:
-  glm::mat4 CalculateMatrix(
-      TransformationType translate = TransformationType::LOCAL,
-      bool rotate = true,
-      bool scale = true) const;
+  glm::mat4 CalculateMatrix(bool translate = true,
+                            bool rotate = true,
+                            bool scale = true) const;
   void RecalculateModelMatrix();
 
  public:
   const glm::mat4& ModelMatrix = m_model_;
 
  private:
-  TransformationType translation_type_ = TransformationType::LOCAL;
   glm::vec3 translation_;
   glm::vec3 rotation_;
   glm::vec3 scale_;

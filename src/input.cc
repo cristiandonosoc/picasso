@@ -22,10 +22,9 @@ namespace {
 void HandleMouse(ImGuiIO& io) {
   // We move the camera in ording or it's view direction
   if (io.MouseWheel) {
-    auto direction = GLOBAL_CAMERA.Direction();
-    GLOBAL_CAMERA.transform.SetTranslation(GLOBAL_CAMERA.transform.GetTranslation() + 
-                                           direction * io.MouseWheel * 0.1f);
-    GLOBAL_CAMERA.ReloadViewMatrix();
+    /* GLOBAL_CAMERA.radius += GLOBAL_CAMERA.radius * io.DeltaTime * io.MouseWheel * 2.5f; */
+    /* GLOBAL_CAMERA.GeneratePositionFromParameters(); */
+    /* GLOBAL_CAMERA.ReloadViewMatrix(); */
   }
 }
 

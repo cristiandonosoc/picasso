@@ -33,12 +33,7 @@ void Transform::SetScale(const glm::vec3& scale) {
   RecalculateModelMatrix();
 }
 
-void Transform::SetTranslationType(TransformationType translation_type) {
-  translation_type_ = translation_type;
-  RecalculateModelMatrix();
-}
-
-glm::mat4 Transform::CalculateMatrix(TransformationType translate,
+glm::mat4 Transform::CalculateMatrix(bool translate,
                                      bool rotate,
                                      bool scale) const {
   glm::mat4 mat = glm::mat4(1.0f);
@@ -54,18 +49,14 @@ glm::mat4 Transform::CalculateMatrix(TransformationType translate,
   }
 
   // Translate
-  if (translate == TransformationType::LOCAL) {
+  if (translate) {
     mat = glm::translate(mat, translation_);
-  } else if (translate == TransformationType::GLOBAL) {
-    mat[3][0] = translation_[0];
-    mat[3][1] = translation_[1];
-    mat[3][2] = translation_[2];
   }
   return mat;
 }
 
 void Transform::RecalculateModelMatrix() {
-  m_model_ = CalculateMatrix(translation_type_);
+  m_model_ = CalculateMatrix();
 }
 
 }   // namespace models

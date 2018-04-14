@@ -28,11 +28,23 @@ glm::mat4 GeneratePerspectiveMatrix(const Camera& camera) {
 
 }   // namespace
 
-glm::mat4 Camera::GenerateViewMatrix() const {
-  glm::vec3 position = transform.ModelMatrix[3];
-  glm::vec3 target = target_transform.ModelMatrix[3];
+glm::vec3 Camera::GetLookDirection() const {
+  /* glm::vec3 direction(0); */
+  /* float pitch = transform.GetRotation().x; */
+  /* float yaw = transform.GetRotation().y; */
+  /* direction.x = cos(glm::radians(pitch)) * cos(glm::radians(yaw)); */
+  /* direction.y = sin(glm::radians(pitch)); */
+  /* direction.z = cos(glm::radians(pitch)) * sin(glm::radians(yaw)); */
+  /* return direction; */
+  return transform.CalculateMatrix(false, true, false) * glm::vec4(0, 0, 1, 0);
+}
 
-  return glm::lookAt(position, target, {0, 1, 0});
+glm::mat4 Camera::GenerateViewMatrix() const {
+  const auto& position = transform.GetTranslation();
+  const auto& direction = GetLookDirection();
+  return glm::lookAt(position, 
+                     position + direction,
+                     {0, 1, 0});
 }
 
 glm::mat4 Camera::GenerateProjectionMatrix() const {
