@@ -44,12 +44,12 @@ class Mesh {
  public:
   DEFINE_PTR_TYPES(Mesh);
 
-
  public:
-  Mesh() = default;
+  Mesh(const std::string& name) : name_(name) {}
 
  public:
   bool Valid() const { return setup_; }
+  const std::string& GetName() const { return name_; }
 
  public:
   void SetVertexBuffer(size_t count, GLfloat *vertices);
@@ -70,6 +70,7 @@ class Mesh {
   bool Render(const Transform& transform, const Camera&, const Material&) const;
 
  private:
+  std::string name_;
   AttributePointerMap attribute_pointer_map_;
 
   DynamicArray<GLfloat> vertex_buffer_;

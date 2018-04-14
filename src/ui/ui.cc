@@ -80,7 +80,7 @@ void TextureWindow(UiData*, ImVec2 start_pos, ImVec2 start_size) {
 
   auto&& texture_map = TextureRegistry::GetTextureMap();
   static int selected_index = -1;
-  static MaterialRegistry::KeyType selected_key;
+  static TextureRegistry::Key selected_key;
 
   {
     SCOPED_TRIGGER(ImGui::BeginChild("Left Pane", {150, 0}, true),

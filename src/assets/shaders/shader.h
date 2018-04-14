@@ -39,7 +39,7 @@ class Shader {
 
   // CONSTRUCTORS
  public:
-  Shader() = default;
+  Shader(const std::string& name) : name_(name) {}
   DISABLE_COPY(Shader);
   DEFAULT_MOVE(Shader);
 

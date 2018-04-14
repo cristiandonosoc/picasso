@@ -52,7 +52,7 @@ StatusOr<int> CompileShader(const std::string& shader_name,
 /**
  * STATIC INTERFACE
  **/
-StatusOr<ShaderRegistry::KeyType> ShaderRegistry::CreateFromFiles(
+StatusOr<ShaderRegistry::Result> ShaderRegistry::CreateFromFiles(
     const std::string& name,
     const std::string& vertex_path,
     const std::string& fragment_path) {
@@ -62,7 +62,7 @@ StatusOr<ShaderRegistry::KeyType> ShaderRegistry::CreateFromFiles(
   return Create(name, vs, fs);
 }
 
-StatusOr<ShaderRegistry::KeyType> ShaderRegistry::Create(const std::string& name,
+StatusOr<ShaderRegistry::Result> ShaderRegistry::Create(const std::string& name,
                                            const std::string& vs,
                                            const std::string& fs) {
   // We attempt to allocate it
@@ -72,34 +72,13 @@ StatusOr<ShaderRegistry::KeyType> ShaderRegistry::Create(const std::string& name
   }
 
   // We attempt to register the shader
-  Shader *shader = reg_res.ConsumeOrDie();
-  auto load_res = LoadShader(shader, name, vs, fs);
+  Result registry_result = reg_res.ConsumeOrDie();
+  auto load_res = LoadShader(registry_result.value, name, vs, fs);
   if (!load_res.Ok()) {
-    Unregister(name);
+    Unregister(registry_result.key);
     return load_res;
   }
-  return name;
-}
-
-StatusOr<Shader*> ShaderRegistry::Get(const std::string& name) {
-  auto& map = Instance().map_;
-  auto it = map.find(name);
-  if (it == map.end()) {
-    return FILENO_STATUS(Status::STATUS_ERROR, "ShaderRegistry: cannot find key \"%s\"",
-                         name.c_str());
-  }
-  return it->second.get();
-}
-
-std::vector<Shader*> ShaderRegistry::GetShaders() {
-  std::vector<Shader*> programs;
-  auto& map = Instance().map_;
-  programs.reserve(map.size());
-  for (auto&& it : map) {
-    programs.push_back(it.second.get());
-  }
-
-  return programs;
+  return registry_result;
 }
 
 Status ShaderRegistry::LoadShader(Shader *shader,

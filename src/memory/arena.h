@@ -18,123 +18,116 @@
 #include "utils/singleton.h"
 #include "utils/macros.h"
 #include "logging/log.h"
+#include "utils/status.h"
 
 namespace picasso {
 namespace memory {
 
-using ::picasso::utils::Singleton;
 
-template <typename T, size_t ARENA_SIZE>
-class Arena : public Singleton<Arena<T, ARENA_SIZE>> {
+using ::picasso::utils::Status;
+using ::picasso::utils::StatusOr;
+
+template<typename T, size_t ARENA_SIZE = 128>
+class Arena {
  public:
+  struct Result {
+    size_t index;   // Used for deallocating
+    T *instance;
+  };
+
+ public:
+  using ValueType = T;
   static constexpr size_t ArenaSize = ARENA_SIZE;
-  static constexpr size_t ArenaByteSize = ARENA_SIZE * sizeof(T);
-
- public:
-  using Singleton<Arena<T, ARENA_SIZE>>::Instance;
+  static constexpr size_t ArenaByteSize = ARENA_SIZE * sizeof(ValueType);
 
  public:
   Arena() = default;
+  ~Arena() {
+
+  }
   DISABLE_COPY(Arena);
   DISABLE_MOVE(Arena);
 
  public:
-  static T* Allocate() {
-    auto& instance = Instance();
-    // Search for a free element
-    for (size_t i = 0; i < ARENA_SIZE; i++) {
-      if (!instance.used_[i]) {
-        instance.used_[i] = 1;
-        return (T*)(instance.arena_ + i * sizeof(T));
-      }
+  int GetCount() const { return count_; }
+
+ public:
+  StatusOr<T*> Get(size_t index) const {
+    assert(index < ArenaSize);
+    if (!used_[index]) {
+      return { Status::STATUS_FAILED,
+               "Cannot get element with index %zu", index };
     }
-    // No more space
-    return nullptr;
+    return (T*)arena_ + index;
   }
 
-  static void Deallocate(T* ptr) {
-    if (!ptr) {
-      return;
+  std::vector<Result> GetActive() const {
+    std::vector<Result> result;
+    result.reserve(ArenaSize);
+
+    T *base = (T*)arena_;
+    for (size_t i = 0; i < ArenaSize; i++) {
+      if (used_[i]) {
+        result.push_back({i, base + i});
+      }
     }
-    auto& instance = Instance();
-    // We see if that pointer was allocated
-    auto diff = (uint8_t*)ptr - instance.arena_;
-    assert((diff >= 0) &&
-           (diff < (int)ArenaByteSize) &&
-           ((diff % sizeof(T)) == 0));
-    int index = diff / sizeof(T);
-    assert(instance.used_[index]);
-    instance.used_[index] = 0;
+    return result;
+  }
+
+ public:
+  template <typename... Args>
+  StatusOr<Result> Create(Args&&... args) {
+    LOG_DEBUG("CREATING NEW OBJECT");
+    int index = GetNextAvailableSlot();
+    if (index < 0) {
+      LOG_ERROR("CANNOT ALLOCATE NEW OBJECT");
+      return { Status::STATUS_ERROR, "Cannot allocate new object" };
+    }
+
+    // In-place construction the object
+    T *slot = (T*)arena_ + index;
+    ::new ((void*)slot) T(std::forward<Args>(args)...);
+    used_[index] = 1;
+    count_++;
+    Result res;
+    res.index = (size_t)index;
+    res.instance = slot;
+    return res;
+  }
+
+  Status Destroy(size_t index) {
+    assert(index < ArenaSize);
+    assert(used_[index]);
+    // Obtain the pointer
+    T *slot = ((T*)arena_) + index;
+    // Call the destructor
+    slot->~T();
+    // Mark memory as free
+    used_[index] = 0;
+    count_--;
+
+    return Status::STATUS_OK;
   }
 
  private:
-  uint8_t arena_[ArenaByteSize] = {};  // Starts at 0
-  std::bitset<ARENA_SIZE> used_;
-
- public:
-  friend class Singleton<Arena<T, ARENA_SIZE>>;
-};  // class Arena
-
-template <typename T, typename ArenaAllocator>
-class ArenaDeleter {
- public:
-  void operator()(T* ptr) {
-    if (ptr) {
-      ArenaAllocator allocator;
-      std::allocator_traits<ArenaAllocator>::destroy(allocator, ptr);
-      std::allocator_traits<ArenaAllocator>::deallocate(allocator, ptr, 1);
+  int GetNextAvailableSlot() {
+    int index = -1;
+    // Linear search for a free element
+    // TODO(Cristian): Do we want a more claver scheme for this?
+    for (size_t i = 0; i < ArenaSize; i++) {
+      if (!used_[i]) {
+        index = i;
+        break;
+      }
     }
-  }
-};  // class ArenaDeleter
-
-template<typename T, size_t ARENA_SIZE = 128>
-class ArenaAllocator {
- public:
-  using value_type = T;
-
- public:
-  ArenaAllocator() noexcept {}
-  ~ArenaAllocator() noexcept {}
-
- public:
-  template <typename U>
-  ArenaAllocator(const ArenaAllocator<U>&) noexcept {}
-
- public:
-  T* allocate(size_t n) {
-    LOG_DEBUG("ALLOCATING");
-    assert(n == 1);
-    return Arena<T, ARENA_SIZE>::Allocate();
+    return index;
   }
 
-  void deallocate(T* ptr, size_t n) {
-    LOG_DEBUG("ALLOCATING");
-    assert(n == 1);
-    return Arena<T, ARENA_SIZE>::Deallocate(ptr);
-  }
-};  // class ArenaAllocator
-
-template <typename T, typename U>
-constexpr bool operator== (const ArenaAllocator<T>&, const ArenaAllocator<U>&) noexcept {
-  return false;
-}
-// Specialization
-template <typename T>
-constexpr bool operator==(const ArenaAllocator<T>&, const ArenaAllocator<T>&) noexcept {
-  return true;
-}
-
-template <typename T, typename U>
-constexpr bool operator!= (const ArenaAllocator<T>&, const ArenaAllocator<U>&) noexcept {
-  return true;
-}
-// Specialization
-template <typename T>
-constexpr bool operator!=(const ArenaAllocator<T>&, const ArenaAllocator<T>&) noexcept {
-  return false;
-}
-
-
+ private:
+  uint8_t arena_[ArenaByteSize] = {};   // starts at 0
+  std::bitset<ArenaSize> used_;
+  int count_ = 0;
+};  // class Arena
 
 }   // namespace memory
 }   // namespace picasso

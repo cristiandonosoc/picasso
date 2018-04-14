@@ -22,6 +22,7 @@ namespace windows {
 
 using ::picasso::assets::MeshRegistry;
 using ::picasso::utils::picasso_snprintf;
+using ::picasso::assets::Mesh;
 
 using ::picasso::ui::widgets::TransformWidget;
 
@@ -31,7 +32,7 @@ void MeshWindow(UiData*, ImVec2 start_pos, ImVec2 start_size) {
   static bool open = true;
   SCOPED_TRIGGER(ImGui::Begin("Meshes", &open), ImGui::End());
 
-  auto&& meshes = MeshRegistry::GetMap();
+  auto&& meshes = MeshRegistry::GetElements();
   static int selected_index = -1;
   static MeshRegistry::KeyType selected_key;
   static MeshRegistry::ValueType *selected_mesh = nullptr;
@@ -43,14 +44,15 @@ void MeshWindow(UiData*, ImVec2 start_pos, ImVec2 start_size) {
     for (auto&& it = meshes.begin();
          it != meshes.end();
          it++, i++) {
-      MeshRegistry::KeyType key = it->first;
+      MeshRegistry::KeyType key = it->key;
       /* Material* material = it->second; */
+      Mesh *mesh = it->value;
       char label[128];
-      picasso_snprintf(label, sizeof(label), "%s", key.c_str());
+      picasso_snprintf(label, sizeof(label), "%s", mesh->GetName().c_str());
       if (ImGui::Selectable(label, selected_index == i)) {
         selected_index = i;
         selected_key = key;
-        selected_mesh = it->second.get();
+        selected_mesh = it->value;
       }
     }
   }

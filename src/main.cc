@@ -43,7 +43,6 @@ using ::picasso::registries::ModelRegistry;
 using ::picasso::assets::Mesh;
 using ::picasso::assets::TextureRegistry;
 
-
 using ::picasso::assets::shaders::Shader;
 using ::picasso::assets::materials::Material;
 using ::picasso::assets::Mesh;
@@ -102,45 +101,7 @@ SDL_Window *SetupSDL() {
   return window;
 }
 
-
-}   // namespace
-
-int main(int, char **) {
-  if (SDL_Init(SDL_INIT_VIDEO|SDL_INIT_TIMER) != 0) {
-    LOGERR_FATAL("SDL_Init Error: %s", SDL_GetError());
-    return 1;
-  }
-
-  // Setup window
-  SDL_Window *window = SetupSDL();
-  SDL_GLContext glcontext = SDL_GL_CreateContext(window);
-	SDL_GL_SetSwapInterval(1); // Enable vsync
-  gl3wInit();
-
-  // Setup ImGUI binding
-  ImGui::CreateContext();
-  ImGuiIO& io = ImGui::GetIO();
-  // Mainly sets up the HDC and SDL Keyboard/Mouse stuf
-  ImGui_ImplSdlGL3_Init(window);
-
-  // We maximize the window
-  //
-#ifdef _WIN32
-  // TODO(Cristian): For some reason, we need this for stdout logging in windows
-  //                 Move this to the platform layer
-  fflush(stderr);
-
-  // Maximize the window
-  ShowWindow((HWND)io.ImeWindowHandle, SW_MAXIMIZE);
-#endif
-
-  LOG_INFO("OpenGL Vendor: %s", glGetString(GL_VENDOR));
-  LOG_INFO("OpenGL Renderer: %s", glGetString(GL_RENDERER));
-  LOG_INFO("OpenGL Version: %s", glGetString(GL_VERSION));
-  LOG_INFO("OpenGL Shading Language Version: %s",
-              glGetString(GL_SHADING_LANGUAGE_VERSION));
-  LOG_INFO("OpenGL Extension: %s", glGetString(GL_EXTENSIONS));
-
+Model *CreateCube() {
   // Load a shader
 	std::string simple_vs = ReadWholeFile(GetExecutableDir() +
                                         "/shaders/simple.vert");
@@ -150,9 +111,9 @@ int main(int, char **) {
                                        "/shaders/color.frag");
 
   auto simple_shader_key = ShaderRegistry::Create("test_shader",
-      simple_vs, simple_fs).ConsumeOrDie();
-  auto color_shader_key= ShaderRegistry::Create("color_shader",
-      simple_vs, color_fs).ConsumeOrDie();
+      simple_vs, simple_fs).ConsumeOrDie().key;
+  ShaderRegistry::Create("color_shader",
+      simple_vs, color_fs);
 
   // We load a texture
   auto dir = GetExecutableDir();
@@ -164,18 +125,18 @@ int main(int, char **) {
 
   TextureRegistry::Create("grid", dir + "textures/grid.png");
 
-  LOG_SEPARATOR;
-  LOG_INFO("Creating material");
+
   std::string mat_name = "mat0";
   auto material_res = MaterialRegistry::Create(mat_name);
   if (!material_res.Ok()) {
     LOGERR_FATAL("Could not create material \"%s\"", mat_name.c_str());
-    return 1;
+    exit(1);
   }
 
-  Material* material = material_res.ConsumeOrDie();
+  auto mat_res = material_res.ConsumeOrDie();
+  Material* material = mat_res.value;
 
-  auto mapping_res = ShaderMaterialMapper::AddMapping(simple_shader_key, mat_name);
+  auto mapping_res = ShaderMaterialMapper::AddMapping(simple_shader_key, mat_res.key);
   LOG_NON_OK_STATUS(mapping_res);
 
   material->SetValue<uint32_t>("tex0", texture->GetId());
@@ -230,16 +191,9 @@ int main(int, char **) {
       -0.5f,  0.5f, -0.5f,  0.0f, 1.0f
   }; 
 
-  /* // Indices that OpenGL will use to generate the primitives */
-  /* // This enables us to send much less data */
-  /* unsigned int indices[] = {  // note that we start from 0! */
-  /*   0, 1, 3,   // first triangle */
-  /*   1, 2, 3    // second triangle */
-  /* }; */
-
   auto mesh_res = MeshRegistry::Create("mesh0");
   assert(mesh_res.Ok());
-  Mesh *mesh = mesh_res.ConsumeOrDie();
+  Mesh *mesh = mesh_res.ConsumeOrDie().value;
 
   mesh->SetVertexBuffer(sizeof(vertices), vertices);
   /* mesh->SetIndexBuffer(sizeof(indices), indices); */
@@ -251,9 +205,53 @@ int main(int, char **) {
   mesh->SetupBuffers();
 
   // Create the model
-  Model *model = ModelRegistry::Create("model0").ConsumeOrDie(); 
+  Model *model = ModelRegistry::Create("model0").ConsumeOrDie().value;
   model->mesh = mesh;
   model->material = material;
+
+  return model;
+}
+
+}   // namespace
+
+int main(int, char **) {
+  if (SDL_Init(SDL_INIT_VIDEO|SDL_INIT_TIMER) != 0) {
+    LOGERR_FATAL("SDL_Init Error: %s", SDL_GetError());
+    return 1;
+  }
+
+  // Setup window
+  SDL_Window *window = SetupSDL();
+  SDL_GLContext glcontext = SDL_GL_CreateContext(window);
+	SDL_GL_SetSwapInterval(1); // Enable vsync
+  gl3wInit();
+
+  // Setup ImGUI binding
+  ImGui::CreateContext();
+  ImGuiIO& io = ImGui::GetIO();
+  // Mainly sets up the HDC and SDL Keyboard/Mouse stuf
+  ImGui_ImplSdlGL3_Init(window);
+
+  // We maximize the window
+  //
+#ifdef _WIN32
+  // TODO(Cristian): For some reason, we need this for stdout logging in windows
+  //                 Move this to the platform layer
+  fflush(stderr);
+
+  // Maximize the window
+  ShowWindow((HWND)io.ImeWindowHandle, SW_MAXIMIZE);
+#endif
+
+  LOG_INFO("OpenGL Vendor: %s", glGetString(GL_VENDOR));
+  LOG_INFO("OpenGL Renderer: %s", glGetString(GL_RENDERER));
+  LOG_INFO("OpenGL Version: %s", glGetString(GL_VERSION));
+  LOG_INFO("OpenGL Shading Language Version: %s",
+              glGetString(GL_SHADING_LANGUAGE_VERSION));
+  LOG_INFO("OpenGL Extension: %s", glGetString(GL_EXTENSIONS));
+
+
+  Model *model = CreateCube();
 
   // Setup style
   ImGui::StyleColorsDark();

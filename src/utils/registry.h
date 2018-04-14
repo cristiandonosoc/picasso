@@ -18,89 +18,79 @@
 #include "utils/singleton.h"
 #include "utils/status.h"
 #include "memory/arena.h"
+#include "utils/key.h"
 
 namespace picasso {
 namespace utils {
 
-using ::picasso::memory::ArenaDeleter;
+using ::picasso::utils::Key;
+using ::picasso::memory::Arena;
 
-template <typename ParentClass,
-          typename Key, typename Value,
-          typename ArenaAllocator = std::allocator<Value>>
-class Registry : Singleton<Registry<ParentClass, Key, Value,
-                                    ArenaAllocator>> {
+template <typename ParentClass, typename TValueType>
+class Registry : Singleton<Registry<ParentClass, TValueType>> {
  public:
-  using KeyType = Key;
-  using ValueType = Value;
-  using ArenaUniquePtr = std::unique_ptr<ValueType,
-                                         ArenaDeleter<ValueType, ArenaAllocator>>;
-  using MapType = std::map<KeyType, ArenaUniquePtr>;
+  using KeyType = Key<size_t>;
+  using ValueType = TValueType;
 
  public:
-  using AllocatorTraits = std::allocator_traits<ArenaAllocator>;
+  using ArenaType = Arena<TValueType, 1024>;
+  class Result {
+   public:
+    Result() = default;
+    Result(const typename ArenaType::Result& r) : key(r.index), value(r.instance) {}
+
+   public:
+    KeyType key;
+    ValueType *value;
+  };  // class Registry::Result
 
  public:
-  using Singleton<Registry<ParentClass, Key, Value, ArenaAllocator>>::Instance;
+  using Singleton<Registry<ParentClass, TValueType>>::Instance;
 
  protected:
-  Registry() = default;
+  Registry() {
+    elements.reserve(ArenaType::ArenaSize);
+  }
   DISABLE_COPY(Registry);
   DISABLE_MOVE(Registry);
 
- public:
-  static StatusOr<ValueType*> Register(const KeyType& key) {
+ protected:
+  template<typename... Args>
+  static StatusOr<Result> Register(Args&&... args) {
     auto& instance = Instance();
-    auto it = instance.map_.find(key);
-    if (it != instance.map_.end()) {
-      return FILENO_STATUS(Status::STATUS_ERROR,
-                           "Key \"%s\" already exists!",
-                           key.c_str());
-    }
     // Calling custom allocator
-    ArenaAllocator allocator;
-    ArenaUniquePtr value(AllocatorTraits::allocate(allocator, 1));
-    ::new (static_cast<void*>(value.get())) Value();
-    if (!value) {
-      return FILENO_STATUS(Status::STATUS_ERROR,
-                           "Could not allocate memory for key \"%s\"",
-                           key.c_str());
-    }
-    instance.map_[key] = std::move(value);
-    return instance.map_[key].get();
+    auto res = instance.arena_.Create(std::forward<Args>(args)...);
+    RETURN_OR_ASSIGN(arena_result, res);
+    return res.ConsumeOrDie();
   }
 
+ public:
   static Status Unregister(const KeyType& key) {
     auto& instance = Instance();
-    auto it = instance.map_.find(key);
-    if (it == instance.map_.end()) {
-      return FILENO_STATUS(Status::STATUS_ERROR,
-                           "Key \"%s\" already exists!",
-                           key.c_str());
-    }
-    instance.map_.erase(it);
-    return Status::STATUS_OK;
+    return instance.arena_.Destroy(key.Value());
   }
 
  public:
-  static StatusOr<ValueType*> Get(const KeyType& key) {
-    auto& map = Instance().map_;
-    auto it = map.find(key);
-    if (it == map.end()) {
-      return FILENO_STATUS(Status::STATUS_ERROR, "Cannot find key \"%s\"",
-                           key.c_str());
-    }
-    return it->second.get();
+  static StatusOr<TValueType*> Get(const KeyType& key) {
+    return Instance().arena_.Get(key.Value());
   }
 
-  static const MapType& GetMap() {
-    return Instance().map_;
+  static const std::vector<Result>& GetElements() { 
+    auto& instance = Instance();
+    const auto& actives = Instance().arena_.GetActive();
+    instance.elements.clear();
+    for (auto&& active : actives) {
+      instance.elements.push_back(active);
+    }
+    return instance.elements;
   }
 
  private:
-  MapType map_;
+  ArenaType arena_;
+  std::vector<Result> elements;
 
  public:
-  friend class Singleton<Registry<ParentClass, Key, Value, ArenaAllocator>>;
+  friend class Singleton<Registry<ParentClass, TValueType>>;
   friend ParentClass;
 };  // class Registry
 

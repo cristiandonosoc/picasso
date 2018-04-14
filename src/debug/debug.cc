@@ -24,7 +24,7 @@ using ::picasso::assets::shaders::Shader;
 Debug::Debug() {
   shader_key_ = ShaderRegistry::CreateFromFiles("debug_shader", 
       GetExecutableDir() + "/shaders/debug.vert",
-      GetExecutableDir() + "/shaders/debug.frag").ConsumeOrDie();
+      GetExecutableDir() + "/shaders/debug.frag").ConsumeOrDie().key;
   
   attrib_pos_ = AttributePointer(AttributeKind::VERTEX, 3,
                                  GL_FLOAT, GL_FALSE,

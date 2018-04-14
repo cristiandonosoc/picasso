@@ -12,7 +12,6 @@
 #define SRC_ASSETS_MESH_REGISTRY_H
 
 #include "assets/mesh.h"
-#include "memory/arena.h"
 #include "utils/registry.h"
 #include "utils/status.h"
 
@@ -20,15 +19,14 @@ namespace picasso {
 namespace assets {
 
 using ::picasso::assets::Mesh;
-using ::picasso::memory::ArenaAllocator;
 using ::picasso::utils::Registry;
 using ::picasso::utils::StatusOr;
 
-class MeshRegistry : public Registry<MeshRegistry, std::string, Mesh,
-                                     ArenaAllocator<Mesh, 1024>> {
+class MeshRegistry : public Registry<MeshRegistry, Mesh> {
  public:
-  static StatusOr<Mesh*> Create(const std::string& name);
-
+  static StatusOr<Result> Create(const std::string& name) {
+    return Register(name);
+  }
 };  // class MeshRegistry
 
 }   // namespace assets

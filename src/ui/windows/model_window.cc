@@ -20,6 +20,7 @@ namespace picasso {
 namespace ui {
 namespace windows {
 
+using ::picasso::models::Model;
 using ::picasso::registries::ModelRegistry;
 using ::picasso::utils::picasso_snprintf;
 
@@ -31,7 +32,7 @@ void ModelWindow(UiData*, ImVec2 start_pos, ImVec2 start_size) {
   static bool open = true;
   SCOPED_TRIGGER(ImGui::Begin("Modeles", &open), ImGui::End());
 
-  auto&& meshes = ModelRegistry::GetMap();
+  auto&& meshes = ModelRegistry::GetElements();
   static int selected_index = -1;
   static ModelRegistry::KeyType selected_key;
   static ModelRegistry::ValueType *selected_model = nullptr;
@@ -43,14 +44,15 @@ void ModelWindow(UiData*, ImVec2 start_pos, ImVec2 start_size) {
     for (auto&& it = meshes.begin();
          it != meshes.end();
          it++, i++) {
-      ModelRegistry::KeyType key = it->first;
+      ModelRegistry::KeyType key = it->key;
       /* Material* material = it->second; */
+      Model *model = it->value;
       char label[128];
-      picasso_snprintf(label, sizeof(label), "%s", key.c_str());
+      picasso_snprintf(label, sizeof(label), "%s", model->name.c_str());
       if (ImGui::Selectable(label, selected_index == i)) {
         selected_index = i;
         selected_key = key;
-        selected_model = it->second.get();
+        selected_model = it->value;
       }
     }
   }

@@ -54,7 +54,8 @@ class Status {
     STATUS_OK,
     STATUS_ERROR,
     STATUS_WARNING,
-    STATUS_CONSUMED
+    STATUS_CONSUMED,
+    STATUS_FAILED
   };  // enum StatusEnum
 
  public:

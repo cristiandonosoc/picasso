@@ -54,7 +54,7 @@ void MaterialWindow(UiData *, ImVec2 start_pos, ImVec2 start_size) {
 
   SCOPED_TRIGGER(ImGui::Begin("Materials", &open), ImGui::End());
 
-  auto&& materials = MaterialRegistry::GetMap();
+  auto&& materials = MaterialRegistry::GetElements();
   static int selected_material = -1;
   static MaterialRegistry::KeyType selected_key;
 
@@ -65,10 +65,11 @@ void MaterialWindow(UiData *, ImVec2 start_pos, ImVec2 start_size) {
     for (auto&& it = materials.begin();
          it != materials.end();
          it++, i++) {
-      MaterialRegistry::KeyType key = it->first;
+      MaterialRegistry::KeyType key = it->key;
+      Material *material = it->value;
       /* Material* material = it->second; */
       char label[128];
-      picasso_snprintf(label, sizeof(label), "%s", key.c_str());
+      picasso_snprintf(label, sizeof(label), "%s", material->GetName().c_str());
       if (ImGui::Selectable(label, selected_material == i)) {
         selected_material = i;
         selected_key = key;
@@ -80,10 +81,8 @@ void MaterialWindow(UiData *, ImVec2 start_pos, ImVec2 start_size) {
 
   Material *material= nullptr;
   if (selected_material >= 0) {
-    auto it = materials.find(selected_key);
-    material = it != materials.end() ? it->second.get() : nullptr;
+    material = materials[selected_material].value;
   }
-
 
   if (material) {
     SCOPED_TRIGGER(ImGui::BeginChild("Material", {-1, -1}),
@@ -92,15 +91,14 @@ void MaterialWindow(UiData *, ImVec2 start_pos, ImVec2 start_size) {
     int current_index = -1;
     std::vector<std::string> shader_names;
     std::vector<ShaderRegistry::KeyType> shader_keys;
-    const auto& map = ShaderRegistry::GetMap();
-    shader_names.reserve(map.size());
-    shader_keys.reserve(map.size());
+    const auto& shaders = ShaderRegistry::GetElements();
+    shader_names.reserve(shaders.size());
+    shader_keys.reserve(shaders.size());
     int index = 0;
-    for (const auto& it : ShaderRegistry::GetMap()) {
-      const auto& key = it.first;
-      shader_keys.push_back(key);
+    for (const auto& it : shaders) {
+      shader_keys.push_back(it.key);
 
-      const Shader *shader = it.second.get();
+      const Shader *shader = it.value;
       shader_names.push_back(shader->GetName().c_str());
       if (shader == material->GetShader()) {
         current_index = index;
@@ -131,8 +129,6 @@ void MaterialWindow(UiData *, ImVec2 start_pos, ImVec2 start_size) {
       MaterialUniformWidget(it.second);
       ImGui::Separator();
     }
-
-
   }
 }
 

@@ -37,7 +37,7 @@ class Material {
    DEFINE_PTR_TYPES(Material);
 
  public:
-  Material() {}
+  Material(const std::string& name) : name_(name) {}
   DISABLE_COPY(Material);
   DISABLE_MOVE(Material);
 

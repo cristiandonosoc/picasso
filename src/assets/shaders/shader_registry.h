@@ -32,21 +32,15 @@ using ::picasso::utils::Status;
 using ::picasso::utils::StatusOr;
 using ::picasso::utils::Registry;
 
-using ::picasso::memory::ArenaAllocator;
-
-class ShaderRegistry : public Registry<ShaderRegistry, std::string, Shader,
-                                       ArenaAllocator<Shader, 1024>> {
+class ShaderRegistry : public Registry<ShaderRegistry, Shader> {
 
  public:
-  static StatusOr<KeyType> CreateFromFiles(const std::string& name,
-                                           const std::string& vertex_path,
-                                           const std::string& fragment_path);
-  static StatusOr<KeyType> Create(const std::string& name,
+  static StatusOr<Result> CreateFromFiles(const std::string& name,
+                                          const std::string& vertex_path,
+                                          const std::string& fragment_path);
+  static StatusOr<Result> Create(const std::string& name,
                                   const std::string& vs,
                                   const std::string& fs);
-  static StatusOr<Shader*> Get(const std::string& name);
-  static std::vector<Shader*> GetShaders();
-
  private:
   static Status LoadShader(Shader*,
                            const std::string& name,

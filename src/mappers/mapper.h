@@ -61,7 +61,9 @@ class Mapper : Singleton<Mapper<DerivedMapper, FromRegistry, ToRegistry>> {
     if (it != mapped_keys.end()) {
       return { Status::STATUS_WARNING,
                "Mapper \"%s\": Mapping (%s) -> (%s) already exists",
-               DerivedMapper::TypeName().c_str(), from_key.c_str(), to_key.c_str() };
+               DerivedMapper::TypeName().c_str(), 
+               from_key.ToString().c_str(), 
+               to_key.ToString().c_str() };
     }
 
     // We check if the job was actually succesful
@@ -81,7 +83,8 @@ class Mapper : Singleton<Mapper<DerivedMapper, FromRegistry, ToRegistry>> {
     if (from_it == map.end()) {
       return FILENO_STATUS(Status::STATUS_WARNING,
              "Mapper \"%s\": Cannot find key \"%s\"",
-             DerivedMapper::TypeName().c_str(), from_key.c_str());
+             DerivedMapper::TypeName().c_str(), 
+             from_key.ToString().c_str());
     }
 
     auto& mapped_keys = from_it->second;
@@ -89,7 +92,9 @@ class Mapper : Singleton<Mapper<DerivedMapper, FromRegistry, ToRegistry>> {
     if (to_it == mapped_keys.end()) {
       return { Status::STATUS_WARNING,
                "Mapper \"%s\": Mapping (%s) -> (%s) doesn't exists",
-               DerivedMapper::TypeName().c_str(), from_key.c_str(), to_key.c_str() };
+               DerivedMapper::TypeName().c_str(), 
+               from_key.ToString().c_str(), 
+               to_key.ToString().c_str() };
     }
 
     // We call the callback, and only delete if the result is succesful

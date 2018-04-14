@@ -21,16 +21,16 @@ namespace registries {
 
 using ::picasso::models::Model;
 using ::picasso::utils::Registry;
-using ::picasso::memory::ArenaAllocator;
 using ::picasso::utils::StatusOr;
 
-class ModelRegistry : public Registry<ModelRegistry, std::string, Model,
-                                      ArenaAllocator<Model, 1024>> {
+class ModelRegistry : public Registry<ModelRegistry, Model> {
  public:
-  static StatusOr<Model*> Create(const std::string& name) {
-    return Register(name);
+  static StatusOr<Result> Create(const std::string& name) {
+    auto res = Register();
+    RETURN_OR_ASSIGN(pair, res);
+    pair.value->name = name;
+    return pair;
   }
-
 };  // class ModelRegistry
 
 }   // namespace registries

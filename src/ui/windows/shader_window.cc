@@ -61,7 +61,7 @@ void ShaderWindow(UiData *, ImVec2 start_pos, ImVec2 start_size) {
   SCOPED_TRIGGER(ImGui::Begin("Shaders", &open), ImGui::End());
 
   static int selected_shader = -1;
-  auto&& shaders = ShaderRegistry::GetShaders();
+  auto&& shaders = ShaderRegistry::GetElements();
 
   {
     SCOPED_TRIGGER(ImGui::BeginChild("Left Pane", {150, 0}, true),
@@ -70,7 +70,7 @@ void ShaderWindow(UiData *, ImVec2 start_pos, ImVec2 start_size) {
     for (auto&& it = shaders.begin();
          it != shaders.end();
          it++, i++) {
-      auto&& shader = *it;
+      auto&& shader = it->value;
       char label[128];
       picasso_snprintf(label, sizeof(label), "Shader: %s", shader->GetName().c_str());
       if (ImGui::Selectable(label, selected_shader == i)) {
@@ -83,7 +83,7 @@ void ShaderWindow(UiData *, ImVec2 start_pos, ImVec2 start_size) {
 
   Shader *shader = nullptr;
   if (selected_shader >= 0) {
-    shader = shaders[selected_shader];
+    shader = shaders[selected_shader].value;
   } else {
     return;
   }
