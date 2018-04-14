@@ -185,31 +185,69 @@ int main(int, char **) {
   // We create some sample points
   // Actual points to be renderer
   // There are 6 floats from each element. So stride is 24
+  // Vertices + UV for a cube
   float vertices[] = {
-     // positions         // colors
-     0.5f,  0.5f, 0.0f,   1.0f, 0.0f, 0.0f,  1.0f, 1.0f,  // top right
-     0.5f, -0.5f, 0.0f,   0.0f, 1.0f, 0.0f,  1.0f, 0.0f,  // bottom right
-    -0.5f, -0.5f, 0.0f,   0.0f, 0.0f, 1.0f,  0.0f, 0.0f,  // bottom left
-    -0.5f,  0.5f, 0.0f,   0.5f, 0.7f, 0.2f,  0.0f, 1.0f   // top left
-  };
-  // Indices that OpenGL will use to generate the primitives
-  // This enables us to send much less data
-  unsigned int indices[] = {  // note that we start from 0!
-    0, 1, 3,   // first triangle
-    1, 2, 3    // second triangle
-  };
+      -0.5f, -0.5f, -0.5f,  0.0f, 0.0f,
+       0.5f, -0.5f, -0.5f,  1.0f, 0.0f,
+       0.5f,  0.5f, -0.5f,  1.0f, 1.0f,
+       0.5f,  0.5f, -0.5f,  1.0f, 1.0f,
+      -0.5f,  0.5f, -0.5f,  0.0f, 1.0f,
+      -0.5f, -0.5f, -0.5f,  0.0f, 0.0f,
+
+      -0.5f, -0.5f,  0.5f,  0.0f, 0.0f,
+       0.5f, -0.5f,  0.5f,  1.0f, 0.0f,
+       0.5f,  0.5f,  0.5f,  1.0f, 1.0f,
+       0.5f,  0.5f,  0.5f,  1.0f, 1.0f,
+      -0.5f,  0.5f,  0.5f,  0.0f, 1.0f,
+      -0.5f, -0.5f,  0.5f,  0.0f, 0.0f,
+
+      -0.5f,  0.5f,  0.5f,  1.0f, 0.0f,
+      -0.5f,  0.5f, -0.5f,  1.0f, 1.0f,
+      -0.5f, -0.5f, -0.5f,  0.0f, 1.0f,
+      -0.5f, -0.5f, -0.5f,  0.0f, 1.0f,
+      -0.5f, -0.5f,  0.5f,  0.0f, 0.0f,
+      -0.5f,  0.5f,  0.5f,  1.0f, 0.0f,
+
+       0.5f,  0.5f,  0.5f,  1.0f, 0.0f,
+       0.5f,  0.5f, -0.5f,  1.0f, 1.0f,
+       0.5f, -0.5f, -0.5f,  0.0f, 1.0f,
+       0.5f, -0.5f, -0.5f,  0.0f, 1.0f,
+       0.5f, -0.5f,  0.5f,  0.0f, 0.0f,
+       0.5f,  0.5f,  0.5f,  1.0f, 0.0f,
+
+      -0.5f, -0.5f, -0.5f,  0.0f, 1.0f,
+       0.5f, -0.5f, -0.5f,  1.0f, 1.0f,
+       0.5f, -0.5f,  0.5f,  1.0f, 0.0f,
+       0.5f, -0.5f,  0.5f,  1.0f, 0.0f,
+      -0.5f, -0.5f,  0.5f,  0.0f, 0.0f,
+      -0.5f, -0.5f, -0.5f,  0.0f, 1.0f,
+
+      -0.5f,  0.5f, -0.5f,  0.0f, 1.0f,
+       0.5f,  0.5f, -0.5f,  1.0f, 1.0f,
+       0.5f,  0.5f,  0.5f,  1.0f, 0.0f,
+       0.5f,  0.5f,  0.5f,  1.0f, 0.0f,
+      -0.5f,  0.5f,  0.5f,  0.0f, 0.0f,
+      -0.5f,  0.5f, -0.5f,  0.0f, 1.0f
+  }; 
+
+  /* // Indices that OpenGL will use to generate the primitives */
+  /* // This enables us to send much less data */
+  /* unsigned int indices[] = {  // note that we start from 0! */
+  /*   0, 1, 3,   // first triangle */
+  /*   1, 2, 3    // second triangle */
+  /* }; */
 
   auto mesh_res = MeshRegistry::Create("mesh0");
   assert(mesh_res.Ok());
   Mesh *mesh = mesh_res.ConsumeOrDie();
 
   mesh->SetVertexBuffer(sizeof(vertices), vertices);
-  mesh->SetIndexBuffer(sizeof(indices), indices);
+  /* mesh->SetIndexBuffer(sizeof(indices), indices); */
 
-  int stride = 8 * sizeof(float);
+  int stride = 5 * sizeof(float);
   mesh->AddAttributePointer({AttributeKind::VERTEX, 3, GL_FLOAT, false, stride, 0});
-  mesh->AddAttributePointer({AttributeKind::COLOR, 3, GL_FLOAT, false, stride, 3 * sizeof(float)});
-  mesh->AddAttributePointer({AttributeKind::UV, 2, GL_FLOAT, false, stride, 6 * sizeof(float)});
+  /* mesh->AddAttributePointer({AttributeKind::COLOR, 3, GL_FLOAT, false, stride, 3 * sizeof(float)}); */
+  mesh->AddAttributePointer({AttributeKind::UV, 2, GL_FLOAT, false, stride, 3 * sizeof(float)});
   mesh->SetupBuffers();
 
   // Create the model
@@ -223,11 +261,10 @@ int main(int, char **) {
   picasso::ui::UiData ui_data;
   ui_data.clear_color = { 0.137f, 0.152f, 0.637f, 1.00f };
 
-
-  /* picasso::GLOBAL_CAMERA.transform; */
-  /* picasso::GLOBAL_CAMERA.transform; */
+  picasso::GLOBAL_CAMERA.transform.SetTranslation({0, 0, -10});
   picasso::GLOBAL_CAMERA.ReloadViewMatrix();
 
+  glEnable(GL_DEPTH_TEST);
 
   // Main loop
   bool done = false;
@@ -267,7 +304,7 @@ int main(int, char **) {
                    ui_data.clear_color.y,
                    ui_data.clear_color.z,
                    ui_data.clear_color.w);
-      glClear(GL_COLOR_BUFFER_BIT);
+      glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
       ::picasso::debug::Debug::FrameInit();
       ::picasso::debug::Debug::AddAxis();

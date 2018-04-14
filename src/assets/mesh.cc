@@ -358,6 +358,8 @@ bool Mesh::Render(const Transform& transform,
   if (indexed_) {
     // TODO(Cristian): Actually calculate the sizes
     glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
+  } else {
+    glDrawArrays(GL_TRIANGLES, 0, 36);
   }
 
 
