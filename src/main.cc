@@ -35,7 +35,10 @@
 #include "debug/debug.h"
 
 #include "input.h"
+#include "registries/model_registry.h"
 
+using ::picasso::models::Model;
+using ::picasso::registries::ModelRegistry;
 
 using ::picasso::assets::Mesh;
 using ::picasso::assets::TextureRegistry;
@@ -207,8 +210,12 @@ int main(int, char **) {
   mesh->AddAttributePointer({AttributeKind::VERTEX, 3, GL_FLOAT, false, stride, 0});
   mesh->AddAttributePointer({AttributeKind::COLOR, 3, GL_FLOAT, false, stride, 3 * sizeof(float)});
   mesh->AddAttributePointer({AttributeKind::UV, 2, GL_FLOAT, false, stride, 6 * sizeof(float)});
-
   mesh->SetupBuffers();
+
+  // Create the model
+  Model *model = ModelRegistry::Create("model0").ConsumeOrDie(); 
+  model->mesh = mesh;
+  model->material = material;
 
   // Setup style
   ImGui::StyleColorsDark();
@@ -268,6 +275,7 @@ int main(int, char **) {
 
       /* glPolygonMode(GL_FRONT_AND_BACK, GL_LINE); */
       /* mesh->Render(::picasso::GLOBAL_CAMERA, *material); */
+      model->Render(::picasso::GLOBAL_CAMERA);
 
       ImGui::Render();
       ImGui_ImplSdlGL3_RenderDrawData(ImGui::GetDrawData());

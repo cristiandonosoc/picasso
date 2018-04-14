@@ -228,7 +228,7 @@ void RunUi(UiData *ui_data) {
   windows::ShaderWindow(ui_data,    {0, 500},     {500, 500});
   windows::MaterialWindow(ui_data,  {0, 1000},    {500, 500});
 
-  windows::MeshWindow(ui_data,      {500, 0},     {500, 500});
+  windows::ModelWindow(ui_data,     {500, 0},     {500, 500});
   TextureWindow(ui_data,            {500, 500},   {500, 500});
   windows::CameraWindow(ui_data,    {500, 1000},  {500, 500});
 

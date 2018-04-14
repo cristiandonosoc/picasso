@@ -67,14 +67,9 @@ class Mesh {
   bool RemoveAttributePointer(const AttributePointer&);
 
  public:
-  bool Render(const Camera&, const Material&) const;
-
- public:
-  Transform& GetTransform() { return transform_; }
+  bool Render(const Transform& transform, const Camera&, const Material&) const;
 
  private:
-  Transform transform_;
-
   AttributePointerMap attribute_pointer_map_;
 
   DynamicArray<GLfloat> vertex_buffer_;

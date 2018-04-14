@@ -282,7 +282,8 @@ bool Mesh::RemoveAttributePointer(const AttributePointer& attrib_pointer) {
   return true;
 }
 
-bool Mesh::Render(const Camera& camera,
+bool Mesh::Render(const Transform& transform, 
+                  const Camera& camera,
                   const Material& material) const {
   if (!setup_) {
     // TODO(Cristian): Send error message
@@ -329,7 +330,7 @@ bool Mesh::Render(const Camera& camera,
   auto u_it = material.Uniforms.find("M_MODEL");
   if (u_it != material.Uniforms.end()) {
     location = u_it->second.GetLocation();
-    glUniformMatrix4fv(location, 1, GL_FALSE, glm::value_ptr(transform_.GetModelMatrix()));
+    glUniformMatrix4fv(location, 1, GL_FALSE, glm::value_ptr(transform.GetModelMatrix()));
   }
 
   u_it = material.Uniforms.find("M_VIEW");
