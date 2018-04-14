@@ -10,7 +10,7 @@
 #include "assets/mesh.h"
 #include "assets/shaders/shader_registry.h"
 #include "assets/materials/material_registry.h"
-#include "assets/mesh_registry.h"
+#include "registries/mesh_registry.h"
 
 #include "assets/texture_registry.h"
 
@@ -49,7 +49,7 @@ using ::picasso::assets::Mesh;
 
 using ::picasso::assets::shaders::ShaderRegistry;
 using ::picasso::assets::materials::MaterialRegistry;
-using ::picasso::assets::MeshRegistry;
+using ::picasso::registries::MeshRegistry;
 
 using ::picasso::models::AttributeKind;
 using ::picasso::models::AttributePointer;
@@ -211,6 +211,7 @@ Model *CreateCube() {
 
   return model;
 }
+
 
 }   // namespace
 

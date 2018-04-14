@@ -10,7 +10,7 @@
 
 #include "ui/windows/windows.h"
 
-#include "assets/mesh_registry.h"
+#include "registries/mesh_registry.h"
 #include "utils/scope_trigger.h"
 #include "utils/string.h"
 
@@ -20,7 +20,7 @@ namespace picasso {
 namespace ui {
 namespace windows {
 
-using ::picasso::assets::MeshRegistry;
+using ::picasso::registries::MeshRegistry;
 using ::picasso::utils::picasso_snprintf;
 using ::picasso::assets::Mesh;
 

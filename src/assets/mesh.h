@@ -45,6 +45,7 @@ class Mesh {
   DEFINE_PTR_TYPES(Mesh);
 
  public:
+  Mesh() = default;
   Mesh(const std::string& name) : name_(name) {}
 
  public:

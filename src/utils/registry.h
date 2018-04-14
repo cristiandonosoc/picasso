@@ -27,7 +27,7 @@ using ::picasso::utils::Key;
 using ::picasso::memory::Arena;
 
 template <typename ParentClass, typename TValueType>
-class Registry : Singleton<Registry<ParentClass, TValueType>> {
+class Registry : Singleton<ParentClass> {
  public:
   using KeyType = Key<size_t>;
   using ValueType = TValueType;
@@ -45,10 +45,10 @@ class Registry : Singleton<Registry<ParentClass, TValueType>> {
   };  // class Registry::Result
 
  public:
-  using Singleton<Registry<ParentClass, TValueType>>::Instance;
+  /* using Singleton<Registry<ParentClass, TValueType>>::Instance; */
+  using Singleton<ParentClass>::Instance;
 
- protected:
-  Registry() {
+ protected: Registry() {
     elements.reserve(ArenaType::ArenaSize);
   }
   DISABLE_COPY(Registry);
