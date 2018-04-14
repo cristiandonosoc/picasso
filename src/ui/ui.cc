@@ -15,7 +15,7 @@
 #include <regex>
 
 #include "ui.h"
-#include "assets/shaders/shader_registry.h"
+#include "registries/shader_registry.h"
 #include "assets/materials/material_registry.h"
 #include "logging/log.h"
 #include "utils/snprintf.h"
@@ -35,7 +35,8 @@
 namespace picasso {
 namespace ui {
 
-using ::picasso::assets::shaders::ShaderRegistry;
+using ::picasso::registries::ShaderRegistry;
+
 using ::picasso::assets::shaders::Shader;
 using ::picasso::assets::shaders::Attribute;
 using ::picasso::assets::shaders::Uniform;

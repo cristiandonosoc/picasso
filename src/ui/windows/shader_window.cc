@@ -14,7 +14,7 @@
 #include "ui/widgets/popup.h"
 #include "ui/widgets/uniform.h"
 #include "utils/scope_trigger.h"
-#include "assets/shaders/shader_registry.h"
+#include "registries/shader_registry.h"
 #include "utils/snprintf.h"
 #include "assets/shaders/uniform.h"
 
@@ -29,6 +29,8 @@ using ::picasso::utils::picasso_snprintf;
 
 using namespace ::picasso::assets::shaders;
 using ::picasso::assets::shaders::Uniform;
+
+using ::picasso::registries::ShaderRegistry;
 
 namespace {
 

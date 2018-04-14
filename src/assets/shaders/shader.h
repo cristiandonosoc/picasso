@@ -24,6 +24,13 @@
 #include "assets/shaders/uniform.h"
 
 namespace picasso {
+
+// Forward declaration
+namespace registries {
+class ShaderRegistry;
+}   // namespace registries
+
+
 namespace assets {
 namespace shaders {
 
@@ -90,7 +97,7 @@ class Shader {
   bool valid_ = false;
 
  public:
-  friend class ShaderRegistry;
+  friend class ::picasso::registries::ShaderRegistry;
 };
 
 }   // namespace shaders

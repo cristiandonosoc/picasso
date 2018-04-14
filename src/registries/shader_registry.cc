@@ -2,18 +2,17 @@
  * @file: shader_registry.cc
  * @author: Cristián Donoso C.
  * @email: cristiandonosoc@gmail.com
- * @date: 2018-03-05
+ * @date: 2018-04-14
  * @license: 2018 Cristián Donoso C. - All Rights Reserved.
  *
  * @description: TODO(Cristian): Add description
  ******************************************************************************/
 
-#include "assets/shaders/shader_registry.h"
+#include "registries/shader_registry.h"
 #include "utils/file.h"
 
 namespace picasso {
-namespace assets {
-namespace shaders {
+namespace registries {
 
 using ::picasso::utils::Status;
 using ::picasso::utils::ReadWholeFile;
@@ -130,6 +129,9 @@ Status ShaderRegistry::LoadShader(Shader *shader,
   return Status::STATUS_OK;
 }
 
-}   // namespace shaders
-}   // namespace assets
+
+
+}   // namespace registries
 }   // namespace picasso
+
+

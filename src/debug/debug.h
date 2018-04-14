@@ -16,7 +16,7 @@
 #include "utils/macros.h"
 #include "utils/glm.h"
 #include "utils/singleton.h"
-#include "assets/shaders/shader_registry.h"
+#include "registries/shader_registry.h"
 
 #include "utils/status.h"
 
@@ -25,7 +25,7 @@ namespace debug {
 
 using ::picasso::utils::Singleton;
 using ::picasso::models::AttributePointer;
-using ::picasso::assets::shaders::ShaderRegistry;
+using ::picasso::registries::ShaderRegistry;
 using ::picasso::utils::Status;
 
 class Debug : public Singleton<Debug> {

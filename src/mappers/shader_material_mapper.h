@@ -12,7 +12,7 @@
 #define SRC_MAPPERS_SHADER_MATERIAL_MAPPER_H
 
 #include "mappers/mapper.h"
-#include "assets/shaders/shader_registry.h"
+#include "registries/shader_registry.h"
 #include "assets/materials/material_registry.h"
 
 #include "logging/log.h"
@@ -20,10 +20,11 @@
 namespace picasso {
 namespace mappers {
 
-using ::picasso::assets::shaders::ShaderRegistry;
 using ::picasso::assets::shaders::Shader;
 using ::picasso::assets::materials::MaterialRegistry;
 using ::picasso::assets::materials::Material;
+
+using ::picasso::registries::ShaderRegistry;
 
 class ShaderMaterialMapper : public Mapper<ShaderMaterialMapper, ShaderRegistry, MaterialRegistry> {
  public:

@@ -2,32 +2,24 @@
  * @file: shader_registry.h
  * @author: Cristián Donoso C.
  * @email: cristiandonosoc@gmail.com
- * @date: 2018-03-25
+ * @date: 2018-04-14
  * @license: 2018 Cristián Donoso C. - All Rights Reserved.
  *
  * @description: TODO(Cristian): Add description
  ******************************************************************************/
 
-#ifndef SRC_ASSETS_SHADERS_SHADER_REGISTRY_H
-#define SRC_ASSETS_SHADERS_SHADER_REGISTRY_H
+#ifndef SRC_REGISTRIES_SHADER_REGISTRY_H
+#define SRC_REGISTRIES_SHADER_REGISTRY_H
 
 #include "assets/shaders/shader.h"
-#include "utils/macros.h"
 #include "utils/status.h"
 #include "utils/registry.h"
 
-#include "memory/arena.h"
-
-#include <map>
-#include <memory>
-#include <string>
-#include <vector>
-
 
 namespace picasso {
-namespace assets {
-namespace shaders {
+namespace registries {
 
+using ::picasso::assets::shaders::Shader;
 using ::picasso::utils::Status;
 using ::picasso::utils::StatusOr;
 using ::picasso::utils::Registry;
@@ -49,8 +41,9 @@ class ShaderRegistry : public Registry<ShaderRegistry, Shader> {
 
 };
 
-}   // namespace shaders
-}   // namespace assets
+
+
+}   // namespace registries
 }   // namespace picasso
 
-#endif  // SRC_ASSETS_SHADERS_SHADER_REGISTRY_H
+#endif  // SRC_REGISTRIES_SHADER_REGISTRY_H
